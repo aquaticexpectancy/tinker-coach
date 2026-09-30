@@ -349,7 +349,11 @@ end
 function TinkerBot:StationValue(st)
 	local v = 0
 	for _, c in ipairs(self.camps or {}) do
-		if c.stuck and (c.n == 0 or c.n >= c.stuck + 3) then c.stuck = nil end   -- cleared, or a new set (a straggler walking back is +1)
+		-- cleared, a new set (a straggler walking back is +1), or 90 s on: leftovers block the spawn, so without
+		-- a timeout a stuck camp stayed dead all game (run 7: A and D stuck by 6:45, 30+ s idle in fountain)
+		if c.stuck and (c.n == 0 or c.n >= c.stuck + 3 or GameRules:GetGameTime() - c.stuck_at > 90) then
+			c.stuck, c.low = nil, 0
+		end
 		if c.st == st and not c.stuck then v = v + c.n end
 	end
 	return v
@@ -357,6 +361,8 @@ end
 
 function TinkerBot:CampReady(st)
 	if st == "B" then return true end
+	-- (tried: counting only camps holding a full set, so 4+ leftovers don't look fresh. Run 9 was the worst
+	-- Jev run, 4,278, and it missed A's 5 leftovers anyway since a set's size is learned from one look.)
 	local v = self:StationValue(st)
 	if v >= 4 then return true end
 	-- low now but the :00 spawn lands before we would: count it as ready (we wait for it there);
@@ -430,6 +436,43 @@ function TinkerBot:CastPos(ab, pos) self:Order({OrderType = DOTA_UNIT_ORDER_CAST
 function TinkerBot:CastTarget(ab, u) self:Order({OrderType = DOTA_UNIT_ORDER_CAST_TARGET, AbilityIndex = ab:entindex(), TargetIndex = u:entindex()}) end
 function TinkerBot:CastNo(ab) self:Order({OrderType = DOTA_UNIT_ORDER_CAST_NO_TARGET, AbilityIndex = ab:entindex()}) end
 function TinkerBot:Attack(u) self:Order({OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET, TargetIndex = u:entindex()}) end
+
+-- the March direction that sweeps the most creep HP: robots walk a strip ~450 either side of the line, ~1500
+-- long (estimate). Replaces the replay facings at camps: A's 325 pointed 77 deg off its only camp and the
+-- 180 turns at A and D aimed at nothing once the camps were matched to real spawners (2026-09-30).
+-- Each creep counts once, a tanky one (ancients, big creeps) a third: scoring by HP aimed the robots at C's
+-- ancients, which they barely scratch (run 5: C +2 and +1 with 10-11 left).
+-- A follow-up March (within 5 s) counts creeps still in the last March's path at 30%: its robots are still
+-- walking there (run 5: every March at C went the same way; Immortals turn 180 onto the other camp).
+function TinkerBot:BestMarchDir(p, targets)
+	local ldmg = CFG.laser_dmg[self:Ab("tinker_laser"):GetLevel()] or 0
+	local function inside(v, d)
+		local along = v.x * d.x + v.y * d.y
+		return along > -100 and along < 1500 and math.abs(v.x * d.y - v.y * d.x) < 450
+	end
+	local prev = self.last_march and GameRules:GetGameTime() - self.last_march < 5 and self.march_dir or nil
+	local w, total = {}, 0
+	for i, u in ipairs(targets) do
+		w[i] = self:IsTanky(u, ldmg) and 0.33 or 1
+		if prev and inside(u:GetAbsOrigin() - p, prev) then w[i] = w[i] * 0.3 end
+		total = total + w[i]
+	end
+	local best, bs = nil, 0
+	for k = 0, 35 do
+		local d = yawdir(k * 10)
+		local s = 0
+		for i, u in ipairs(targets) do if inside(u:GetAbsOrigin() - p, d) then s = s + w[i] end end
+		if s > bs then best, bs = d, s end
+	end
+	return best, total > 0 and bs / total or 0
+end
+
+-- where the Marches are aimed at the creeps instead of the replay facing: aiming won at C (5.5 kills a trip vs
+-- 3.2-5.0) and held at D, but lost at A (1.5-2.0 vs ~4.4 with the Immortal facing) in runs on 2026-09-30
+function TinkerBot:Aims(st)
+	local s = CFG.aim_stations or {C = true, D = true, E = true}
+	return s[st] == true
+end
 
 function TinkerBot:MarchDir(dir, why)
 	local p = self.hero:GetAbsOrigin()
@@ -892,7 +935,7 @@ function TinkerBot:Book(prev)
 			-- (one bad trip isn't enough: C went +1 then +5 in the same run)
 			c.low = prev.station ~= "B" and prev.lh <= 1 and c.n > 0 and (c.low or 0) + 1 or 0
 			if c.low >= 2 and not c.stuck then
-				c.stuck = c.n
+				c.stuck, c.stuck_at = c.n, GameRules:GetGameTime()
 				self:Log("camp_stuck", {station = c.st, creeps = c.n})
 			end
 		end
@@ -1000,14 +1043,18 @@ function TinkerBot:StationDecision(t)
 	local options = {}
 	local in_f = self:InFountain()
 	local here = (not in_f) and self.trip and self.trip.station or nil
+	local cleanup = {}
 	for _, s in ipairs({"A", "C", "D", "E"}) do
 		-- from the field, only stations the mana on hand can clear (from fountain the refill covers it)
 		local affordable = in_f or h:GetMana() + self:BottleCharges() * 60 >= self:PlanNeed(s)
-		if s ~= here and (self:CampReady(s) or self:CleanupReady(s)) and affordable
-				and (s ~= "C" or self:Ab("tinker_march_of_the_machines"):GetLevel() >= 4) then
-			table.insert(options, s)
+		if s ~= here and affordable and (s ~= "C" or self:Ab("tinker_march_of_the_machines"):GetLevel() >= 4) then
+			if self:CampReady(s) then table.insert(options, s)
+			elseif self:CleanupReady(s) then table.insert(cleanup, s) end
 		end
 	end
+	-- leftover-only camps only when no full one is up, like the rules (run 7: Jev took A's 3 leftovers over
+	-- D's 8 fresh creeps twice, 0 kills each)
+	if #options == 0 then options = cleanup end
 	if wave and here ~= "B" and (in_f or h:GetMana() + self:BottleCharges() * 60 >= self:PlanNeed("B")) then table.insert(options, "B") end
 	table.insert(options, "F")
 	if wave and wave.threat then options = {"B"} end                    -- a wave at your tower is always taken
@@ -1017,7 +1064,8 @@ function TinkerBot:StationDecision(t)
 	if not in_fountain then self:SetPhase("deciding") end
 	self:Decide("station", facts, options, rules, function(pick, src)
 		if CFG.station_by_rules and pick ~= rules then src = "rules (jev shadow: " .. pick .. ")"; pick = rules end
-		self:Log("decision", {what = "station", pick = pick, rules = rules, src = src, options = options})
+		self:Log("decision", {what = "station", pick = pick, rules = rules, src = src, options = options,
+			wave = wave and wave.n or 0, wave_threat = wave and wave.threat or nil})
 		if in_fountain then
 			self.next_station = pick
 		elseif pick == "F" then
@@ -1165,7 +1213,7 @@ function TinkerBot:Trip(t, now)
 			if not march:IsCooldownReady() then                                   -- the queued March went off
 				self.march_dir = tr.queued_dir
 				self.last_march = now
-				self:Log("cast", {ability = "march", why = "turned 180 (queued behind Rearm)"})
+				self:Log("cast", {ability = "march", why = (self:Aims(tr.station) and "aimed" or "turned 180") .. " (queued behind Rearm)"})
 				tr.queued_dir = nil
 				tr.marches = tr.marches + 1
 				return nxt()
@@ -1216,8 +1264,13 @@ function TinkerBot:Trip(t, now)
 		else
 			dir = (self.march_dir or yawdir(S.face)) * -1                    -- turned 180 (Immortals: 139 of 304)
 		end
+		local why = tr.marches == 0 and "first March, Immortal facing" or "turned 180"
+		if self:Aims(tr.station) then
+			local d, share = self:BestMarchDir(p, targets)
+			if d then dir, why = d, string.format("aimed: %d%% of the creeps in its path", math.floor(share * 100)) end
+		end
 		tr.issued = now
-		return self:MarchDir(dir, tr.marches == 0 and "first March, Immortal facing" or "turned 180")
+		return self:MarchDir(dir, why)
 	end
 	if tok == "b" then
 		self:UseBottle("while the robots work")
@@ -1272,6 +1325,7 @@ function TinkerBot:Trip(t, now)
 		for j = tr.i + 1, #tr.plan do if tr.plan[j] == "M" then nextM = true break elseif tr.plan[j] ~= "b" then break end end
 		if nextM and tr.station ~= "B" and self.march_dir then
 			local d = self.march_dir * -1
+			if self:Aims(tr.station) then d = self:BestMarchDir(h:GetAbsOrigin(), targets) or d end
 			self:Order({OrderType = DOTA_UNIT_ORDER_CAST_POSITION, AbilityIndex = march:entindex(),
 				Position = h:GetAbsOrigin() + d * 250, Queue = 1})
 			tr.queued_dir = d
@@ -1341,6 +1395,7 @@ function TinkerBot:Trip(t, now)
 		local dir = aim and (aim - p) or (self.march_dir or yawdir(S.face or 0))
 		dir.z = 0
 		if dir:Length2D() < 1 then dir = yawdir(S.face or 0) end
+		if #targets > 0 and self:Aims(tr.station) then dir = self:BestMarchDir(p, targets) or dir end
 		tr.issued = now
 		return self:MarchDir(dir:Normalized(), "one extra March, then leave")
 	end
