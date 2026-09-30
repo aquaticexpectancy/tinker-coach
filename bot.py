@@ -144,6 +144,15 @@ def install(advisor: str, speed: float, end_at: int, lane_speed: float = 1.0, dr
 
 
 # ---------------------------------------------------------------------- Jev questions
+# Jev's station guidance for the bot: the coach's Immortal lines, but the bot's own numbers on waves. Batch
+# 2026-09-30 (20 runs): Jev took 0-2 wave trips a game vs the rules' 3-6, and more wave trips went with more
+# net worth (r = 0.49); a wave of 4-7 creeps paid 3 kills in ~9 s, about what a camp trip pays per second.
+BOT_GUIDANCE = [g for g in jev_advisor.GUIDANCE if not g.startswith("The mid wave is worth it")] + [
+    "For this bot (20 test games): a mid-wave trip with 4+ creeps pays about 3 kills in ~9 s and a camp trip "
+    "about 4 kills in 11-15 s, so per second a wave is as good as a camp. After a camp trip, take a visible mid "
+    "wave of 4+ creeps; never two waves in a row.",
+]
+
 FINISH_TEXT = {
     "keen_now": "Leave now: the robots keep hitting during the 3 s Keen channel and their kills still count",
     "laser": "Laser a creep: one it kills (`laser.creeps_it_kills`), else the tankiest one (`tanky_creeps`), which "
@@ -282,7 +291,7 @@ class Bridge:
             return rules, "rules", None
         from typesafe_sdk import Choice, Noul
         if kind == "station":
-            state = dict(state, guidance=jev_advisor.GUIDANCE)
+            state = dict(state, guidance=BOT_GUIDANCE)
             q = {"pick": Choice(
                     instructions="Tinker is farming the jungle in Dota 2, Keen Teleporting to a spot, clearing it with "
                                  "March of the Machines and Rearm, and going back to fountain for mana. Using `tinker`, "
@@ -414,7 +423,7 @@ def main():
                     help="skip the lane: start at 5:00 in fountain from your saved F11 drill state "
                          f"(default: your best F11 run, session {DRILL_DEFAULT})")
     ap.add_argument("--no-video", action="store_true", help="don't film the screen (the .jsonl log is always written)")
-    ap.add_argument("--aim", choices=["on", "off"], default="on",
+    ap.add_argument("--aim", choices=["on", "off"], default="off",
                     help="on: Marches at C/D/E aim at the creeps; off: the Immortal replay facing everywhere")
     a = ap.parse_args()
     if subprocess.run([sys.executable, str(HERE / "lua_check.py")]).returncode != 0:
