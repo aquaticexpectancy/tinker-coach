@@ -48,7 +48,26 @@ def main(path=None):
     print("  errors:", errs.most_common(3) or "none", "| other:", dict(other) or "none")
     buys = [(round(r["clock"]), r["item"].replace("item_", "")) for r in rows if r["kind"] == "buy"]
     print("  buys:", buys)
+    camp_check(rows)
+
+
+def camp_check(rows):
+    """Camps seen again after a :00 spawn: did the leftovers block it (Poke) or did a new set stack on top (7.41 notes)?"""
+    seen = [r for r in rows if r["kind"] == "camp_seen" and r.get("last_seen") is not None and (r.get("spawns") or 0) >= 1]
+    if not seen:
+        print("  camp check: no camps seen again after a :00 spawn yet")
+        return
+    err = sum(abs(r["expected"] - r["actual"]) for r in seen) / len(seen)
+    print(f"  camp check ({len(seen)} re-sightings): bot's guess off by {err:.1f} creeps per camp on average")
+    for label, grp in (("left empty", [r for r in seen if r["last_seen"] == 0]),
+                       ("left with creeps", [r for r in seen if r["last_seen"] > 0])):
+        if grp:
+            gain = sum((r["actual"] - r["last_seen"]) / r["spawns"] for r in grp) / len(grp)
+            print(f"    {label:16s} {len(grp):3d}x: {gain:+.1f} creeps per :00 spawn  (about +4 = a new set spawned, about 0 = blocked)")
 
 
 if __name__ == "__main__":
-    main(sys.argv[1] if len(sys.argv) > 1 else None)
+    if sys.argv[1:] == ["--camps"]:     # camp check over every run so far
+        camp_check([json.loads(l) for f in glob.glob(os.path.join(HERE, "bot_runs", "*.jsonl")) for l in open(f, encoding="utf-8")])
+    else:
+        main(sys.argv[1] if len(sys.argv) > 1 else None)

@@ -35,8 +35,8 @@ GUIDANCE = [
     "D (top-side) joins from ~7:30, E (far bottom) later.",
     "The mid wave is worth it when it is pushing past your tier-1 tower, or when every ready camp is more than ~15 s "
     "from respawning; never two waves in a row.",
-    "Camps get a new set of creeps every full minute (:00), even when leftovers are still there (patch 7.41), so "
-    "leftovers stack up; Immortals leave about a third of a camp alive and move on.",
+    "A camp only gets a new set of creeps at the full minute (:00) if it is empty: leftovers block the spawn and never "
+    "stack up on their own (bot runs 2026-09-30), so a camp left with creeps stays at those few creeps until cleared.",
     "Fountain stops are ~7.5 s (Bottle, Rearm, Bottle, Keen); come home with about 200 mana, not empty.",
     "Ancients (C) need March level 4 and ~600+ mana to clear in one visit.",
 ]

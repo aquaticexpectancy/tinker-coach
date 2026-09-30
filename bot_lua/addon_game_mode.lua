@@ -294,31 +294,64 @@ end
 function TinkerBot:UpdateCamps(now)
 	if not self.camps then
 		self.camps = {}
+		-- the replay camp spots are where the Marches landed, not always where a camp is: pair each with a neutral
+		-- spawner, closest pairs first, and drop spots with none (bot runs 2026-09-30: A's 2nd and D's 3rd spot have
+		-- no camp of their own and read 0 creeps every time)
+		local spawners, spots, pairs_ = Entities:FindAllByClassname("npc_dota_neutral_spawner"), {}, {}
 		for st, S in pairs(CFG.stations) do
-			for _, c in ipairs(S.camps) do table.insert(self.camps, {st = st, pos = vec(c), n = 4, seen = -1}) end
+			for _, c in ipairs(S.camps) do
+				local spot = {st = st, xy = c}
+				table.insert(spots, spot)
+				for _, sp in ipairs(spawners) do
+					local d = dist2(vec(c), sp:GetAbsOrigin())
+					if d < 900 then table.insert(pairs_, {spot = spot, sp = sp, d = d}) end
+				end
+			end
+		end
+		table.sort(pairs_, function(a, b) return a.d < b.d end)
+		local used = {}
+		for _, pr in ipairs(pairs_) do
+			if not pr.spot.sp and not used[pr.sp] then pr.spot.sp, pr.spot.d, used[pr.sp] = pr.sp, pr.d, true end
+		end
+		for _, spot in ipairs(spots) do
+			local pos = spot.sp and spot.sp:GetAbsOrigin() or vec(spot.xy)
+			local keep = spot.sp ~= nil or #spawners == 0             -- no spawners found at all: keep the old spots
+			self:Log("camp_spot", {station = spot.st, x = spot.xy[1], y = spot.xy[2], moved = spot.d and math.floor(spot.d),
+				to_x = math.floor(pos.x), to_y = math.floor(pos.y), dropped = not keep or nil, spawners = #spawners})
+			if keep then table.insert(self.camps, {st = spot.st, pos = pos, n = 4, seen = -1}) end
 		end
 		self.camp_minute = self:Minute()
 	end
 	local m = self:Minute()
 	if m ~= self.camp_minute then
-		-- 7.41: a camp spawns a new set at :00 even when leftovers are still in it (they stack)
-		for _, c in ipairs(self.camps) do c.n = math.min(c.n + 4, 16) end
+		-- leftovers block a camp's :00 spawn, so only an empty camp gets a new set
+		-- (bot run 2026-09-30: camps left with creeps grew +0.7 per :00, not +4)
+		for _, c in ipairs(self.camps) do if c.n == 0 then c.n = c.full or 4 end end
 		self.camp_minute = m
 	end
 	if now < (self.next_camp_scan or 0) then return end
 	self.next_camp_scan = now + 0.4
 	local p = self.hero:GetAbsOrigin()
-	for _, c in ipairs(self.camps) do
+	for i, c in ipairs(self.camps) do
 		if dist2(p, c.pos) < 1100 then
-			c.n = #self:Units(c.pos, 650, true)
-			c.seen = now
+			local n = #self:Units(c.pos, 650, true)
+			if now - c.seen > 5 then
+				-- first look in a while: the guess vs what's really there, and whether leftovers blocked the :00 spawn
+				self:Log("camp_seen", {station = c.st, camp = i, expected = c.n, actual = n, last_seen = c.seen_n,
+					spawns = c.seen_minute and m - c.seen_minute, unseen_s = c.seen >= 0 and math.floor(now - c.seen) or nil})
+			end
+			c.n, c.seen, c.seen_n, c.seen_minute = n, now, n, m
+			if not c.full and n > 0 then c.full = n end         -- first sight with creeps = one set (4-6 by camp)
 		end
 	end
 end
 
 function TinkerBot:StationValue(st)
 	local v = 0
-	for _, c in ipairs(self.camps or {}) do if c.st == st then v = v + c.n end end
+	for _, c in ipairs(self.camps or {}) do
+		if c.stuck and (c.n == 0 or c.n >= c.stuck + 3) then c.stuck = nil end   -- cleared, or a new set (a straggler walking back is +1)
+		if c.st == st and not c.stuck then v = v + c.n end
+	end
 	return v
 end
 
@@ -326,8 +359,20 @@ function TinkerBot:CampReady(st)
 	if st == "B" then return true end
 	local v = self:StationValue(st)
 	if v >= 4 then return true end
-	-- low now but the :00 spawn lands before we would: count it as ready (we wait for it there)
-	return 60 - self:Clock() % 60 <= 6
+	-- low now but the :00 spawn lands before we would: count it as ready (we wait for it there);
+	-- only camps that are empty get that spawn, leftovers block it
+	if 60 - self:Clock() % 60 > 6 then return false end
+	for _, c in ipairs(self.camps or {}) do if c.st == st and c.n == 0 then v = v + (c.full or 4) end end
+	return v >= 4
+end
+
+-- a station holding only leftovers: they block its :00 spawn, so it stays this low until someone clears it;
+-- worth a trip when nothing full is up (bot run 2026-09-30: A sat at 2 creeps from 5:17 to 10:00, and a 44 s
+-- fountain wait with every camp blocked)
+function TinkerBot:CleanupReady(st)
+	if st == "B" then return false end
+	local v = self:StationValue(st)
+	return v >= 1 and not self:CampReady(st)
 end
 
 function TinkerBot:CampReadyOld(st)
@@ -341,7 +386,7 @@ end
 function TinkerBot:StationCreeps(st)
 	-- living neutrals at the station's camps (used after leaving, to book the camp as cleared or not)
 	local n = 0
-	for _, c in ipairs(CFG.stations[st].camps) do n = n + #self:Units(vec(c), 700, true) end
+	for _, c in ipairs(self.camps or {}) do if c.st == st then n = n + #self:Units(c.pos, 700, true) end end
 	return n
 end
 
@@ -839,7 +884,18 @@ function TinkerBot:Book(prev)
 	prev.lh = PlayerResource:GetLastHits(self.pid) - prev.lh0
 	local left = prev.station ~= "B" and self:StationCreeps(prev.station) or 0
 	for _, c in ipairs(self.camps or {}) do
-		if c.st == prev.station then c.n = #self:Units(c.pos, 650, true); c.seen = GameRules:GetGameTime() end
+		if c.st == prev.station then
+			c.n = #self:Units(c.pos, 650, true)
+			c.seen, c.seen_n, c.seen_minute = GameRules:GetGameTime(), c.n, self:Minute()
+			-- two trips in a row with 0-1 kills and creeps still there: the plan's Marches don't reach them (bot run
+			-- 2026-09-30: D's SW camp kept 6 creeps / 3,400 HP through four trips). Stop counting them.
+			-- (one bad trip isn't enough: C went +1 then +5 in the same run)
+			c.low = prev.station ~= "B" and prev.lh <= 1 and c.n > 0 and (c.low or 0) + 1 or 0
+			if c.low >= 2 and not c.stuck then
+				c.stuck = c.n
+				self:Log("camp_stuck", {station = c.st, creeps = c.n})
+			end
+		end
 	end
 	if prev.station ~= "B" and left == 0 then
 		self.last_cleared[prev.station] = math.max(self.last_cleared[prev.station] or -1, prev.stop_minute)
@@ -855,7 +911,9 @@ end
 function TinkerBot:Fountain(t, now)
 	local h = self.hero
 	local keen, rearm = self:Ab("tinker_keen_teleport"), self:Ab("tinker_rearm")
-	if not self.asked_station then
+	-- ask once the camps we just left are recounted (3.5 s after landing): asking on landing saw the creeps the
+	-- robots were still killing, and 72 of 72 same-minute repeat trips went camp -> fountain -> same camp
+	if not self.asked_station and #self.bookings == 0 then
 		self.asked_station = true
 		self:StationDecision(t)                   -- in the background: Jev answers while we Bottle and Rearm
 	end
@@ -891,7 +949,8 @@ function TinkerBot:StationFacts(t, mana_now)
 	local wave = self:MidWave()
 	local camps, recent = {}, {}
 	for _, st in ipairs({"A", "C", "D", "E"}) do
-		camps[st] = {ready = self:CampReady(st), expected_creeps = self:StationValue(st)}
+		camps[st] = {ready = self:CampReady(st), expected_creeps = self:StationValue(st),
+			only_leftovers_blocking_the_spawn = self:CleanupReady(st)}
 	end
 	for i = math.max(1, #self.trips - 3), #self.trips do
 		local tr = self.trips[i]
@@ -925,7 +984,12 @@ function TinkerBot:StationRules(t, wave, mana)
 	if self:CampReady("D") then return "D" end
 	if t >= 510 and self:CampReady("E") then return "E" end
 	if wave and wave.n >= CFG.wave_min_creeps then return "B" end
-	return "F"
+	-- nothing full: clear the camp with the most leftovers so its next :00 spawn can land
+	local best, bv = nil, 0
+	for _, st in ipairs({"A", "C", "D"}) do
+		if self:CleanupReady(st) and (st ~= "C" or march >= 4) and self:StationValue(st) > bv then best, bv = st, self:StationValue(st) end
+	end
+	return best or "F"
 end
 
 function TinkerBot:StationDecision(t)
@@ -939,7 +1003,8 @@ function TinkerBot:StationDecision(t)
 	for _, s in ipairs({"A", "C", "D", "E"}) do
 		-- from the field, only stations the mana on hand can clear (from fountain the refill covers it)
 		local affordable = in_f or h:GetMana() + self:BottleCharges() * 60 >= self:PlanNeed(s)
-		if s ~= here and self:CampReady(s) and affordable and (s ~= "C" or self:Ab("tinker_march_of_the_machines"):GetLevel() >= 4) then
+		if s ~= here and (self:CampReady(s) or self:CleanupReady(s)) and affordable
+				and (s ~= "C" or self:Ab("tinker_march_of_the_machines"):GetLevel() >= 4) then
 			table.insert(options, s)
 		end
 	end
@@ -1335,6 +1400,18 @@ function TinkerBot:FinishDecision(t, now, targets)
 			table.insert(tr.plan, "L")                                      -- the fattest ancient, while the robots work
 			return
 		end
+		-- a few creeps left block the camp's next :00 spawn (bot runs 2026-09-30), so a small remainder is worth
+		-- a few seconds of right-clicks next to the robots; a big one isn't (Keen out, a cleanup trip gets it later)
+		if tr.station ~= "B" and #targets >= 1 and #targets <= 3 and (tr.finish or 0) < 2 then
+			local hp = 0
+			for _, u in ipairs(targets) do hp = hp + u:GetHealth() end
+			if hp <= (CFG.finish_hp or 700) then
+				tr.finish = (tr.finish or 0) + 1
+				self:Log("finish", {left = #targets, hp = hp, round = tr.finish})
+				table.insert(tr.plan, "A")                                  -- up to 3 s, then this decision again
+				return
+			end
+		end
 		table.insert(tr.plan, "K")
 		return
 	end
@@ -1412,7 +1489,9 @@ function TinkerBot:LeaveDecision(t, now)
 			self:Log("decision", {what = "station", pick = "F", rules = "F", src = "mana_check", was = pf.pick})
 			return self:SetPhase("go_home")                                       -- Lasers since then spent the mana
 		end
-		if pf.pick == "F" or not self:CampReady(pf.pick) and pf.pick ~= "B" then return self:SetPhase("go_home") end
+		if pf.pick == "F" or not (self:CampReady(pf.pick) or self:CleanupReady(pf.pick)) and pf.pick ~= "B" then
+			return self:SetPhase("go_home")
+		end
 		self.go_to = pf.pick
 		return self:SetPhase("go_station")
 	end
