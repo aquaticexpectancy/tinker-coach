@@ -1,0 +1,24 @@
+# secrets
+stratz_key.txt
+typesafe_key.txt
+*.key
+# personal game data and recordings
+sessions/
+bot_runs/
+voice/
+runs.csv
+scoresheet.csv
+stats.html
+settings.json
+jev_log.jsonl
+manual_drill.flag
+# extracted from Dota's game files (python coach.py --install rebuilds them)
+icons/
+map_simple.png
+map_detailed.png
+# build/cache
+__pycache__/
+*.pyc
+research/out/
+research/lib/
+research/data/

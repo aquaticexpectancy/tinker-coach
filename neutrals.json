@@ -1,0 +1,194 @@
+{
+"npc_dota_neutral_kobold": {
+"hp": 240,
+"mr": 0.0
+},
+"npc_dota_neutral_kobold_tunneler": {
+"hp": 325,
+"mr": 0.0
+},
+"npc_dota_neutral_kobold_taskmaster": {
+"hp": 400,
+"mr": 0.0
+},
+"npc_dota_neutral_centaur_outrunner": {
+"hp": 350,
+"mr": 0.0
+},
+"npc_dota_neutral_centaur_khan": {
+"hp": 1100,
+"mr": 0.0
+},
+"npc_dota_neutral_fel_beast": {
+"hp": 400,
+"mr": 0.0
+},
+"npc_dota_neutral_polar_furbolg_champion": {
+"hp": 700,
+"mr": 0.0
+},
+"npc_dota_neutral_polar_furbolg_ursa_warrior": {
+"hp": 950,
+"mr": 0.0
+},
+"npc_dota_neutral_warpine_raider": {
+"hp": 850,
+"mr": 30.0
+},
+"npc_dota_neutral_mud_golem": {
+"hp": 750,
+"mr": 30.0
+},
+"npc_dota_neutral_mud_golem_split": {
+"hp": 250,
+"mr": 33.0
+},
+"npc_dota_neutral_mud_golem_split_doom": {
+"hp": 250,
+"mr": 33.0
+},
+"npc_dota_neutral_ogre_mauler": {
+"hp": 800,
+"mr": 0.0
+},
+"npc_dota_neutral_ogre_magi": {
+"hp": 600,
+"mr": 0.0
+},
+"npc_dota_neutral_giant_wolf": {
+"hp": 500,
+"mr": 0.0
+},
+"npc_dota_neutral_alpha_wolf": {
+"hp": 600,
+"mr": 0.0
+},
+"npc_dota_neutral_wildkin": {
+"hp": 350,
+"mr": 0.0
+},
+"npc_dota_neutral_enraged_wildkin": {
+"hp": 950,
+"mr": 0.0
+},
+"npc_dota_neutral_satyr_soulstealer": {
+"hp": 600,
+"mr": 0.0
+},
+"npc_dota_neutral_satyr_hellcaller": {
+"hp": 1100,
+"mr": 0.0
+},
+"npc_dota_neutral_jungle_stalker": {
+"hp": 1600,
+"mr": 50.0
+},
+"npc_dota_neutral_elder_jungle_stalker": {
+"hp": 2000,
+"mr": 50.0
+},
+"npc_dota_neutral_prowler_acolyte": {
+"hp": 750,
+"mr": 0.0
+},
+"npc_dota_neutral_prowler_shaman": {
+"hp": 1400,
+"mr": 0.0
+},
+"npc_dota_neutral_rock_golem": {
+"hp": 800,
+"mr": 30.0
+},
+"npc_dota_neutral_granite_golem": {
+"hp": 1500,
+"mr": 30.0
+},
+"npc_dota_neutral_ice_shaman": {
+"hp": 1500,
+"mr": 30.0
+},
+"npc_dota_neutral_frostbitten_golem": {
+"hp": 900,
+"mr": 30.0
+},
+"npc_dota_neutral_big_thunder_lizard": {
+"hp": 1700,
+"mr": 30.0
+},
+"npc_dota_neutral_small_thunder_lizard": {
+"hp": 800,
+"mr": 50.0
+},
+"npc_dota_neutral_gnoll_assassin": {
+"hp": 400,
+"mr": 0.0
+},
+"npc_dota_neutral_ghost": {
+"hp": 500,
+"mr": 0.0
+},
+"npc_dota_neutral_dark_troll": {
+"hp": 500,
+"mr": 0.0
+},
+"npc_dota_neutral_dark_troll_warlord": {
+"hp": 1100,
+"mr": 0.0
+},
+"npc_dota_neutral_satyr_trickster": {
+"hp": 300,
+"mr": 0.0
+},
+"npc_dota_neutral_forest_troll_berserker": {
+"hp": 500,
+"mr": 0.0
+},
+"npc_dota_neutral_forest_troll_high_priest": {
+"hp": 450,
+"mr": 0.0
+},
+"npc_dota_neutral_harpy_scout": {
+"hp": 400,
+"mr": 0.0
+},
+"npc_dota_neutral_harpy_storm": {
+"hp": 500,
+"mr": 0.0
+},
+"npc_dota_neutral_black_drake": {
+"hp": 950,
+"mr": 25.0
+},
+"npc_dota_neutral_black_dragon": {
+"hp": 2000,
+"mr": 30.0
+},
+"npc_dota_neutral_tadpole": {
+"hp": 400,
+"mr": 0.0
+},
+"npc_dota_neutral_froglet": {
+"hp": 700,
+"mr": 0.0
+},
+"npc_dota_neutral_grown_frog": {
+"hp": 900,
+"mr": 0.0
+},
+"npc_dota_neutral_ancient_frog": {
+"hp": 1250,
+"mr": 30.0
+},
+"npc_dota_neutral_froglet_mage": {
+"hp": 700,
+"mr": 0.0
+},
+"npc_dota_neutral_grown_frog_mage": {
+"hp": 900,
+"mr": 0.0
+},
+"npc_dota_neutral_ancient_frog_mage": {
+"hp": 1250,
+"mr": 30.0
+}
+}
