@@ -105,7 +105,7 @@ def drill_state(session: str) -> dict:
 
 
 def install(advisor: str, speed: float, end_at: int, lane_speed: float = 1.0, drill: dict | None = None,
-            route: str = "rules", manual: bool = False) -> pathlib.Path:
+            route: str = "rules", manual: bool = False, aim: bool = True) -> pathlib.Path:
     vs = GAME_DIR / "scripts" / "vscripts"
     vs.mkdir(parents=True, exist_ok=True)
     CONTENT_DIR.mkdir(parents=True, exist_ok=True)      # the tools only list addons that have a content folder
@@ -122,6 +122,8 @@ def install(advisor: str, speed: float, end_at: int, lane_speed: float = 1.0, dr
         # fitted on 1,098 Immortal camp trips (148 games): camp HP still standing ~6 s after the 1st March
         "more_march_hp": {"A": {2: 5500, 3: 6500}, "D": {2: 6300, 3: 8900}, "C": {2: 1100, 3: 7500}, "E": {2: 5500, 3: 8900}},
         "leave_at_once": True, "stack": False,        # stacking: off until it has a stricter rule (tested: -400)
+        # stations whose Marches aim at the creeps instead of the replay facing (off: the facing everywhere)
+        "aim_stations": {"C": True, "D": True, "E": True} if aim else {},
         "skill_order": {i + 1: s for i, s in enumerate(SKILLS) if s},
         "buy": buy_list(),
     }
@@ -412,6 +414,8 @@ def main():
                     help="skip the lane: start at 5:00 in fountain from your saved F11 drill state "
                          f"(default: your best F11 run, session {DRILL_DEFAULT})")
     ap.add_argument("--no-video", action="store_true", help="don't film the screen (the .jsonl log is always written)")
+    ap.add_argument("--aim", choices=["on", "off"], default="on",
+                    help="on: Marches at C/D/E aim at the creeps; off: the Immortal replay facing everywhere")
     a = ap.parse_args()
     if subprocess.run([sys.executable, str(HERE / "lua_check.py")]).returncode != 0:
         sys.exit("bot script check failed: not launching")
@@ -424,7 +428,8 @@ def main():
         (HERE / "manual_drill.flag").write_text("1")          # the coach logs this run as yours
     else:
         (HERE / "manual_drill.flag").unlink(missing_ok=True)
-    print("Addon written to", install(a.advisor, a.speed, a.end, a.lane_speed or a.speed, drill, a.route, manual=a.manual))
+    print("Addon written to", install(a.advisor, a.speed, a.end, a.lane_speed or a.speed, drill, a.route, manual=a.manual,
+                                      aim=a.aim == "on"))
     print("Route decided by:", a.route)
     bot_hud.COMPARE_SESSION = a.drill
     bridge = Bridge(a.advisor)
