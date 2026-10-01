@@ -432,9 +432,9 @@ def main():
     ap.add_argument("--no-video", action="store_true", help="don't film the screen (the .jsonl log is always written)")
     ap.add_argument("--aim", choices=["on", "off", "d"], default="off",
                     help="on: Marches at C/D/E aim at the creeps; d: at D only; off: the Immortal replay facing")
-    ap.add_argument("--marches", choices=["immortal", "mana"], default="immortal",
+    ap.add_argument("--marches", choices=["immortal", "mana"], default="mana",
                     help="immortal: stop at the Immortal HP thresholds; mana: March on while the mana covers it")
-    ap.add_argument("--router", choices=["rules", "rate"], default="rules",
+    ap.add_argument("--router", choices=["rules", "rate"], default="rate",
                     help="rules: the Immortal routing rules; rate: the best measured gold per second")
     ap.add_argument("--ready", choices=["fresh", "old"], default="fresh",
                     help="fresh: leftovers from the last trip don't make a camp ready; old: every creep counts")

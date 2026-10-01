@@ -25,12 +25,15 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 RUNS = os.path.join(HERE, "bot_runs")
 SETUPS = {                                  # name: bot.py arguments
-    "rules_facing": ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "old"],
-    "rules_aim":    ["--advisor", "rules", "--route", "rules", "--aim", "on"],
+    "rules_facing": ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "old", "--router", "rules",
+                     "--marches", "immortal"],
+    "rules_aim":    ["--advisor", "rules", "--route", "rules", "--aim", "on", "--router", "rules", "--marches", "immortal"],
     "jev_facing":   ["--advisor", "jev", "--route", "jev", "--aim", "off"],
     "jev_aim":      ["--advisor", "jev", "--route", "jev", "--aim", "on"],
-    "rules_mana":   ["--advisor", "rules", "--route", "rules", "--aim", "off", "--marches", "mana", "--ready", "old"],
-    "rules_fresh":  ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh"],
+    "rules_mana":   ["--advisor", "rules", "--route", "rules", "--aim", "off", "--marches", "mana", "--ready", "old",
+                     "--router", "rules"],
+    "rules_fresh":  ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rules",
+                     "--marches", "immortal"],
     "rate":         ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rate"],
     "rate_mana":    ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rate",
                      "--marches", "mana"],
