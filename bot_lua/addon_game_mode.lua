@@ -338,6 +338,7 @@ function TinkerBot:UpdateCamps(now)
 			if now - c.seen > 5 then
 				-- first look in a while: the guess vs what's really there, and whether leftovers blocked the :00 spawn
 				self:Log("camp_seen", {station = c.st, camp = i, expected = c.n, actual = n, last_seen = c.seen_n,
+					gold = self:CampGold(c.pos),
 					spawns = c.seen_minute and m - c.seen_minute, unseen_s = c.seen >= 0 and math.floor(now - c.seen) or nil})
 			end
 			c.n, c.seen, c.seen_n, c.seen_minute = n, now, n, m
@@ -345,6 +346,16 @@ function TinkerBot:UpdateCamps(now)
 			if c.left and n < c.left then c.left = n end         -- some of the leftovers died
 		end
 	end
+end
+
+-- gold standing in a camp: the average bounty of its creeps (logged to price camps by gold, not count)
+function TinkerBot:CampGold(pos)
+	local g = 0
+	for _, u in ipairs(self:Units(pos, 650, true)) do
+		local ok, b = pcall(function() return (u:GetMinimumGoldBounty() + u:GetMaximumGoldBounty()) / 2 end)
+		g = g + (ok and b or 35)
+	end
+	return math.floor(g)
 end
 
 function TinkerBot:StationValue(st)
@@ -1115,7 +1126,9 @@ function TinkerBot:RateRoute(t, wave, here, in_f)
 	for _, s in ipairs({"A", "C", "D", "E", "B"}) do
 		local ok = s ~= here and (in_f or h:GetMana() + self:BottleCharges() * 60 >= self:PlanNeed(s))
 		if s == "C" and march < 4 then ok = false end
-		if s == "B" and (not wave or last == "B") then ok = false end           -- never two waves in a row
+		-- two waves in a row only for a fresh wave of 4+: the mid wave pays the most (7.1 gold/s, 42.8 a kill vs
+		-- 20.7-31.2 at camps, 1,169 bot trips); the Immortal "never two in a row" kept the bot on cheap A/D kills
+		if s == "B" and (not wave or last == "B" and wave.n < 4) then ok = false end
 		if ok then
 			local r = self:StationRate(s, t, arrive, wave)
 			rates[s] = math.floor(r * 10 + 0.5) / 10
