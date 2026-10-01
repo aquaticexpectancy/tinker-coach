@@ -1048,6 +1048,71 @@ function TinkerBot:StationRules(t, wave, mana)
 	return best or "F"
 end
 
+-- ------------------------------------------------------------------ gold-per-second router
+-- farm gold per trip (net of passive gold) = a + b * creeps on landing, and seconds from the Keen out to the next
+-- Keen out (incl. the fountain stop): fitted on 1,169 bot trips, 2026-09-30/10-01. The mid wave pays 6.5-7.6 gold
+-- a second, a full A or C ~7-7.6, D only 4-5 (its March facing reaches one of its two camps), C with 4 creeps 3.7.
+local TRIP_GOLD = {A = {32, 18.0, 19.9}, C = {41, 11.8, 24.0}, D = {56, 3.0, 17.8}, E = {0, 17.0, 24.2}}
+-- creeps per camp on the bot's first look (camp_seen, 2026-09-30/10-01): E held 8-9, not the default 4, so an
+-- unvisited E looked worth 2.8 gold/s instead of ~6 (router test 10-01: E first picked at 9:00)
+local UNSEEN_SET = {A = 5, C = 6, D = 6, E = 9}
+
+-- creeps worth Marching when Tinker lands: fresh ones in full, leftovers (what a trip couldn't kill) at 30%,
+-- plus a set in each empty camp if the :00 spawn lands first
+function TinkerBot:LandingCreeps(st, t, arrive)
+	self:StationValue(st)                                                  -- expires stale 'stuck' marks
+	local spawn = 60 - t % 60 <= arrive
+	local n = 0
+	for _, c in ipairs(self.camps or {}) do
+		if c.st == st and not c.stuck then
+			if c.seen < 0 then
+				n = n + (UNSEEN_SET[st] or 4)                                  -- never seen: a typical first look
+			else
+				local left = math.min(c.n, c.left or 0)
+				n = n + (c.n - left) + 0.3 * left
+				if c.n == 0 and spawn then n = n + (c.full or 4) end
+			end
+		end
+	end
+	return n
+end
+
+function TinkerBot:StationRate(st, t, arrive, wave)
+	if st == "B" then
+		if not wave then return 0 end
+		if wave.n >= 5 then return 130 / 17 elseif wave.n >= 4 then return 106 / 16.4 end
+		return wave.n * 25 / 16
+	end
+	local n = math.min(self:LandingCreeps(st, t, arrive), 14)
+	if n < 1 then return 0 end
+	local g = TRIP_GOLD[st]
+	return math.min(g[1] + g[2] * n, 35 * n) / g[3]                      -- no more than ~35 gold a creep
+end
+
+-- options = every station that pays something; pick = the best gold per second, or wait in fountain when nothing
+-- beats ~2.5/s (4.5/s when the :00 spawn is under 15 s away: waiting for it pays more)
+function TinkerBot:RateRoute(t, wave, here, in_f)
+	local h = self.hero
+	local march = self:Ab("tinker_march_of_the_machines"):GetLevel()
+	local last = self.trips[#self.trips] and self.trips[#self.trips].station
+	local arrive = in_f and 7 or 3.5                                       -- fountain stop left + Keen, or Keen
+	local bar = (60 - t % 60 <= 15) and 4.5 or 2.5
+	local options, pick, best, rates = {}, "F", bar, {}
+	for _, s in ipairs({"A", "C", "D", "E", "B"}) do
+		local ok = s ~= here and (in_f or h:GetMana() + self:BottleCharges() * 60 >= self:PlanNeed(s))
+		if s == "C" and march < 4 then ok = false end
+		if s == "B" and (not wave or last == "B") then ok = false end           -- never two waves in a row
+		if ok then
+			local r = self:StationRate(s, t, arrive, wave)
+			rates[s] = math.floor(r * 10 + 0.5) / 10
+			if r > 0 then table.insert(options, s) end
+			if r > best then best, pick = r, s end
+		end
+	end
+	table.insert(options, "F")
+	return options, pick, rates
+end
+
 function TinkerBot:StationDecision(t)
 	local h = self.hero
 	local mana = self:InFountain() and math.min(h:GetMaxMana(), h:GetMana() + 250) or h:GetMana()   -- fountain refills before leaving
@@ -1073,12 +1138,16 @@ function TinkerBot:StationDecision(t)
 	if wave and wave.threat then options = {"B"} end                    -- a wave at your tower is always taken
 	if rules == here then rules = "F" end
 	if not contains(options, rules) then table.insert(options, rules) end
+	local rates
+	if CFG.router == "rate" and not (wave and wave.threat) then
+		options, rules, rates = self:RateRoute(t, wave, here, in_f)
+	end
 	local in_fountain = self:InFountain()
 	if not in_fountain then self:SetPhase("deciding") end
 	self:Decide("station", facts, options, rules, function(pick, src)
 		if CFG.station_by_rules and pick ~= rules then src = "rules (jev shadow: " .. pick .. ")"; pick = rules end
 		self:Log("decision", {what = "station", pick = pick, rules = rules, src = src, options = options,
-			wave = wave and wave.n or 0, wave_threat = wave and wave.threat or nil})
+			wave = wave and wave.n or 0, wave_threat = wave and wave.threat or nil, rates = rates})
 		if in_fountain then
 			self.next_station = pick
 		elseif pick == "F" then
@@ -1442,6 +1511,9 @@ function TinkerBot:PrefetchStation(t)
 	end
 	if full and wave and tr.station ~= "B" and arrive >= self:PlanNeed("B") then table.insert(options, "B") end
 	if not contains(options, rules) then rules = "F" end
+	if CFG.router == "rate" and not (wave and wave.threat) then
+		if full then options, rules = self:RateRoute(t, wave, tr.station, false) else options, rules = {"F"}, "F" end
+	end
 	self:Decide("station", facts, options, rules, function(pick, src)
 		if CFG.station_by_rules and pick ~= rules then src = "rules (jev shadow: " .. pick .. ")"; pick = rules end
 		tr.prefetch = {pick = pick, at = GameRules:GetGameTime()}
@@ -1565,7 +1637,9 @@ function TinkerBot:LeaveDecision(t, now)
 			self:Log("decision", {what = "station", pick = "F", rules = "F", src = "mana_check", was = pf.pick})
 			return self:SetPhase("go_home")                                       -- Lasers since then spent the mana
 		end
-		if pf.pick == "F" or not (self:CampReady(pf.pick) or self:CleanupReady(pf.pick)) and pf.pick ~= "B" then
+		local still = CFG.router == "rate" and self:StationRate(pf.pick, t, 3.5, self:MidWave()) > 0
+			or self:CampReady(pf.pick) or self:CleanupReady(pf.pick)
+		if pf.pick == "F" or not still and pf.pick ~= "B" then
 			return self:SetPhase("go_home")
 		end
 		self.go_to = pf.pick

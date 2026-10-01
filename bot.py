@@ -106,7 +106,7 @@ def drill_state(session: str) -> dict:
 
 def install(advisor: str, speed: float, end_at: int, lane_speed: float = 1.0, drill: dict | None = None,
             route: str = "rules", manual: bool = False, aim: str = "off", use_mana: bool = False,
-            ready: str = "fresh") -> pathlib.Path:
+            ready: str = "fresh", router: str = "rules") -> pathlib.Path:
     vs = GAME_DIR / "scripts" / "vscripts"
     vs.mkdir(parents=True, exist_ok=True)
     CONTENT_DIR.mkdir(parents=True, exist_ok=True)      # the tools only list addons that have a content folder
@@ -129,6 +129,8 @@ def install(advisor: str, speed: float, end_at: int, lane_speed: float = 1.0, dr
         "use_mana": use_mana,
         # fresh: a camp is ready by the creeps beyond what the last trip left; old: by all creeps there
         "ready": ready,
+        # rate: go where the measured gold per second is highest (bot_lua RateRoute); rules: the Immortal routing
+        "router": router,
         "skill_order": {i + 1: s for i, s in enumerate(SKILLS) if s},
         "buy": buy_list(),
     }
@@ -432,6 +434,8 @@ def main():
                     help="on: Marches at C/D/E aim at the creeps; d: at D only; off: the Immortal replay facing")
     ap.add_argument("--marches", choices=["immortal", "mana"], default="immortal",
                     help="immortal: stop at the Immortal HP thresholds; mana: March on while the mana covers it")
+    ap.add_argument("--router", choices=["rules", "rate"], default="rules",
+                    help="rules: the Immortal routing rules; rate: the best measured gold per second")
     ap.add_argument("--ready", choices=["fresh", "old"], default="fresh",
                     help="fresh: leftovers from the last trip don't make a camp ready; old: every creep counts")
     a = ap.parse_args()
@@ -447,7 +451,7 @@ def main():
     else:
         (HERE / "manual_drill.flag").unlink(missing_ok=True)
     print("Addon written to", install(a.advisor, a.speed, a.end, a.lane_speed or a.speed, drill, a.route, manual=a.manual,
-                                      aim=a.aim, use_mana=a.marches == "mana", ready=a.ready))
+                                      aim=a.aim, use_mana=a.marches == "mana", ready=a.ready, router=a.router))
     print("Route decided by:", a.route)
     bot_hud.COMPARE_SESSION = a.drill
     bridge = Bridge(a.advisor)

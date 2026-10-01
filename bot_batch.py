@@ -31,6 +31,9 @@ SETUPS = {                                  # name: bot.py arguments
     "jev_aim":      ["--advisor", "jev", "--route", "jev", "--aim", "on"],
     "rules_mana":   ["--advisor", "rules", "--route", "rules", "--aim", "off", "--marches", "mana", "--ready", "old"],
     "rules_fresh":  ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh"],
+    "rate":         ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rate"],
+    "rate_mana":    ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rate",
+                     "--marches", "mana"],
 }
 COMMON = ["--drill", "--speed", "2", "--no-video"]
 TIMEOUT = 15 * 60                           # a run is ~4-5 min; anything past this is stuck
