@@ -6,6 +6,7 @@ makes the decisions (where to Keen next, how to finish a camp).
     python bot.py --speed 2          run the game at 2x (host_timescale)
     python bot.py --end 1200         play until 20:00 instead of 10:00
     python bot.py --no-launch        only install + run the bridge (Dota already in the bot game)
+    python bot.py --video            also film the screen to bot_runs/<run>.mp4 (off by default)
 
 Close Dota first: the bot game needs Dota started with Workshop Tools (-tools).
 Everything the bot sees, decides and does is recorded to bot_runs/<date_time>.jsonl, and a one-line
@@ -429,7 +430,8 @@ def main():
     ap.add_argument("--drill", nargs="?", const=DRILL_DEFAULT, default=None, metavar="SESSION",
                     help="skip the lane: start at 5:00 in fountain from your saved F11 drill state "
                          f"(default: your best F11 run, session {DRILL_DEFAULT})")
-    ap.add_argument("--no-video", action="store_true", help="don't film the screen (the .jsonl log is always written)")
+    ap.add_argument("--video", action="store_true", help="film the screen to bot_runs/<run>.mp4 (~300 MB a run)")
+    ap.add_argument("--no-video", action="store_true", help="(the default now; kept so old commands still work)")
     ap.add_argument("--aim", choices=["on", "off", "d"], default="off",
                     help="on: Marches at C/D/E aim at the creeps; d: at D only; off: the Immortal replay facing")
     ap.add_argument("--marches", choices=["immortal", "mana"], default="mana",
@@ -476,7 +478,7 @@ def main():
             pass
         (HERE / "manual_drill.flag").unlink(missing_ok=True)
         return
-    run_ui(bridge, record=not a.no_video)
+    run_ui(bridge, record=a.video and not a.no_video)
 
 
 def run_ui(bridge: Bridge, record: bool):
