@@ -4,7 +4,8 @@
     python lab_tele.py <run.jsonl>
 
 Setup (once): make a bot with @BotFather (/newbot), put its token in telegram_token.txt next to this file (git-
-ignored) or in TELEGRAM_BOT_TOKEN, and send /start to the bot. The chat is remembered in telegram_chat.txt.
+ignored) or in TELEGRAM_BOT_TOKEN, and send /start to the bot. The chat is remembered in telegram_chat.txt and
+the message in telegram_msg.txt: every run edits that same message instead of sending a new one.
 Stops by itself when the lab ends (the last message stays), or with Ctrl+C.
 """
 import argparse
@@ -13,6 +14,7 @@ import json
 import os
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -21,6 +23,7 @@ sys.path.insert(0, HERE)
 import lab_hud  # noqa: E402  (latest_lab, short)
 
 TOKEN_FILE, CHAT_FILE = os.path.join(HERE, "telegram_token.txt"), os.path.join(HERE, "telegram_chat.txt")
+MSG_FILE = os.path.join(HERE, "telegram_msg.txt")      # the one message every run edits (sent once, then reused)
 EVERY, BAR_W, WIDTH = 5, 16, 40
 
 
@@ -115,6 +118,23 @@ class State:
         return "\n".join(t)
 
 
+def reuse(token, cid, text):
+    """Edit the message an earlier run sent; send a new one only if it's gone (deleted, or never sent)."""
+    if os.path.exists(MSG_FILE):
+        mid = open(MSG_FILE).read().strip()
+        try:
+            api(token, "editMessageText", chat_id=cid, message_id=mid, text=text, parse_mode="HTML")
+            return mid
+        except urllib.error.HTTPError as ex:
+            if "not modified" in ex.read().decode("utf-8", "replace"):
+                return mid                                  # same text as already shown: the message is there
+        except Exception:
+            pass
+    mid = str(api(token, "sendMessage", chat_id=cid, text=text, parse_mode="HTML")["result"]["message_id"])
+    open(MSG_FILE, "w").write(mid)
+    return mid
+
+
 def main():
     token = os.environ.get("TELEGRAM_BOT_TOKEN") or (open(TOKEN_FILE).read().strip() if os.path.exists(TOKEN_FILE) else None)
     if not token:
@@ -124,7 +144,7 @@ def main():
     st = State(path)
     st.read()
     body = lambda: "<pre>" + html.escape(st.text()) + "</pre>"
-    msg = api(token, "sendMessage", chat_id=cid, text=body(), parse_mode="HTML")["result"]["message_id"]
+    msg = reuse(token, cid, body())
     last = None
     while True:
         time.sleep(EVERY)

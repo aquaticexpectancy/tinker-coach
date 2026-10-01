@@ -2,6 +2,7 @@
 stratz_key.txt
 telegram_token.txt
 telegram_chat.txt
+telegram_msg.txt
 typesafe_key.txt
 *.key
 # personal game data and recordings
