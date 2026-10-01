@@ -107,7 +107,7 @@ def drill_state(session: str) -> dict:
 
 def install(advisor: str, speed: float, end_at: int, lane_speed: float = 1.0, drill: dict | None = None,
             route: str = "rules", manual: bool = False, aim: str = "off", use_mana: bool = False,
-            ready: str = "fresh", router: str = "rules") -> pathlib.Path:
+            ready: str = "fresh", router: str = "rules", tricks: bool = True, plan: str = "user") -> pathlib.Path:
     vs = GAME_DIR / "scripts" / "vscripts"
     vs.mkdir(parents=True, exist_ok=True)
     CONTENT_DIR.mkdir(parents=True, exist_ok=True)      # the tools only list addons that have a content folder
@@ -132,6 +132,11 @@ def install(advisor: str, speed: float, end_at: int, lane_speed: float = 1.0, dr
         "ready": ready,
         # rate: go where the measured gold per second is highest (bot_lua RateRoute); rules: the Immortal routing
         "router": router,
+        # skip a 3rd+ March with nothing it can kill; Laser the ranged / flag bearer at mid; March the next wave early
+        "skip_dead_marches": tricks, "wave_laser": tricks, "future_wave": tricks,
+        # user: fixed March counts (3 at small camps; at March 4: 2, C 3 + Laser the biggest ancient) and never
+        # the same place twice in a row; auto: thresholds and skips decide the March count
+        "fixed_marches": plan == "user", "no_repeat": plan == "user",
         "skill_order": {i + 1: s for i, s in enumerate(SKILLS) if s},
         "buy": buy_list(),
     }
@@ -438,6 +443,10 @@ def main():
                     help="immortal: stop at the Immortal HP thresholds; mana: March on while the mana covers it")
     ap.add_argument("--router", choices=["rules", "rate"], default="rate",
                     help="rules: the Immortal routing rules; rate: the best measured gold per second")
+    ap.add_argument("--plan", choices=["user", "auto"], default="user",
+                    help="user: fixed March counts by March level + never the same place twice in a row; auto: skips decide")
+    ap.add_argument("--tricks", choices=["on", "off"], default="on",
+                    help="on: skip 3rd+ Marches with nothing to kill, Laser ranged/flag bearer at mid, March the next wave early")
     ap.add_argument("--ready", choices=["fresh", "old"], default="fresh",
                     help="fresh: leftovers from the last trip don't make a camp ready; old: every creep counts")
     a = ap.parse_args()
@@ -453,7 +462,8 @@ def main():
     else:
         (HERE / "manual_drill.flag").unlink(missing_ok=True)
     print("Addon written to", install(a.advisor, a.speed, a.end, a.lane_speed or a.speed, drill, a.route, manual=a.manual,
-                                      aim=a.aim, use_mana=a.marches == "mana", ready=a.ready, router=a.router))
+                                      aim=a.aim, use_mana=a.marches == "mana", ready=a.ready, router=a.router,
+                                      tricks=a.tricks == "on", plan=a.plan))
     print("Route decided by:", a.route)
     bot_hud.COMPARE_SESSION = a.drill
     bridge = Bridge(a.advisor)

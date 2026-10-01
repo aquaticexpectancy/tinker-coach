@@ -500,7 +500,52 @@ function TinkerBot:MarchDir(dir, why)
 	self:CastPos(self:Ab("tinker_march_of_the_machines"), p + dir * 250)
 	self.last_march = GameRules:GetGameTime()
 	local yaw = math.floor(math.deg(math.atan2(dir.y, dir.x)) % 360)
-	self:Log("cast", {ability = "march", yaw = yaw, why = why, x = math.floor(p.x), y = math.floor(p.y)})
+	local info = self.march_info or {}
+	self.march_info = nil
+	self:Log("cast", {ability = "march", yaw = yaw, why = why, x = math.floor(p.x), y = math.floor(p.y),
+		creeps = info.creeps, killable = info.killable})
+end
+
+-- creeps one more March can still kill: HP under what a March deals a creep in its path. An estimate by March
+-- level, logged with every March (creeps / killable) to check against the kills that follow.
+local MARCH_KILL_HP = {200, 280, 350, 450}
+function TinkerBot:MarchKillable(targets)
+	local cap = MARCH_KILL_HP[self:Ab("tinker_march_of_the_machines"):GetLevel()] or 350
+	local n = 0
+	for _, u in ipairs(targets) do if u:GetHealth() <= cap then n = n + 1 end end
+	self.march_info = {creeps = #targets, killable = n}
+	return n
+end
+
+-- the third+ March at a camp with nothing it can kill: all bot runs to 10-01, D's 3rd March got 0 kills 49% of
+-- the time, C's 4th 36%, A's 3rd/4th 20-28% (the creeps left are the tanky ones). Leave them alive instead.
+function TinkerBot:DeadMarch(tr, targets)
+	if CFG.skip_dead_marches == false or tr.station == "B" or tr.marches < 2 or #targets == 0 then return false end
+	if self:MarchKillable(targets) > 0 then return false end
+	self:Log("skip", {why = string.format("no creep a March can kill (%d left): no March %d", #targets, tr.marches + 1)})
+	tr.i = #tr.plan + 1
+	return true
+end
+
+-- the next enemy wave walking down mid toward Tinker: 3+ lane creeps 400-3,000 further along the lane (~1-9 s
+-- away at 325 speed; 600-2,200 never fired in the first test). Returns the direction to March so robots meet it.
+function TinkerBot:IncomingWave()
+	local p = self.hero:GetAbsOrigin()
+	local lane = Vector(1, 1, 0):Normalized()
+	local cx, cy, n, seen = 0, 0, 0, {}
+	for _, u in ipairs(self:Units(p, 3200, false)) do
+		local q = u:GetAbsOrigin()
+		local v = q - p
+		local along = v.x * lane.x + v.y * lane.y
+		if math.abs(q.x - q.y) < 1800 then table.insert(seen, math.floor(along)) end
+		if along > 400 and along < 3000 and math.abs(q.x - q.y) < 1800 then cx, cy, n = cx + q.x, cy + q.y, n + 1 end
+	end
+	table.sort(seen)
+	self:Log("wave_scan", {creeps_along_lane = seen, found = n})
+	if n < 3 then return nil end
+	local d = Vector(cx / n, cy / n, 0) - p
+	d.z = 0
+	return d:Normalized(), n
 end
 
 function TinkerBot:UseBottle(why)
@@ -928,6 +973,16 @@ function TinkerBot:Landed(t, now)
 		self.trip = {station = st, start = t, lh0 = PlayerResource:GetLastHits(self.pid), marches = 0, lasers = 0,
 			plan = {}, i = 1, landed_at = now}
 		for tok in CFG.stations[st].plan:gmatch("%S+") do table.insert(self.trip.plan, tok) end
+		if CFG.fixed_marches and st ~= "B" then
+			-- your rules: March 3 -> 3 Marches at the small camps (no ancients); March 4 -> 2 at small camps, 3 at C
+			local lvl = self:Ab("tinker_march_of_the_machines"):GetLevel()
+			local n = lvl >= 4 and (st == "C" and 3 or 2) or 3
+			self.trip.plan = {"walk", "M"}
+			for _ = 2, n do table.insert(self.trip.plan, "b"); table.insert(self.trip.plan, "R"); table.insert(self.trip.plan, "M") end
+		end
+		if st == "B" and CFG.wave_laser ~= false then                          -- Laser while the robots work
+			for j, tok in ipairs(self.trip.plan) do if tok == "M" then table.insert(self.trip.plan, j + 1, "L") break end end
+		end
 		if CFG.two_marches_at_4 and st ~= "B" and self:Ab("tinker_march_of_the_machines"):GetLevel() >= 4 then  -- tested: fewer kills
 			-- March maxed: two Marches, then Laser the tanky creeps instead of a third March
 			local p2, ms = {}, 0
@@ -1129,6 +1184,8 @@ function TinkerBot:RateRoute(t, wave, here, in_f)
 		-- two waves in a row only for a fresh wave of 4+: the mid wave pays the most (7.1 gold/s, 42.8 a kill vs
 		-- 20.7-31.2 at camps, 1,169 bot trips); the Immortal "never two in a row" kept the bot on cheap A/D kills
 		if s == "B" and (not wave or last == "B" and wave.n < 4) then ok = false end
+		-- your rule: never the same place twice in a row; more Marches on the visit instead (6:30 test: D then D)
+		if CFG.no_repeat and s == last then ok = false end
 		if ok then
 			local r = self:StationRate(s, t, arrive, wave)
 			rates[s] = math.floor(r * 10 + 0.5) / 10
@@ -1279,6 +1336,8 @@ end
 
 function TinkerBot:Trip(t, now)
 	local tr = self.trip
+	-- fixed March counts at camps (your rules): no Immortal-threshold / dead-March / survivor skips there
+	local fixed = CFG.fixed_marches and tr.station ~= "B"
 	local h = self.hero
 	if self:StackStep(t, now) then return end
 	if self:OutOfSpawnBox(t) then return end
@@ -1331,6 +1390,9 @@ function TinkerBot:Trip(t, now)
 			tr.queued_dir = nil                                                    -- didn't fire: cast normally
 		end
 		if not self:Ready(march) then return nxt() end
+		-- after a Rearm the March is already paid for: always cast it, then Keen (the Rearm refreshed it too).
+		-- test 10-01: 7 Rearms at mid were followed by a skipped March and 4.5-5.7 s to the Keen
+		if not fixed and not tr.rearmed then
 		local hpleft = 0
 		for _, u in ipairs(targets) do hpleft = hpleft + u:GetHealth() end
 		hpleft = hpleft + math.max(0, self:StationValue(tr.station) - #targets) * 450     -- creeps remembered but not in sight
@@ -1344,11 +1406,13 @@ function TinkerBot:Trip(t, now)
 			tr.i = #tr.plan + 1
 			return
 		end
+		if self:DeadMarch(tr, targets) then return end
 		local expected = self:StationValue(tr.station)
 		if tr.marches >= 1 and #targets <= 2 and #targets > 0 and expected <= 2 then     -- really 1-2 left: the Laser does it
 			self:Log("skip", {why = "only " .. #targets .. " creeps left: Laser instead of another March"})
 			tr.i = #tr.plan + 1
 			return
+		end
 		end
 		if #targets == 0 then
 			local to_spawn = 60 - t % 60
@@ -1383,6 +1447,8 @@ function TinkerBot:Trip(t, now)
 			if d then dir, why = d, string.format("aimed: %d%% of the creeps in its path", math.floor(share * 100)) end
 		end
 		tr.issued = now
+		tr.rearmed = nil
+		self:MarchKillable(targets)
 		return self:MarchDir(dir, why)
 	end
 	if tok == "b" then
@@ -1405,10 +1471,22 @@ function TinkerBot:Trip(t, now)
 				day = GameRules:IsDaytime(), vision = math.floor(h:GetCurrentVisionRange())})
 			tr.i = #tr.plan + 1; return
 		end
-		if not tr.issued and tr.marches >= 1 and #targets <= 2 and self.last_march and now - self.last_march > 1.2 then
+		if not fixed and not tr.issued and tr.marches >= 1 and #targets <= 2 and self.last_march and now - self.last_march > 1.2 then
 			self:Log("skip", {why = "only " .. #targets .. " creeps left: Laser instead of another March"})
 			tr.i = #tr.plan + 1
 			return
+		end
+		-- the robots already out kill everything under the March threshold: if that leaves 0-1 creeps, a Rearm
+		-- would only buy a March that gets skipped (test 10-01: 5 Rearms after the last March, 4.6-6.6 s to the
+		-- Keen instead of ~1.2). Laser the last one and Keen out; the last Rearm already refreshed the Keen.
+		-- not at the mid wave: its 2nd March is the surest March there is (3% get 0 kills, 2.8 kills each)
+		if not fixed and tr.station ~= "B" and not tr.issued and CFG.skip_dead_marches ~= false and tr.marches >= 1 then
+			local survive = #targets - self:MarchKillable(targets)
+			if survive <= 1 then
+				self:Log("skip", {why = string.format("robots out leave %d of %d creeps: no Rearm, Laser + Keen", survive, #targets)})
+				tr.i = #tr.plan + 1
+				return
+			end
 		end
 		if tr.issued then
 			if now - tr.issued >= 0.25 and not h:IsChanneling() then return nxt() end
@@ -1416,11 +1494,12 @@ function TinkerBot:Trip(t, now)
 		end
 		if not rearm:IsCooldownReady() then return end                        -- Rearm has a 5.5 s cooldown in 7.41
 		if h:GetMana() < rc then tr.i = #tr.plan + 1; return end
-		if tr.marches >= 1 and #targets <= 2 then
+		if not fixed and tr.marches >= 1 and #targets <= 2 then
 			self:Log("skip", {why = "only " .. #targets .. " creeps left: no Rearm, finish and go"})
 			tr.i = #tr.plan + 1
 			return
 		end
+		if not fixed then
 		local hpleft = 0
 		for _, u in ipairs(targets) do hpleft = hpleft + u:GetHealth() end
 		hpleft = hpleft + math.max(0, self:StationValue(tr.station) - #targets) * 450     -- creeps remembered but not in sight
@@ -1434,7 +1513,10 @@ function TinkerBot:Trip(t, now)
 			tr.i = #tr.plan + 1
 			return
 		end
+		if self:DeadMarch(tr, targets) then return end
+		end
 		tr.issued = now
+		tr.rearmed = true
 		self:CastNo(rearm)
 		self:Log("cast", {ability = "rearm", why = "refresh March"})
 		-- action queue: shift-queue the next March so it fires the moment the channel ends
@@ -1458,7 +1540,25 @@ function TinkerBot:Trip(t, now)
 		if not self:Ready(laser) or #targets == 0 then return nxt() end
 		local ldmg = CFG.laser_dmg[laser:GetLevel()] or 0
 		local best, why = nil, "kills it"
-		for _, u in ipairs(targets) do                                   -- a creep it kills (the biggest such) first
+		if tr.station == "B" and CFG.wave_laser ~= false then
+			-- mid wave: the ranged creep or the flag bearer (the most gold), else the creep closest to dying
+			for _, u in ipairs(targets) do
+				local n = u:GetUnitName()
+				if (n:find("ranged") or n:find("flagbearer")) and (not best or u:GetHealth() < best:GetHealth()) then best = u end
+			end
+			why = "ranged / flag bearer"
+			if not best then
+				why = "closest to dying"
+				for _, u in ipairs(targets) do if not best or u:GetHealth() < best:GetHealth() then best = u end end
+			end
+		end
+		if not best and tr.station == "C" and CFG.fixed_marches then         -- your rule: the biggest ancient
+			why = "biggest ancient"
+			for _, u in ipairs(targets) do
+				if u:GetUnitName():find("ancient") and (not best or u:GetHealth() > best:GetHealth()) then best = u end
+			end
+		end
+		for _, u in ipairs(best and {} or targets) do                    -- a creep it kills (the biggest such) first
 			if u:GetHealth() <= ldmg and (not best or u:GetHealth() > best:GetHealth()) then best = u end
 		end
 		if not best and tr.station == "C" then why = "fattest (ancients)" end
@@ -1516,6 +1616,33 @@ function TinkerBot:Trip(t, now)
 		tr.issued = now
 		return self:MarchDir(dir:Normalized(), "one extra March, then leave")
 	end
+	if tok == "RF" then                                                    -- Rearm for a March at the next wave
+		if tr.issued then
+			if now - tr.issued >= 0.25 and not h:IsChanneling() then return nxt() end
+			return
+		end
+		if self:Ready(march) then return nxt() end
+		tr.rf_wait = tr.rf_wait or now
+		if not rearm:IsCooldownReady() then
+			if now - tr.rf_wait > 6 then tr.rf_wait = nil; return nxt() end
+			return
+		end
+		tr.rf_wait = nil
+		if h:GetMana() < rc + mc + kc then return nxt() end
+		tr.issued = now
+		self:CastNo(rearm)
+		self:Log("cast", {ability = "rearm", why = "refresh March for the next wave"})
+		return
+	end
+	if tok == "Z" then                                                     -- March at the next wave before it arrives
+		if tr.issued then
+			if not march:IsCooldownReady() or now - tr.issued > 1.5 then tr.marches = tr.marches + 1; return nxt() end
+			return
+		end
+		if not self:Ready(march) or not tr.future_dir then return nxt() end
+		tr.issued = now
+		return self:MarchDir(tr.future_dir, "next wave, before it arrives")
+	end
 	if tok == "K" then
 		return self:LeaveDecision(t, now)
 	end
@@ -1569,6 +1696,31 @@ function TinkerBot:FinishDecision(t, now, targets)
 			tr.kill_lasered = true
 			table.insert(tr.plan, "L")                                      -- a creep the Laser kills: take it
 			return
+		end
+		if CFG.skip_dead_marches ~= false and #targets == 1 and not tr.one_lasered and self:Ready(laser)
+				and self:Ab("tinker_march_of_the_machines"):GetLevel() >= 4 then
+			tr.one_lasered = true
+			table.insert(tr.plan, "L")                                      -- the last creep: Laser it and go
+			return
+		end
+		if tr.station == "B" and CFG.future_wave ~= false and not tr.future then
+			tr.future = true
+			local d, n = self:IncomingWave()
+			if d then
+				local march = self:Ab("tinker_march_of_the_machines")
+				local mc, rc, kc = self:Costs()
+				local mana = self.hero:GetMana() + self:BottleCharges() * 60 - kc - self:Reserve()
+				local first = (self:Ready(march) and 0 or rc) + mc
+				local k = mana >= first + rc + mc and 2 or mana >= first and 1 or 0
+				if k > 0 then
+					tr.future_dir = d
+					if not self:Ready(march) then table.insert(tr.plan, "RF") end
+					table.insert(tr.plan, "Z")
+					if k == 2 then table.insert(tr.plan, "RF"); table.insert(tr.plan, "Z") end
+					self:Log("future_wave", {marches = k, creeps = n})
+					return
+				end
+			end
 		end
 		if tr.station == "C" and (tr.lasers or 0) < 1 and self:Ready(laser) and #targets > 0 and not tr.c_lasered then
 			tr.c_lasered = true

@@ -25,19 +25,16 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 RUNS = os.path.join(HERE, "bot_runs")
 SETUPS = {                                  # name: bot.py arguments
-    "rules_facing": ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "old", "--router", "rules",
-                     "--marches", "immortal"],
-    "rules_aim":    ["--advisor", "rules", "--route", "rules", "--aim", "on", "--router", "rules", "--marches", "immortal"],
-    "jev_facing":   ["--advisor", "jev", "--route", "jev", "--aim", "off"],
-    "jev_aim":      ["--advisor", "jev", "--route", "jev", "--aim", "on"],
-    "rules_mana":   ["--advisor", "rules", "--route", "rules", "--aim", "off", "--marches", "mana", "--ready", "old",
-                     "--router", "rules"],
-    "rules_fresh":  ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rules",
-                     "--marches", "immortal"],
-    "rate":         ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rate",
-                     "--marches", "immortal"],
-    "rate_mana":    ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rate",
-                     "--marches", "mana"],
+    "rules_facing": ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "old", "--router", "rules", "--marches", "immortal", "--tricks", "off", "--plan", "auto"],
+    "rules_aim": ["--advisor", "rules", "--route", "rules", "--aim", "on", "--router", "rules", "--marches", "immortal", "--tricks", "off", "--plan", "auto"],
+    "jev_facing": ["--advisor", "jev", "--route", "jev", "--aim", "off", "--tricks", "off", "--plan", "auto"],
+    "jev_aim": ["--advisor", "jev", "--route", "jev", "--aim", "on", "--tricks", "off", "--plan", "auto"],
+    "rules_mana": ["--advisor", "rules", "--route", "rules", "--aim", "off", "--marches", "mana", "--ready", "old", "--router", "rules", "--tricks", "off", "--plan", "auto"],
+    "rules_fresh": ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rules", "--marches", "immortal", "--tricks", "off", "--plan", "auto"],
+    "rate": ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rate", "--marches", "immortal", "--tricks", "off", "--plan", "auto"],
+    "rate_mana": ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rate", "--marches", "mana", "--tricks", "off", "--plan", "auto"],
+    "tricks": ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rate", "--marches", "mana", "--tricks", "on", "--plan", "auto"],
+    "user": ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rate", "--marches", "mana", "--tricks", "on", "--plan", "user"],
 }
 COMMON = ["--drill", "--speed", "2", "--no-video"]
 TIMEOUT = 15 * 60                           # a run is ~4-5 min; anything past this is stuck
