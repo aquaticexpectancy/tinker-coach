@@ -1,0 +1,186 @@
+[
+ {
+  "station": "D",
+  "x": -8023,
+  "y": -1838,
+  "type": "small",
+  "families": [
+   [
+    "forest_troll_berserker",
+    "forest_troll_berserker",
+    "forest_troll_high_priest"
+   ],
+   [
+    "fel_beast",
+    "fel_beast",
+    "ghost"
+   ],
+   [
+    "gnoll_assassin",
+    "gnoll_assassin",
+    "gnoll_assassin"
+   ],
+   [
+    "kobold",
+    "kobold",
+    "kobold",
+    "kobold_taskmaster",
+    "kobold_tunneler"
+   ]
+  ]
+ },
+ {
+  "station": "D",
+  "x": -8314,
+  "y": -553,
+  "type": "hard/medium",
+  "families": [
+   [
+    "centaur_khan",
+    "centaur_outrunner",
+    "centaur_outrunner"
+   ],
+   [
+    "dark_troll",
+    "dark_troll",
+    "dark_troll_warlord"
+   ],
+   [
+    "polar_furbolg_champion",
+    "polar_furbolg_ursa_warrior"
+   ],
+   [
+    "satyr_hellcaller",
+    "satyr_soulstealer",
+    "satyr_trickster"
+   ],
+   [
+    "warpine_raider",
+    "warpine_raider"
+   ],
+   [
+    "enraged_wildkin",
+    "wildkin",
+    "wildkin"
+   ]
+  ]
+ },
+ {
+  "station": "E",
+  "x": -721,
+  "y": -7696,
+  "type": "frog",
+  "families": [
+   [
+    "froglet",
+    "froglet",
+    "froglet",
+    "froglet",
+    "froglet_mage",
+    "grown_frog_mage"
+   ]
+  ]
+ },
+ {
+  "station": "A",
+  "x": -1454,
+  "y": -3357,
+  "type": "hard/medium",
+  "families": [
+   [
+    "centaur_khan",
+    "centaur_outrunner",
+    "centaur_outrunner"
+   ],
+   [
+    "dark_troll",
+    "dark_troll",
+    "dark_troll_warlord"
+   ],
+   [
+    "polar_furbolg_champion",
+    "polar_furbolg_ursa_warrior"
+   ],
+   [
+    "satyr_hellcaller",
+    "satyr_soulstealer",
+    "satyr_trickster"
+   ],
+   [
+    "warpine_raider",
+    "warpine_raider"
+   ],
+   [
+    "enraged_wildkin",
+    "wildkin",
+    "wildkin"
+   ]
+  ]
+ },
+ {
+  "station": "C",
+  "x": -4013,
+  "y": 991,
+  "type": "hard",
+  "families": [
+   [
+    "centaur_khan",
+    "centaur_outrunner",
+    "centaur_outrunner"
+   ],
+   [
+    "mud_golem",
+    "mud_golem"
+   ],
+   [
+    "ogre_magi",
+    "ogre_mauler",
+    "ogre_mauler"
+   ],
+   [
+    "satyr_soulstealer",
+    "satyr_soulstealer",
+    "satyr_trickster",
+    "satyr_trickster"
+   ],
+   [
+    "alpha_wolf",
+    "giant_wolf",
+    "giant_wolf"
+   ]
+  ]
+ },
+ {
+  "station": "C",
+  "x": -5015,
+  "y": -96,
+  "type": "ancient",
+  "families": [
+   [
+    "black_dragon",
+    "black_drake",
+    "black_drake"
+   ],
+   [
+    "frostbitten_golem",
+    "frostbitten_golem",
+    "ice_shaman"
+   ],
+   [
+    "granite_golem",
+    "rock_golem",
+    "rock_golem"
+   ],
+   [
+    "big_thunder_lizard",
+    "small_thunder_lizard",
+    "small_thunder_lizard"
+   ],
+   [
+    "prowler_acolyte",
+    "prowler_acolyte",
+    "prowler_shaman"
+   ]
+  ]
+ }
+]

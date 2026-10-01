@@ -658,7 +658,7 @@ function TinkerBot:Think()
 	if not self.enabled or not h:IsAlive() then return 0.1 end
 	local ok, err = pcall(function()
 		self:UpdateCamps(now)
-		if self.phase ~= "drill_ffwd" then
+		if self.phase ~= "drill_ffwd" and self.phase ~= "lab" then
 			self:LevelUp()
 			self:Buy()
 		end
@@ -666,7 +666,7 @@ function TinkerBot:Think()
 	end)
 	if not ok then print("[tinker_bot] step error: " .. tostring(err)); self:Log("error", {msg = tostring(err), phase = self.phase}) end
 	-- stuck guard: a phase that doesn't move on for 25 s goes home and starts over
-	if self.phase ~= "lane" and self.phase ~= "wait" and self.phase ~= "fountain" and self.phase ~= "drill_ffwd"
+	if self.phase ~= "lane" and self.phase ~= "wait" and self.phase ~= "fountain" and self.phase ~= "drill_ffwd" and self.phase ~= "lab"
 			and now - self.phase_since > 40 then
 		self:Log("stuck", {phase = self.phase})
 		self.pending = nil
@@ -687,6 +687,7 @@ function TinkerBot:Step(t, now)
 	local p = self.phase
 	if p == "wait" then
 		if t > -CFG.pregame + 1 then
+			if CFG.lab then return self:LabStart() end
 			if CFG.drill then
 				self:SetSpeed(CFG.drill.ffwd_speed)
 				self.hero:AddNewModifier(self.hero, nil, "modifier_stunned", {})
@@ -700,6 +701,7 @@ function TinkerBot:Step(t, now)
 		end
 		return
 	end
+	if p == "lab" then return self:Lab(now) end
 	if p == "drill_ffwd" then
 		if t >= CFG.drill.start_at - 3 then self:ApplyDrillState(now) end
 		return
@@ -720,6 +722,233 @@ function TinkerBot:Step(t, now)
 	if p == "keening" then return self:Keening(t, now) end
 	if p == "fountain" then return self:Fountain(t, now) end
 	if p == "trip" then return self:Trip(t, now) end
+end
+
+-- ------------------------------------------------------------------ lab: March tests on the real camps
+-- Tinker (invulnerable) stands where the bot stands and casts a fixed sequence on a full camp: n Marches, the
+-- first at the replay facing and each next one turned 180 like the bot, then optionally a Laser. Rearm is
+-- simulated (cooldowns refreshed, mana topped up) at the bot's gap between Marches. What died is logged, the rest
+-- is removed so the camp respawns at the next :00, and the four stations are tested in parallel.
+local LAB_GAP = 4.0          -- seconds between Marches in bot trips (Rearm channel + recast)
+local LAB_SETTLE = 7.0       -- the robots of the last March run ~6 s
+
+function TinkerBot:LabStart()
+	local h, L = self.hero, CFG.lab
+	-- not invulnerable: Dota refuses every order of an unselectable hero ("target is unselectable", lab run 1).
+	-- Debuff immunity against the creeps' stuns instead, and the HP is refilled every tick.
+	h:AddNewModifier(h, nil, "modifier_black_king_bar_immune", {})
+	SendToServerConsole("sv_cheats 1")
+	-- no XP or gold from the test kills (Tinker's level would drift; you spotted the XP)
+	local mode = GameRules:GetGameModeEntity()
+	mode:SetModifyExperienceFilter(function() return false end, self)
+	mode:SetModifyGoldFilter(function() return false end, self)
+	pcall(function() GameRules:SetCreepSpawningEnabled(false) end)          -- no lane creeps: an empty map
+	for _, n in ipairs({"tinker_rearm", "tinker_keen_teleport"}) do self:Ab(n):SetLevel(1) end
+	self.lab_queue = {}
+	if L.camps then
+		-- v3: each family spawned by name at its real camp, one test at a time: every family gets tested, no
+		-- waiting on the :00 spawn, and Tinker can't block a camp (v2 blocked C's ancients from its stand spot)
+		for _ = 1, L.reps do
+			for _, combo in ipairs(L.combos) do
+				for _, ml in ipairs(L.march_levels) do
+					for _, n in ipairs(L.marches) do
+						for _, las in ipairs(L.lasers) do
+							table.insert(self.lab_queue, {st = combo.station, spawns = combo.spawns, march = ml, n = n,
+								laser = las, manual = true})
+						end
+					end
+				end
+			end
+		end
+		self:SetSpeed(L.speed)
+		self:Log("lab_start", {tests = #self.lab_queue, manual = true})
+		self:SetPhase("lab")
+		return
+	end
+	SendToServerConsole("dota_spawn_neutrals")
+	for _ = 1, L.reps do
+		for _, st in ipairs(L.stations) do
+			for _, ml in ipairs(L.march_levels) do
+				for _, n in ipairs(L.marches) do
+					for _, las in ipairs(L.lasers) do table.insert(self.lab_queue, {st = st, march = ml, n = n, laser = las}) end
+				end
+			end
+		end
+	end
+	self:SetSpeed(L.speed)
+	self:Log("lab_start", {tests = #self.lab_queue})
+	self:SetPhase("lab")
+end
+
+function TinkerBot:LabUnits(st)
+	local out = {}
+	for _, c in ipairs(self.camps or {}) do
+		if c.st == st then for _, u in ipairs(self:Units(c.pos, 650, true)) do table.insert(out, u) end end
+	end
+	return out
+end
+
+-- every camp of the station holds creeps, none of them hurt, and the count held for 0.6 s (a whole fresh spawn:
+-- lab run 1 started on the first creep of a spawn, A with 1 wildkin, C with 2 creeps)
+function TinkerBot:LabFull(st, now)
+	local n = 0
+	for _, c in ipairs(self.camps or {}) do
+		if c.st == st then
+			local us = self:Units(c.pos, 650, true)
+			if #us == 0 then return false end
+			for _, u in ipairs(us) do if u:GetHealth() < u:GetMaxHealth() then return false end end
+			n = n + #us
+		end
+	end
+	self.lab_seen = self.lab_seen or {}
+	local seen = self.lab_seen[st]
+	if not seen or seen.n ~= n then self.lab_seen[st] = {n = n, at = now}; return false end
+	return now - seen.at >= 0.6
+end
+
+local function bounty(u)
+	local ok, b = pcall(function() return (u:GetMinimumGoldBounty() + u:GetMaximumGoldBounty()) / 2 end)
+	return ok and b or 35
+end
+
+function TinkerBot:Lab(now)
+	local h = self.hero
+	local march, laser = self:Ab("tinker_march_of_the_machines"), self:Ab("tinker_laser")
+	local cur = self.lab_cur
+	h:SetHealth(h:GetMaxHealth())                                             -- the creeps can't kill the test
+	if not cur then
+		if #self.lab_queue == 0 then
+			if not self.ended then
+				self.ended = true
+				self:Log("end", {lab = true, lh = PlayerResource:GetLastHits(self.pid), nw = self:NetWorth()})
+			end
+			return
+		end
+		if self.lab_respawn_at and now >= self.lab_respawn_at then
+			self.lab_respawn_at = nil
+			SendToServerConsole("dota_spawn_neutrals")
+		end
+		if self.lab_queue[1] and self.lab_queue[1].manual then
+			cur = table.remove(self.lab_queue, 1)
+		else
+			for i, test in ipairs(self.lab_queue) do
+				if self:LabFull(test.st, now) then cur = table.remove(self.lab_queue, i) break end
+			end
+		end
+		if not cur then return end
+		local S = CFG.stations[cur.st]
+		if cur.manual then
+			march:SetLevel(cur.march)
+			laser:SetLevel(cur.march >= 4 and 3 or 2)
+			for _, u in ipairs(Entities:FindAllByClassnameWithin("npc_dota_creep_neutral", vec(S.stand), 2000)) do
+				if u:IsAlive() then u:ForceKill(false) end                         -- natural spawns and leftovers
+			end
+			cur.units, cur.gold0, cur.names, cur.mine, cur.camps = {}, 0, {}, {}, {}
+			for _, sp in ipairs(cur.spawns) do                                   -- both camps of the station at once
+				local pos = Vector(sp.x, sp.y, 0)
+				local fam = {camp = cur.st .. ":" .. sp.x .. ":" .. sp.y, family = table.concat(sp.family, "+"), creeps = {}}
+				for k, name in ipairs(sp.family) do
+					local a = k * 2.4
+					local u = CreateUnitByName("npc_dota_neutral_" .. name, pos + Vector(math.cos(a), math.sin(a), 0) * 110,
+						true, nil, nil, DOTA_TEAM_NEUTRALS)
+					if u then
+						table.insert(cur.units, u)
+						cur.mine[u] = true
+						table.insert(cur.names, name)
+						table.insert(fam.creeps, {unit = u, name = name, max_hp = u:GetMaxHealth(), bounty = bounty(u)})
+						cur.gold0 = cur.gold0 + bounty(u)
+					end
+				end
+				table.insert(cur.camps, fam)
+			end
+			FindClearSpaceForUnit(h, vec(S.stand), true)
+			h:Stop()
+			cur.cast, cur.next_at, cur.dir, cur.t0 = 0, now + 1.0, yawdir(S.face), now
+			self.lab_cur = cur
+			return
+		end
+		march:SetLevel(cur.march)
+		laser:SetLevel(cur.march >= 4 and 3 or 2)                             -- the bot's build at those levels
+		FindClearSpaceForUnit(h, vec(S.stand), true)
+		h:Stop()
+		cur.units, cur.gold0, cur.names, cur.camps = {}, 0, {}, {}
+		for ci, c in ipairs(self.camps or {}) do
+			if c.st == cur.st then
+				local fam = {camp = ci, creeps = {}}
+				for _, u in ipairs(self:Units(c.pos, 650, true)) do
+					table.insert(cur.units, u)
+					local nm = (u:GetUnitName():gsub("npc_dota_neutral_", ""))
+					table.insert(cur.names, nm)
+					table.insert(fam.creeps, {unit = u, name = nm, max_hp = u:GetMaxHealth(), bounty = bounty(u)})
+					cur.gold0 = cur.gold0 + bounty(u)
+				end
+				table.sort(fam.creeps, function(a, b) return a.name < b.name end)
+				local names = {}
+				for _, x in ipairs(fam.creeps) do table.insert(names, x.name) end
+				fam.family = table.concat(names, "+")
+				table.insert(cur.camps, fam)
+			end
+		end
+		cur.cast, cur.next_at, cur.dir, cur.t0 = 0, now + 0.5, yawdir(S.face), now
+		self.lab_cur = cur
+		return
+	end
+	if cur.manual and now - (cur.swept or 0) > 0.5 then
+		cur.swept = now
+		for _, u in ipairs(Entities:FindAllByClassnameWithin("npc_dota_creep_neutral", vec(CFG.stations[cur.st].stand), 2000)) do
+			if u:IsAlive() and not cur.mine[u] then u:ForceKill(false) end
+		end
+	end
+	if cur.cast < cur.n then
+		if now >= cur.next_at then
+			march:EndCooldown()
+			h:SetMana(h:GetMaxMana())
+			if cur.cast > 0 then cur.dir = cur.dir * -1 end                     -- turned 180, like the bot
+			self:MarchDir(cur.dir, "lab")
+			cur.cast = cur.cast + 1
+			cur.next_at = now + LAB_GAP
+			if cur.cast == cur.n then cur.laser_at, cur.done_at = now + 1.0, now + LAB_SETTLE end
+		end
+		return
+	end
+	if cur.laser > 0 and not cur.lasered and now >= cur.laser_at then
+		cur.lasered = true
+		local ldmg = CFG.laser_dmg[laser:GetLevel()] or 0
+		local best
+		for _, u in ipairs(cur.units) do                                      -- the bot's pick: a creep it kills, the biggest
+			if IsValidEntity(u) and u:IsAlive() and u:GetHealth() <= ldmg and (not best or u:GetHealth() > best:GetHealth()) then best = u end
+		end
+		if not best then                                                      -- else the fattest
+			for _, u in ipairs(cur.units) do
+				if IsValidEntity(u) and u:IsAlive() and (not best or u:GetHealth() > best:GetHealth()) then best = u end
+			end
+		end
+		if best then laser:EndCooldown(); h:SetMana(h:GetMaxMana()); self:CastTarget(laser, best) end
+	end
+	if now < cur.done_at then return end
+	local left, gold_left = {}, 0
+	for _, u in ipairs(cur.units) do
+		if IsValidEntity(u) and u:IsAlive() then
+			table.insert(left, {name = (u:GetUnitName():gsub("npc_dota_neutral_", "")), hp = u:GetHealth(), max_hp = u:GetMaxHealth()})
+			gold_left = gold_left + bounty(u)
+		end
+	end
+	local camps = {}
+	for _, fam in ipairs(cur.camps) do
+		local cs = {}
+		for _, x in ipairs(fam.creeps) do
+			local alive = IsValidEntity(x.unit) and x.unit:IsAlive()
+			table.insert(cs, {name = x.name, max_hp = x.max_hp, bounty = x.bounty, killed = not alive,
+				hp = alive and x.unit:GetHealth() or 0})
+		end
+		table.insert(camps, {camp = fam.camp, family = fam.family, creeps = cs})
+	end
+	self:Log("lab_result", {station = cur.st, march = cur.march, marches = cur.n, laser = cur.laser,
+		creeps = #cur.units, killed = #cur.units - #left, gold = math.floor(cur.gold0 - gold_left), gold_camp = math.floor(cur.gold0),
+		left = left, camp = cur.names, camps = camps, seconds = math.floor((now - cur.t0) * 10) / 10})
+	for _, u in ipairs(cur.units) do if IsValidEntity(u) and u:IsAlive() then u:ForceKill(false) end end
+	self.lab_cur = nil
+	if not cur.manual then self.lab_respawn_at = now + 0.5 end              -- -spawnneutrals once the corpses are gone
 end
 
 -- ------------------------------------------------------------------ drill start: the player's 5:00 state

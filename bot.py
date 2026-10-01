@@ -107,7 +107,8 @@ def drill_state(session: str) -> dict:
 
 def install(advisor: str, speed: float, end_at: int, lane_speed: float = 1.0, drill: dict | None = None,
             route: str = "rules", manual: bool = False, aim: str = "off", use_mana: bool = False,
-            ready: str = "fresh", router: str = "rules", tricks: bool = True, plan: str = "user") -> pathlib.Path:
+            ready: str = "fresh", router: str = "rules", tricks: bool = True, plan: str = "user",
+            lab: dict | None = None) -> pathlib.Path:
     vs = GAME_DIR / "scripts" / "vscripts"
     vs.mkdir(parents=True, exist_ok=True)
     CONTENT_DIR.mkdir(parents=True, exist_ok=True)      # the tools only list addons that have a content folder
@@ -140,6 +141,9 @@ def install(advisor: str, speed: float, end_at: int, lane_speed: float = 1.0, dr
         "skill_order": {i + 1: s for i, s in enumerate(SKILLS) if s},
         "buy": buy_list(),
     }
+    if lab:
+        cfg["lab"] = lab
+        cfg["end_at"] = 999999                                 # the lab ends itself when its tests are done
     if drill:
         cfg["drill"] = drill
         owned = list(drill["items"])
@@ -423,6 +427,27 @@ def dota_running() -> bool:
     return "dota2.exe" in out.lower()
 
 
+def lab_config(a) -> dict:
+    """The lab's tests: with lab_families.json (python lab_families.py) every family is spawned by name at its camp;
+    without it the real spawns are used."""
+    cfg = {"reps": a.lab, "stations": a.lab_stations.split(","), "march_levels": [3, 4], "marches": [1, 2, 3, 4],
+           "lasers": [0, 1], "speed": 10}
+    fams = HERE / "lab_families.json"
+    if fams.exists():
+        import itertools
+        camps = [c for c in json.loads(fams.read_text(encoding="utf-8")) if c["station"] in cfg["stations"]]
+        cfg["camps"] = camps
+        # a station's camps are hit by the same Marches, and robots explode on the first creep they reach, so a
+        # two-camp station gets every family pair (you: "one X and two Y, or one X and two Z ...")
+        combos = []
+        for st in cfg["stations"]:
+            cs = [c for c in camps if c["station"] == st]
+            for picks in itertools.product(*[c["families"] for c in cs]):
+                combos.append({"station": st, "spawns": [{"x": c["x"], "y": c["y"], "family": f} for c, f in zip(cs, picks)]})
+        cfg["combos"] = combos
+    return cfg
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--advisor", choices=["jev", "rules"], default="rules", help="rules (default, no Jev calls) or jev")
@@ -443,6 +468,9 @@ def main():
                     help="immortal: stop at the Immortal HP thresholds; mana: March on while the mana covers it")
     ap.add_argument("--router", choices=["rules", "rate"], default="rate",
                     help="rules: the Immortal routing rules; rate: the best measured gold per second")
+    ap.add_argument("--lab", nargs="?", const=2, type=int, default=None, metavar="REPS",
+                    help="lab: test 1-4 Marches +/- Laser at March 3 and 4 on every camp, REPS times each (default 2)")
+    ap.add_argument("--lab-stations", default="A,C,D,E", help="lab: which stations (default A,C,D,E)")
     ap.add_argument("--plan", choices=["user", "auto"], default="user",
                     help="user: fixed March counts by March level + never the same place twice in a row; auto: skips decide")
     ap.add_argument("--tricks", choices=["on", "off"], default="on",
@@ -463,7 +491,8 @@ def main():
         (HERE / "manual_drill.flag").unlink(missing_ok=True)
     print("Addon written to", install(a.advisor, a.speed, a.end, a.lane_speed or a.speed, drill, a.route, manual=a.manual,
                                       aim=a.aim, use_mana=a.marches == "mana", ready=a.ready, router=a.router,
-                                      tricks=a.tricks == "on", plan=a.plan))
+                                      tricks=a.tricks == "on", plan=a.plan,
+                                      lab=a.lab and lab_config(a)))
     print("Route decided by:", a.route)
     bot_hud.COMPARE_SESSION = a.drill
     bridge = Bridge(a.advisor)
@@ -475,10 +504,22 @@ def main():
     if not a.no_launch:
         if dota_running():
             sys.exit("Dota is running: close it first (the bot game needs Dota started with Workshop Tools).")
+        # a lab run doesn't need sound or a high frame rate (fps_max is saved to your Dota config: reset it with
+        # your usual value, fps_max 0 = no cap); 60, not 30, so the 10x simulation isn't capped by the frames
+        lab_args = ["-nosound", "+fps_max", "60"] if a.lab else []
         subprocess.Popen([str(STEAM / "steam.exe"), "-applaunch", "570", "-tools", "-addon", ADDON, "-novid",
-                          "-gamestateintegration", "-condebug", "-language", "english", "+dota_launch_custom_game", ADDON, "dota"])
+                          "-gamestateintegration", "-condebug", "-language", "english", *lab_args,
+                          "+dota_launch_custom_game", ADDON, "dota"])
         print("Launching Dota (Workshop Tools) into the bot game… the first load takes a minute.")
     print("Type -bot in the game chat to take over. Ctrl+C here to stop.\n")
+    if a.lab:                                                # no HUD for a lab: just wait for its end
+        print("Lab: testing Marches on the camps. Ctrl+C here to stop.")
+        try:
+            while not bridge.done.wait(1):
+                pass
+        except KeyboardInterrupt:
+            pass
+        return
     if a.manual:
         print("Manual drill: you play from 5:00. The coach's HUD guides you. Ctrl+C here after 10:00.")
         try:
