@@ -1069,7 +1069,17 @@ function TinkerBot:LandingCreeps(st, t, arrive)
 				n = n + (UNSEEN_SET[st] or 4)                                  -- never seen: a typical first look
 			else
 				local left = math.min(c.n, c.left or 0)
-				n = n + (c.n - left) + 0.3 * left
+				-- not at C (its remainders are ancients: router test 10-01, C +0 with 7 left) and only where the last
+				-- trip got 2+ kills, i.e. its Marches reach this camp
+				local lh = self.last_trip_lh and self.last_trip_lh[st]
+				if left > 0 and left <= 3 and c.n == left and st ~= "C" and (lh == nil or lh >= 2) then
+					-- a small remainder blocks the camp's spawn: clearing it is worth the kills plus half the set it
+					-- unlocks at the next :00 (router batch 10-01: 1-2 leftovers at every camp, counted at 30%, kept
+					-- the bot idle in fountain from 7:39 to 10:00)
+					n = n + left + 0.5 * (c.full or 4)
+				else
+					n = n + (c.n - left) + 0.3 * left                            -- a big pile: the tanky ones
+				end
 				if c.n == 0 and spawn then n = n + (c.full or 4) end
 			end
 		end
@@ -1096,7 +1106,11 @@ function TinkerBot:RateRoute(t, wave, here, in_f)
 	local march = self:Ab("tinker_march_of_the_machines"):GetLevel()
 	local last = self.trips[#self.trips] and self.trips[#self.trips].station
 	local arrive = in_f and 7 or 3.5                                       -- fountain stop left + Keen, or Keen
-	local bar = (60 - t % 60 <= 15) and 4.5 or 2.5
+	-- waiting only pays if a camp will spawn at the next :00 (an empty one); with every camp blocked, any trip
+	-- beats the fountain
+	local spawning = false
+	for _, c in ipairs(self.camps or {}) do if c.n == 0 and not c.stuck then spawning = true end end
+	local bar = not spawning and 0.5 or (60 - t % 60 <= 15) and 4.5 or 2.5
 	local options, pick, best, rates = {}, "F", bar, {}
 	for _, s in ipairs({"A", "C", "D", "E", "B"}) do
 		local ok = s ~= here and (in_f or h:GetMana() + self:BottleCharges() * 60 >= self:PlanNeed(s))
