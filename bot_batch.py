@@ -34,7 +34,8 @@ SETUPS = {                                  # name: bot.py arguments
                      "--router", "rules"],
     "rules_fresh":  ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rules",
                      "--marches", "immortal"],
-    "rate":         ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rate"],
+    "rate":         ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rate",
+                     "--marches", "immortal"],
     "rate_mana":    ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rate",
                      "--marches", "mana"],
 }
