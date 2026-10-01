@@ -737,12 +737,26 @@ function TinkerBot:LabStart()
 	-- not invulnerable: Dota refuses every order of an unselectable hero ("target is unselectable", lab run 1).
 	-- Debuff immunity against the creeps' stuns instead, and the HP is refilled every tick.
 	h:AddNewModifier(h, nil, "modifier_black_king_bar_immune", {})
+	-- no right-clicks: standing between casts, Tinker's auto-attack hit creeps that came close, damage no test asked for
+	h:SetAttackCapability(DOTA_UNIT_CAP_NO_ATTACK)
 	SendToServerConsole("sv_cheats 1")
 	-- no XP or gold from the test kills (Tinker's level would drift; you spotted the XP)
 	local mode = GameRules:GetGameModeEntity()
 	mode:SetModifyExperienceFilter(function() return false end, self)
 	mode:SetModifyGoldFilter(function() return false end, self)
 	pcall(function() GameRules:SetCreepSpawningEnabled(false) end)          -- no lane creeps: an empty map
+	if L.map and L.map ~= "dota" then
+		-- our own map: Tinker stands at its centre and each camp is spawned at its real offset from the stand spot
+		self.lab_center = h:GetAbsOrigin()
+		self:Log("lab_map", {map = L.map, x = math.floor(self.lab_center.x), y = math.floor(self.lab_center.y)})
+	end
+	if L.probe then
+		self:SetSpeed(L.speed)
+		self.probe = {next_at = -1, minute = 0}
+		self:Log("lab_start", {tests = L.probe, probe = true})
+		self:SetPhase("lab")
+		return
+	end
 	for _, n in ipairs({"tinker_rearm", "tinker_keen_teleport"}) do self:Ab(n):SetLevel(1) end
 	self.lab_queue = {}
 	if L.camps then
@@ -780,6 +794,62 @@ function TinkerBot:LabStart()
 	self:SetPhase("lab")
 end
 
+function TinkerBot:LabPos(st, x, y)
+	if not self.lab_center then return Vector(x, y, 0) end
+	local S = CFG.stations[st]
+	return self.lab_center + (Vector(x, y, 0) - vec(S.stand))
+end
+
+function TinkerBot:LabStand(st)
+	return self.lab_center or vec(CFG.stations[st].stand)
+end
+
+-- probe: a centaur family every game minute from 0:00, its max HP and every buff on it at +0.1 s and +1 s, to find
+-- the strength buff neutrals get as the clock runs (lab run 10-01: creeps ended 1-March tests above their max HP)
+function TinkerBot:LabProbe(now, t)
+	local P = self.probe
+	if P.unit_check and now >= P.unit_check.at then
+		local rec = {minute = P.unit_check.minute, after_s = P.unit_check.after, units = {}}
+		for _, u in ipairs(P.units) do
+			if IsValidEntity(u) and u:IsAlive() then
+				local mods = {}
+				for _, m in ipairs(u:FindAllModifiers()) do
+					table.insert(mods, {name = m:GetName(), stacks = m:GetStackCount()})
+				end
+				table.insert(rec.units, {name = (u:GetUnitName():gsub("npc_dota_neutral_", "")), hp = u:GetHealth(),
+					max_hp = u:GetMaxHealth(), armor = math.floor(u:GetPhysicalArmorValue(false) * 10) / 10,
+					mr = select(2, pcall(function() return math.floor(u:Script_GetMagicalArmorValue(false) * 100) end)),
+					dmg = u:GetAttackDamage(),
+					bounty = (u:GetMinimumGoldBounty() + u:GetMaximumGoldBounty()) / 2, modifiers = mods})
+			end
+		end
+		self:Log("lab_probe", rec)
+		if P.unit_check.after < 1 then
+			P.unit_check = {at = now + 0.9, minute = P.unit_check.minute, after = 1}
+		else
+			for _, u in ipairs(P.units) do if IsValidEntity(u) and u:IsAlive() then u:ForceKill(false) end end
+			P.unit_check, P.units = nil, nil
+		end
+		return
+	end
+	if P.units then return end
+	if t >= P.minute * 60 then
+		if P.minute > CFG.lab.probe then
+			if not self.ended then self.ended = true; self:Log("end", {lab = true}) end
+			return
+		end
+		local c = self.lab_center or self.hero:GetAbsOrigin() + Vector(600, 0, 0)
+		P.units = {}
+		for k, name in ipairs({"centaur_khan", "centaur_outrunner", "centaur_outrunner", "black_dragon", "granite_golem"}) do
+			local a = k * 1.3
+			table.insert(P.units, CreateUnitByName("npc_dota_neutral_" .. name, c + Vector(700 + math.cos(a) * 120, math.sin(a) * 120, 0),
+				true, nil, nil, DOTA_TEAM_NEUTRALS))
+		end
+		P.unit_check = {at = now + 0.1, minute = P.minute, after = 0.1}
+		P.minute = P.minute + 1
+	end
+end
+
 function TinkerBot:LabUnits(st)
 	local out = {}
 	for _, c in ipairs(self.camps or {}) do
@@ -806,6 +876,15 @@ function TinkerBot:LabFull(st, now)
 	return now - seen.at >= 0.6
 end
 
+local function creep_stats(u)
+	local mods = {}
+	for _, m in ipairs(u:FindAllModifiers()) do table.insert(mods, m:GetName()) end
+	local p = u:GetAbsOrigin()
+	local ok, mr = pcall(function() return math.floor(u:Script_GetMagicalArmorValue(false) * 100) end)
+	return {hp = u:GetHealth(), max_hp = u:GetMaxHealth(), armor = math.floor(u:GetPhysicalArmorValue(false) * 10) / 10,
+		mr = ok and mr or nil, x = math.floor(p.x), y = math.floor(p.y), modifiers = mods}
+end
+
 local function bounty(u)
 	local ok, b = pcall(function() return (u:GetMinimumGoldBounty() + u:GetMaximumGoldBounty()) / 2 end)
 	return ok and b or 35
@@ -813,6 +892,7 @@ end
 
 function TinkerBot:Lab(now)
 	local h = self.hero
+	if self.probe then return self:LabProbe(now, GameRules:GetDOTATime(false, true)) end
 	local march, laser = self:Ab("tinker_march_of_the_machines"), self:Ab("tinker_laser")
 	local cur = self.lab_cur
 	h:SetHealth(h:GetMaxHealth())                                             -- the creeps can't kill the test
@@ -840,18 +920,19 @@ function TinkerBot:Lab(now)
 		if cur.manual then
 			march:SetLevel(cur.march)
 			laser:SetLevel(cur.march >= 4 and 3 or 2)
-			for _, u in ipairs(Entities:FindAllByClassnameWithin("npc_dota_creep_neutral", vec(S.stand), 2000)) do
+			for _, u in ipairs(Entities:FindAllByClassnameWithin("npc_dota_creep_neutral", self:LabStand(cur.st), 2000)) do
 				if u:IsAlive() then u:ForceKill(false) end                         -- natural spawns and leftovers
 			end
 			cur.units, cur.gold0, cur.names, cur.mine, cur.camps = {}, 0, {}, {}, {}
 			for _, sp in ipairs(cur.spawns) do                                   -- both camps of the station at once
-				local pos = Vector(sp.x, sp.y, 0)
+				local pos = self:LabPos(cur.st, sp.x, sp.y)
 				local fam = {camp = cur.st .. ":" .. sp.x .. ":" .. sp.y, family = table.concat(sp.family, "+"), creeps = {}}
 				for k, name in ipairs(sp.family) do
 					local a = k * 2.4
 					local u = CreateUnitByName("npc_dota_neutral_" .. name, pos + Vector(math.cos(a), math.sin(a), 0) * 110,
 						true, nil, nil, DOTA_TEAM_NEUTRALS)
 					if u then
+						u:RemoveModifierByName("modifier_neutral_upgrade")              -- frozen strength (see the sweep)
 						table.insert(cur.units, u)
 						cur.mine[u] = true
 						table.insert(cur.names, name)
@@ -861,7 +942,7 @@ function TinkerBot:Lab(now)
 				end
 				table.insert(cur.camps, fam)
 			end
-			FindClearSpaceForUnit(h, vec(S.stand), true)
+			FindClearSpaceForUnit(h, self:LabStand(cur.st), true)
 			h:Stop()
 			cur.cast, cur.next_at, cur.dir, cur.t0 = 0, now + 1.0, yawdir(S.face), now
 			self.lab_cur = cur
@@ -895,8 +976,48 @@ function TinkerBot:Lab(now)
 	end
 	if cur.manual and now - (cur.swept or 0) > 0.5 then
 		cur.swept = now
-		for _, u in ipairs(Entities:FindAllByClassnameWithin("npc_dota_creep_neutral", vec(CFG.stations[cur.st].stand), 2000)) do
+		for _, u in ipairs(Entities:FindAllByClassnameWithin("npc_dota_creep_neutral", self:LabStand(cur.st), 2000)) do
 			if u:IsAlive() and not cur.mine[u] then u:ForceKill(false) end
+		end
+		-- a stale world: neutrals get +34 HP / +0.5 armour / +1 damage per step of the game clock from ~7:30
+		-- (modifier_neutral_upgrade, probe 10-01), and lab run 2 ran to minute 210. Every lab creep stays at step 0.
+		for _, u in ipairs(cur.units) do
+			if IsValidEntity(u) and u:IsAlive() and u:HasModifier("modifier_neutral_upgrade") then
+				local hp = u:GetHealth()
+				u:RemoveModifierByName("modifier_neutral_upgrade")
+				u:SetHealth(math.min(hp, u:GetMaxHealth()))
+			end
+		end
+	end
+	if cur.cast == 0 and now >= cur.next_at and not cur.t_start then
+		cur.t_start = now
+		cur.casts, cur.day = {}, GameRules:IsDaytime()
+		for _, fam in ipairs(cur.camps or {}) do
+			for _, x in ipairs(fam.creeps) do
+				if IsValidEntity(x.unit) and x.unit:IsAlive() then x.start, x.timeline = creep_stats(x.unit), {} end
+			end
+		end
+	end
+	if cur.t_start and now - (cur.sampled or 0) >= 0.5 then                   -- HP + position of every creep, 0.5 s
+		cur.sampled = now
+		local dt = math.floor((now - cur.t_start) * 10) / 10
+		for _, fam in ipairs(cur.camps or {}) do
+			for _, x in ipairs(fam.creeps) do
+				if x.timeline and not x.died_at then
+					if IsValidEntity(x.unit) and x.unit:IsAlive() then
+						local p = x.unit:GetAbsOrigin()
+						table.insert(x.timeline, {dt, x.unit:GetHealth(), math.floor(p.x), math.floor(p.y)})
+					else
+						x.died_at = dt
+					end
+				end
+			end
+		end
+		if cur.laser_check and now >= cur.laser_check.at then              -- the Laser target 0.5 s later
+			local L = cur.laser_check
+			L.hp_after = IsValidEntity(L.unit) and L.unit:IsAlive() and L.unit:GetHealth() or 0
+			L.killed, L.unit, L.at = L.hp_after == 0, nil, nil
+			cur.laser_info, cur.laser_check = L, nil
 		end
 	end
 	if cur.cast < cur.n then
@@ -905,6 +1026,9 @@ function TinkerBot:Lab(now)
 			h:SetMana(h:GetMaxMana())
 			if cur.cast > 0 then cur.dir = cur.dir * -1 end                     -- turned 180, like the bot
 			self:MarchDir(cur.dir, "lab")
+			local hp = h:GetAbsOrigin()
+			table.insert(cur.casts, {ability = "march", t = math.floor((now - cur.t_start) * 10) / 10,
+				yaw = math.floor(math.deg(math.atan2(cur.dir.y, cur.dir.x)) % 360), x = math.floor(hp.x), y = math.floor(hp.y)})
 			cur.cast = cur.cast + 1
 			cur.next_at = now + LAB_GAP
 			if cur.cast == cur.n then cur.laser_at, cur.done_at = now + 1.0, now + LAB_SETTLE end
@@ -915,7 +1039,9 @@ function TinkerBot:Lab(now)
 		cur.lasered = true
 		local ldmg = CFG.laser_dmg[laser:GetLevel()] or 0
 		local best
-		for _, u in ipairs(cur.units) do                                      -- the bot's pick: a creep it kills, the biggest
+		-- laser 1: the bot's pick (a creep it kills, the biggest; else the fattest). laser 2 (your idea): always the
+		-- creep with the most HP left in the whole station, both families together
+		for _, u in ipairs(cur.laser == 1 and cur.units or {}) do
 			if IsValidEntity(u) and u:IsAlive() and u:GetHealth() <= ldmg and (not best or u:GetHealth() > best:GetHealth()) then best = u end
 		end
 		if not best then                                                      -- else the fattest
@@ -923,7 +1049,12 @@ function TinkerBot:Lab(now)
 				if IsValidEntity(u) and u:IsAlive() and (not best or u:GetHealth() > best:GetHealth()) then best = u end
 			end
 		end
-		if best then laser:EndCooldown(); h:SetMana(h:GetMaxMana()); self:CastTarget(laser, best) end
+		if best then
+			laser:EndCooldown(); h:SetMana(h:GetMaxMana()); self:CastTarget(laser, best)
+			cur.laser_check = {unit = best, at = now + 0.5, name = (best:GetUnitName():gsub("npc_dota_neutral_", "")),
+				hp_before = best:GetHealth(), t = math.floor((now - cur.t_start) * 10) / 10, mode = cur.laser}
+			table.insert(cur.casts, {ability = "laser", t = cur.laser_check.t, target = cur.laser_check.name})
+		end
 	end
 	if now < cur.done_at then return end
 	local left, gold_left = {}, 0
@@ -939,13 +1070,16 @@ function TinkerBot:Lab(now)
 		for _, x in ipairs(fam.creeps) do
 			local alive = IsValidEntity(x.unit) and x.unit:IsAlive()
 			table.insert(cs, {name = x.name, max_hp = x.max_hp, bounty = x.bounty, killed = not alive,
-				hp = alive and x.unit:GetHealth() or 0})
+				hp = alive and x.unit:GetHealth() or 0, start = x.start, died_at = x.died_at, timeline = x.timeline})
 		end
 		table.insert(camps, {camp = fam.camp, family = fam.family, creeps = cs})
 	end
 	self:Log("lab_result", {station = cur.st, march = cur.march, marches = cur.n, laser = cur.laser,
 		creeps = #cur.units, killed = #cur.units - #left, gold = math.floor(cur.gold0 - gold_left), gold_camp = math.floor(cur.gold0),
-		left = left, camp = cur.names, camps = camps, seconds = math.floor((now - cur.t0) * 10) / 10})
+		left = left, camp = cur.names, camps = camps, seconds = math.floor((now - cur.t0) * 10) / 10,
+		casts = cur.casts, laser_info = cur.laser_info or (cur.laser_check and {name = cur.laser_check.name,
+			hp_before = cur.laser_check.hp_before, t = cur.laser_check.t, mode = cur.laser}), day = cur.day,
+		laser_mode = cur.laser})
 	for _, u in ipairs(cur.units) do if IsValidEntity(u) and u:IsAlive() then u:ForceKill(false) end end
 	self.lab_cur = nil
 	if not cur.manual then self.lab_respawn_at = now + 0.5 end              -- -spawnneutrals once the corpses are gone

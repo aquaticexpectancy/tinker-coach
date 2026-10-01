@@ -431,7 +431,9 @@ def lab_config(a) -> dict:
     """The lab's tests: with lab_families.json (python lab_families.py) every family is spawned by name at its camp;
     without it the real spawns are used."""
     cfg = {"reps": a.lab, "stations": a.lab_stations.split(","), "march_levels": [3, 4], "marches": [1, 2, 3, 4],
-           "lasers": [0, 1], "speed": 10}
+           "lasers": [0, 1, 2], "speed": 10, "map": a.lab_map}       # Laser 1: the bot's pick, 2: the most HP left
+    if a.lab_probe is not None:
+        cfg["probe"] = a.lab_probe
     fams = HERE / "lab_families.json"
     if fams.exists():
         import itertools
@@ -471,6 +473,9 @@ def main():
     ap.add_argument("--lab", nargs="?", const=2, type=int, default=None, metavar="REPS",
                     help="lab: test 1-4 Marches +/- Laser at March 3 and 4 on every camp, REPS times each (default 2)")
     ap.add_argument("--lab-stations", default="A,C,D,E", help="lab: which stations (default A,C,D,E)")
+    ap.add_argument("--lab-map", default="creeptests", help="lab: the map (default creeptests, empty; dota = the real map)")
+    ap.add_argument("--lab-probe", type=int, default=None, metavar="MINUTES",
+                    help="lab: instead of tests, log a fresh creep family's HP and buffs every game minute up to MINUTES")
     ap.add_argument("--plan", choices=["user", "auto"], default="user",
                     help="user: fixed March counts by March level + never the same place twice in a row; auto: skips decide")
     ap.add_argument("--tricks", choices=["on", "off"], default="on",
@@ -509,7 +514,7 @@ def main():
         lab_args = ["-nosound", "+fps_max", "60"] if a.lab else []
         subprocess.Popen([str(STEAM / "steam.exe"), "-applaunch", "570", "-tools", "-addon", ADDON, "-novid",
                           "-gamestateintegration", "-condebug", "-language", "english", *lab_args,
-                          "+dota_launch_custom_game", ADDON, "dota"])
+                          "+dota_launch_custom_game", ADDON, a.lab_map if a.lab else "dota"])
         print("Launching Dota (Workshop Tools) into the bot game… the first load takes a minute.")
     print("Type -bot in the game chat to take over. Ctrl+C here to stop.\n")
     if a.lab:                                                # no HUD for a lab: just wait for its end

@@ -1,0 +1,144 @@
+"""The March lab's progress in Telegram: one message, edited every 5 s (the same fields as lab_hud.py).
+
+    python lab_tele.py              the latest lab run
+    python lab_tele.py <run.jsonl>
+
+Setup (once): make a bot with @BotFather (/newbot), put its token in telegram_token.txt next to this file (git-
+ignored) or in TELEGRAM_BOT_TOKEN, and send /start to the bot. The chat is remembered in telegram_chat.txt.
+Stops by itself when the lab ends (the last message stays), or with Ctrl+C.
+"""
+import argparse
+import html
+import json
+import os
+import sys
+import time
+import urllib.parse
+import urllib.request
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import lab_hud  # noqa: E402  (latest_lab, short)
+
+TOKEN_FILE, CHAT_FILE = os.path.join(HERE, "telegram_token.txt"), os.path.join(HERE, "telegram_chat.txt")
+EVERY, BAR_W, WIDTH = 5, 16, 40
+
+
+def api(token, method, **params):
+    data = urllib.parse.urlencode(params).encode()
+    with urllib.request.urlopen(f"https://api.telegram.org/bot{token}/{method}", data=data, timeout=20) as r:
+        return json.loads(r.read())
+
+
+def chat_id(token):
+    if os.path.exists(CHAT_FILE):
+        return open(CHAT_FILE).read().strip()
+    print("Send /start to your bot in Telegram ...")
+    while True:
+        for u in api(token, "getUpdates", timeout=10).get("result", []):
+            msg = u.get("message") or {}
+            if msg.get("chat", {}).get("id"):
+                cid = str(msg["chat"]["id"])
+                open(CHAT_FILE, "w").write(cid)
+                print("chat", cid)
+                return cid
+        time.sleep(1)
+
+
+class State:
+    """The lab log, read incrementally."""
+
+    def __init__(self, path):
+        self.path, self.pos, self.start, self.total, self.results, self.ended, self.queue = path, 0, None, None, [], False, None
+
+    def read(self):
+        with open(self.path, encoding="utf-8", errors="replace") as f:
+            f.seek(self.pos)
+            for line in f:
+                if not line.endswith("\n"):
+                    break
+                self.pos += len(line.encode("utf-8"))
+                try:
+                    r = json.loads(line)
+                except ValueError:
+                    continue
+                k = r.get("kind")
+                if k == "lab_start":
+                    self.start, self.total = r.get("wall"), r.get("tests")
+                elif k == "lab_result":
+                    self.results.append(r)
+                elif k == "end":
+                    self.ended = True
+        if self.total and self.queue is None:
+            try:
+                import bot
+                cfg = bot.lab_config(argparse.Namespace(lab=1, lab_stations="A,C,D,E", lab_map="creeptests", lab_probe=None))
+                per = [(c, ml, n, l) for c in cfg["combos"] for ml in cfg["march_levels"] for n in cfg["marches"] for l in cfg["lasers"]]
+                self.queue = per * max(1, self.total // max(1, len(per)))
+            except Exception:
+                self.queue = []
+
+    def text(self):
+        t = ["✻ Tinker March lab"]
+        if not self.start:
+            return "\n".join(t + ["  waiting for the lab to start…"])
+        now, total = time.time(), self.total or 0
+        done = min(len(self.results), total) if total else len(self.results)
+        elapsed = now - self.start
+        rate = done / elapsed if elapsed > 0 and done else 0
+        eta = (total - done) / rate if rate and done < total else None
+        if self.ended or (total and done >= total):
+            status = "✅ done"
+        elif self.results and now - self.results[-1]["wall"] > 30:
+            status = "🟥 stalled (no result for 30 s)"
+        else:
+            status = "🟢 running"
+        cur = self.queue[done] if self.queue and done < len(self.queue) else None
+        if cur:
+            c, ml, n, l = cur
+            fam = lab_hud.short(" + ".join("+".join(sp["family"]) for sp in c["spawns"]))
+            room = WIDTH - len("family   ")
+            t.append(f"testing  {c['station']} · March {ml} · {n}M{('+Laser' if l == 1 else '+Laser max HP') if l else ''}")
+            t.append("family   " + (fam if len(fam) <= room else fam[:room - 1] + "…"))
+        else:
+            t += ["testing  -", "family   -"]
+        combos = len({json.dumps(q[0]) for q in self.queue}) if self.queue else 0
+        per_combo = total // combos if combos else 16
+        mm = lambda s: f"{int(s // 60):02d}:{int(s % 60):02d}"
+        t.append(f"elapsed  {mm(elapsed)}   eta {mm(eta) if eta else '--:--'}")
+        t.append(f"done ≈   {time.strftime('%H:%M', time.localtime(now + eta)) if eta else '--:--'} local")
+        t.append(f"families {done // per_combo}/{combos or '?'}   tests {done}/{total}")
+        frac = done / total if total else 0
+        fill = int(round(frac * BAR_W))
+        t.append("🟩" * fill + "⬜" * (BAR_W - fill) + f" {frac * 100:.1f}%")
+        t.append(status)
+        return "\n".join(t)
+
+
+def main():
+    token = os.environ.get("TELEGRAM_BOT_TOKEN") or (open(TOKEN_FILE).read().strip() if os.path.exists(TOKEN_FILE) else None)
+    if not token:
+        sys.exit("no bot token: put it in telegram_token.txt (see the top of this file)")
+    cid = chat_id(token)
+    path = sys.argv[1] if len(sys.argv) > 1 else lab_hud.latest_lab()
+    st = State(path)
+    st.read()
+    body = lambda: "<pre>" + html.escape(st.text()) + "</pre>"
+    msg = api(token, "sendMessage", chat_id=cid, text=body(), parse_mode="HTML")["result"]["message_id"]
+    last = None
+    while True:
+        time.sleep(EVERY)
+        st.read()
+        b = body()
+        if b != last:
+            try:
+                api(token, "editMessageText", chat_id=cid, message_id=msg, text=b, parse_mode="HTML")
+                last = b
+            except Exception as ex:                    # "message is not modified", a network blip: try next time
+                print("edit:", ex)
+        if st.ended or (st.total and len(st.results) >= st.total):
+            break
+
+
+if __name__ == "__main__":
+    main()

@@ -21,6 +21,7 @@ sys.path.insert(0, HERE)
 BG, FG, DIM, ORANGE, GREEN, RED, BAR_BG = "#1a1a1a", "#e8e6e3", "#8b8b8b", "#d97757", "#4eba65", "#e5534b", "#3a3a3a"
 FONT = ("Cascadia Mono", 10)
 BAR_W = 28
+WIDTH = 64      # characters: no line may be longer (a long family line wrapped and pushed the bar out of the window)
 
 
 def latest_lab():
@@ -51,7 +52,7 @@ class Hud:
         root.attributes("-topmost", True)
         root.attributes("-alpha", 0.94)
         root.configure(bg=BG)
-        self.text = tk.Text(root, width=56, height=8, bg=BG, fg=FG, font=FONT, bd=0, highlightthickness=1,
+        self.text = tk.Text(root, width=WIDTH, height=7, wrap="none", bg=BG, fg=FG, font=FONT, bd=0, highlightthickness=1,
                             highlightbackground="#2e2e2e", padx=12, pady=8, cursor="arrow")
         self.text.pack()
         for tag, col in (("orange", ORANGE), ("dim", DIM), ("green", GREEN), ("red", RED), ("barbg", BAR_BG)):
@@ -96,7 +97,7 @@ class Hud:
         """The lab's test order (combos x March level x Marches x Laser x repeats), to name the test running now."""
         try:
             import bot
-            cfg = bot.lab_config(argparse.Namespace(lab=1, lab_stations="A,C,D,E"))
+            cfg = bot.lab_config(argparse.Namespace(lab=1, lab_stations="A,C,D,E", lab_map="creeptests", lab_probe=None))
         except Exception:
             return None
         per = [(c, ml, n, l) for c in cfg["combos"] for ml in cfg["march_levels"] for n in cfg["marches"] for l in cfg["lasers"]]
@@ -107,7 +108,8 @@ class Hud:
         self.read()
         if self.total and self.queue is None:
             self.queue = self.build_queue() or []
-        done, total = len(self.results), self.total or 0
+        total = self.total or 0
+        done = min(len(self.results), total) if total else len(self.results)   # a few tests can log twice
         t = self.text
         t.configure(state="normal")
         t.delete("1.0", "end")
@@ -119,7 +121,7 @@ class Hud:
             now = time.time()
             elapsed = now - self.start
             rate = done / elapsed if elapsed > 0 and done else 0
-            eta = (total - done) / rate if rate else None
+            eta = (total - done) / rate if rate and done < total else None
             if self.ended or done >= total:
                 status, scol = "done", "green"
             elif self.results and now - self.results[-1]["wall"] > 30:
@@ -131,9 +133,11 @@ class Hud:
                 c, ml, n, l = cur
                 fams = " + ".join("+".join(sp["family"]) for sp in c["spawns"])
                 t.insert("end", "  testing  ", "dim")
-                t.insert("end", f"{c['station']} · March {ml} · {n}M{'+Laser' if l else ''}\n")
+                t.insert("end", f"{c['station']} · March {ml} · {n}M{('+Laser' if l == 1 else '+Laser max HP') if l else ''}\n")
                 t.insert("end", "  family   ", "dim")
-                t.insert("end", short(fams)[:58] + "\n")
+                fam = short(fams)
+                room = WIDTH - len("  family   ")
+                t.insert("end", (fam if len(fam) <= room else fam[:room - 1] + "…") + "\n")
             else:
                 t.insert("end", "  testing  -\n  family   -\n", "dim")
             combos_total = len({json.dumps(q[0]) for q in self.queue}) if self.queue else 0
