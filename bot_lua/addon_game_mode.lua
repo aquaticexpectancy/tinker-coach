@@ -326,7 +326,7 @@ function TinkerBot:UpdateCamps(now)
 	if m ~= self.camp_minute then
 		-- leftovers block a camp's :00 spawn, so only an empty camp gets a new set
 		-- (bot run 2026-09-30: camps left with creeps grew +0.7 per :00, not +4)
-		for _, c in ipairs(self.camps) do if c.n == 0 then c.n = c.full or 4 end end
+		for _, c in ipairs(self.camps) do if c.n == 0 then c.n, c.left = c.full or 4, 0 end end
 		self.camp_minute = m
 	end
 	if now < (self.next_camp_scan or 0) then return end
@@ -342,6 +342,7 @@ function TinkerBot:UpdateCamps(now)
 			end
 			c.n, c.seen, c.seen_n, c.seen_minute = n, now, n, m
 			if not c.full and n > 0 then c.full = n end         -- first sight with creeps = one set (4-6 by camp)
+			if c.left and n < c.left then c.left = n end         -- some of the leftovers died
 		end
 	end
 end
@@ -361,9 +362,16 @@ end
 
 function TinkerBot:CampReady(st)
 	if st == "B" then return true end
-	-- (tried: counting only camps holding a full set, so 4+ leftovers don't look fresh. Run 9 was the worst
-	-- Jev run, 4,278, and it missed A's 5 leftovers anyway since a set's size is learned from one look.)
-	local v = self:StationValue(st)
+	-- only fresh creeps count: the ones a trip left behind are what its Marches couldn't kill, and going back
+	-- for them was 12 zero-kill trips in 10 rules runs (C's ancients, D's SW camp). Exact, from the recount on
+	-- leaving (an earlier try guessed a camp's set size from one look and failed).
+	local v = self:StationValue(st)                                        -- (also expires stale 'stuck' marks)
+	if CFG.ready ~= "old" then
+		v = 0
+		for _, c in ipairs(self.camps or {}) do
+			if c.st == st and not c.stuck then v = v + math.max(0, c.n - (c.left or 0)) end
+		end
+	end
 	if v >= 4 then return true end
 	-- low now but the :00 spawn lands before we would: count it as ready (we wait for it there);
 	-- only camps that are empty get that spawn, leftovers block it
@@ -378,7 +386,8 @@ end
 function TinkerBot:CleanupReady(st)
 	if st == "B" then return false end
 	local v = self:StationValue(st)
-	return v >= 1 and not self:CampReady(st)
+	local lh = self.last_trip_lh and self.last_trip_lh[st]
+	return v >= 1 and not self:CampReady(st) and (CFG.ready == "old" or lh == nil or lh >= 2)
 end
 
 function TinkerBot:CampReadyOld(st)
@@ -925,11 +934,14 @@ end
 
 function TinkerBot:Book(prev)
 	prev.lh = PlayerResource:GetLastHits(self.pid) - prev.lh0
+	self.last_trip_lh = self.last_trip_lh or {}
+	self.last_trip_lh[prev.station] = prev.lh
 	local left = prev.station ~= "B" and self:StationCreeps(prev.station) or 0
 	for _, c in ipairs(self.camps or {}) do
 		if c.st == prev.station then
 			c.n = #self:Units(c.pos, 650, true)
 			c.seen, c.seen_n, c.seen_minute = GameRules:GetGameTime(), c.n, self:Minute()
+			c.left = c.n                                         -- what this trip couldn't kill
 			-- two trips in a row with 0-1 kills and creeps still there: the plan's Marches don't reach them (bot run
 			-- 2026-09-30: D's SW camp kept 6 creeps / 3,400 HP through four trips). Stop counting them.
 			-- (one bad trip isn't enough: C went +1 then +5 in the same run)
@@ -1027,6 +1039,7 @@ function TinkerBot:StationRules(t, wave, mana)
 	if self:CampReady("D") then return "D" end
 	if t >= 510 and self:CampReady("E") then return "E" end
 	if wave and wave.n >= CFG.wave_min_creeps then return "B" end
+	if CFG.ready ~= "old" and self:CampReady("E") then return "E" end   -- a full E beats a cleanup trip
 	-- nothing full: clear the camp with the most leftovers so its next :00 spawn can land
 	local best, bv = nil, 0
 	for _, st in ipairs({"A", "C", "D"}) do
@@ -1226,8 +1239,12 @@ function TinkerBot:Trip(t, now)
 		for _, u in ipairs(targets) do hpleft = hpleft + u:GetHealth() end
 		hpleft = hpleft + math.max(0, self:StationValue(tr.station) - #targets) * 450     -- creeps remembered but not in sight
 		local need = (CFG.more_march_hp[tr.station] or {})[tr.marches]
+		-- use_mana: March on while the mana covers it (the R step checks Rearm + March + Keen + reserve) unless
+		-- only ~2 weak creeps are left; the Immortal thresholds left 5.2 creeps a camp trip and ~670 mana unused
+		if CFG.use_mana then need = 1200 end
 		if tr.marches >= 2 and need and hpleft < need then                               -- Immortals leave here
-			self:Log("skip", {why = string.format("%d HP left after %d Marches: Immortals stop here (< %d)", hpleft, tr.marches, need)})
+			self:Log("skip", {why = string.format("%d HP left after %d Marches: %s (< %d)", hpleft, tr.marches,
+				CFG.use_mana and "too little left for another March" or "Immortals stop here", need)})
 			tr.i = #tr.plan + 1
 			return
 		end
@@ -1312,8 +1329,12 @@ function TinkerBot:Trip(t, now)
 		for _, u in ipairs(targets) do hpleft = hpleft + u:GetHealth() end
 		hpleft = hpleft + math.max(0, self:StationValue(tr.station) - #targets) * 450     -- creeps remembered but not in sight
 		local need = (CFG.more_march_hp[tr.station] or {})[tr.marches]
+		-- use_mana: March on while the mana covers it (the R step checks Rearm + March + Keen + reserve) unless
+		-- only ~2 weak creeps are left; the Immortal thresholds left 5.2 creeps a camp trip and ~670 mana unused
+		if CFG.use_mana then need = 1200 end
 		if tr.marches >= 2 and need and hpleft < need then                               -- Immortals leave here
-			self:Log("skip", {why = string.format("%d HP left after %d Marches: Immortals stop here (< %d)", hpleft, tr.marches, need)})
+			self:Log("skip", {why = string.format("%d HP left after %d Marches: %s (< %d)", hpleft, tr.marches,
+				CFG.use_mana and "too little left for another March" or "Immortals stop here", need)})
 			tr.i = #tr.plan + 1
 			return
 		end
