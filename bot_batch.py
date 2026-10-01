@@ -35,8 +35,9 @@ SETUPS = {                                  # name: bot.py arguments
     "rate_mana": ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rate", "--marches", "mana", "--tricks", "off", "--plan", "auto"],
     "tricks": ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rate", "--marches", "mana", "--tricks", "on", "--plan", "auto"],
     "user": ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rate", "--marches", "mana", "--tricks", "on", "--plan", "user"],
+    "lab": ["--advisor", "rules", "--route", "rules", "--aim", "off", "--ready", "fresh", "--router", "rate", "--marches", "mana", "--tricks", "on", "--plan", "lab"],
 }
-COMMON = ["--drill", "--speed", "2", "--no-video"]
+COMMON = ["--drill", "--speed", "2", "--no-video", "--no-hud"]   # follow a batch with lab_hud.py
 TIMEOUT = 15 * 60                           # a run is ~4-5 min; anything past this is stuck
 FIELDS = ["setup", "run", "status", "nw", "lh", "camp_trips", "camp_lh", "wave_trips", "wave_lh", "jev_lowconf", "jev_calls"]
 
@@ -157,8 +158,18 @@ def main():
     order = [s for _ in range(a.runs) for s in setups]          # round-robin: slow drift hits every setup alike
     print(f"{len(order)} runs ({', '.join(setups)} x {a.runs}) -> {path}")
     t0 = time.time()
+    status = {"csv": os.path.basename(path), "order": order, "start": t0}
+
+    def save_status(**kw):                                       # for lab_hud.py --batch
+        status.update(kw)
+        try:
+            with open(os.path.join(RUNS, "batch_status.json"), "w", encoding="utf-8") as f:
+                json.dump(status, f)
+        except OSError:
+            pass
     try:
         for i, setup in enumerate(order, 1):
+            save_status(i=i, setup=setup, game_start=time.time())
             print(f"[{i}/{len(order)}] {setup} ...", flush=True)
             r = one_run(setup)
             with open(path, "a", newline="", encoding="utf-8") as f:
@@ -166,8 +177,10 @@ def main():
             left = (time.time() - t0) / i * (len(order) - i)
             print(f"   {r['status']}: nw {r.get('nw')}, lh {r.get('lh')}, camp {r.get('camp_lh')}/trip "
                   f"| ~{left / 60:.0f} min left", flush=True)
+        save_status(i=len(order) + 1, setup=None, done=True)
     except KeyboardInterrupt:
         print("stopped")
+        save_status(stopped=True)
         close_dota()
     report(path)
 

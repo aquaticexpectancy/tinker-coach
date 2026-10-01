@@ -1,12 +1,15 @@
-"""A small CLI-style progress window for the March lab (top right, always on top). Reads the lab's log live.
+"""A small CLI-style progress window for the March lab or a bot batch (top right, always on top). Reads logs live.
 
-    python lab_hud.py              the latest lab run
-    python lab_hud.py <run.jsonl>
+    python lab_hud.py              the latest lab run or batch, whichever started last
+    python lab_hud.py <run.jsonl>  that lab run
+    python lab_hud.py --batch [batch.csv] [--runs N]   a bot_batch.py batch (default: the latest)
 
-Shows the family mix being tested now, time passed, ETA, families (combos) checked, tests done and a progress bar.
+Lab: the family mix being tested now, time passed, ETA, families (combos) checked, tests done and a progress bar.
+Batch: the game running now (setup, game clock), time passed, ETA, each setup's average so far and a progress bar.
 Drag it with the left mouse button, right-click to close. Dota must be in Borderless Window mode to see it on top.
 """
 import argparse
+import csv
 import glob
 import json
 import os
@@ -43,16 +46,14 @@ def short(names):
     return " | ".join(out)
 
 
-class Hud:
-    def __init__(self, path):
-        self.path, self.pos, self.start, self.total, self.results, self.ended = path, 0, None, None, [], False
-        self.queue = None
+class Window:
+    def make_window(self, height):
         self.root = root = tk.Tk()
         root.overrideredirect(True)
         root.attributes("-topmost", True)
         root.attributes("-alpha", 0.94)
         root.configure(bg=BG)
-        self.text = tk.Text(root, width=WIDTH, height=7, wrap="none", bg=BG, fg=FG, font=FONT, bd=0, highlightthickness=1,
+        self.text = tk.Text(root, width=WIDTH, height=height, wrap="none", bg=BG, fg=FG, font=FONT, bd=0, highlightthickness=1,
                             highlightbackground="#2e2e2e", padx=12, pady=8, cursor="arrow")
         self.text.pack()
         for tag, col in (("orange", ORANGE), ("dim", DIM), ("green", GREEN), ("red", RED), ("barbg", BAR_BG)):
@@ -70,6 +71,13 @@ class Hud:
 
     def _drag(self, e):
         self.root.geometry(f"+{e.x_root - self._dx}+{e.y_root - self._dy}")
+
+
+class Hud(Window):
+    def __init__(self, path):
+        self.path, self.pos, self.start, self.total, self.results, self.ended = path, 0, None, None, [], False
+        self.queue = None
+        self.make_window(7)
 
     def read(self):
         try:
@@ -164,11 +172,183 @@ class Hud:
         self.root.after(1000, self.tick)
 
 
+def latest_batch():
+    runs = glob.glob(os.path.join(HERE, "bot_runs", "batch_*.csv"))
+    return max(runs, key=os.path.getmtime) if runs else None
+
+
+def clock(sec):
+    return f"{int(sec // 60):02d}:{int(sec % 60):02d}"
+
+
+DRILL_FROM, DRILL_TO = 300, 600      # the drill plays 5:00 -> 10:00 game time
+
+
+class BatchHud(Window):
+    """Follows bot_batch.py: its CSV (finished games), batch_status.json (the plan, batches after 10-01 19:55) and
+    the game log being written now. A batch without a status file: the plan is guessed from the CSV (setups in the
+    order they first appear, round-robin, --runs each). The first setup is the baseline of the net worth column."""
+
+    def __init__(self, path, runs):
+        self.path, self.runs = path, runs
+        self.base = os.path.splitext(os.path.basename(path))[0]
+        self.game, self.game_pos, self.game_clock, self.game_wall, self.game_nw = None, 0, None, None, None
+        self.rows, self.order, self.start, self.status = [], [], None, {}
+        self.read()
+        self.make_window(7 + max(2, len(set(self.order))))
+
+    def read(self):
+        try:
+            with open(self.path, encoding="utf-8") as f:
+                self.rows = list(csv.DictReader(f))
+        except OSError:
+            self.rows = []
+        st = {}
+        try:
+            with open(os.path.join(HERE, "bot_runs", "batch_status.json"), encoding="utf-8") as f:
+                st = json.load(f)
+        except (OSError, ValueError):
+            pass
+        if st.get("csv") == os.path.basename(self.path):
+            self.status, self.order, self.start = st, st["order"], st["start"]
+        else:
+            setups = list(dict.fromkeys(r["setup"] for r in self.rows))
+            self.order = [s for _ in range(self.runs) for s in setups]
+            try:
+                self.start = time.mktime(time.strptime(self.base, "batch_%Y-%m-%d_%H%M"))
+            except ValueError:
+                self.start = os.path.getctime(self.path)
+        # the game now: the newest game log since the batch started that isn't in the CSV yet
+        done = {r["run"] for r in self.rows}
+        logs = [p for p in glob.glob(os.path.join(HERE, "bot_runs", "20*.jsonl"))
+                if os.path.basename(p) not in done and os.path.getmtime(p) >= self.start]
+        newest = max(logs, key=os.path.getmtime) if logs else None
+        if newest != self.game:
+            self.game, self.game_pos, self.game_clock, self.game_wall, self.game_nw = newest, 0, None, None, None
+        if not self.game:
+            return
+        try:
+            with open(self.game, encoding="utf-8", errors="replace") as f:
+                f.seek(self.game_pos)
+                for line in f:
+                    if not line.endswith("\n"):
+                        break
+                    self.game_pos += len(line.encode("utf-8"))
+                    try:
+                        r = json.loads(line)
+                    except ValueError:
+                        continue
+                    if r.get("clock") is not None:
+                        self.game_clock = r["clock"]
+                    if r.get("wall"):
+                        self.game_wall = r["wall"]
+                    if r.get("nw") is not None:
+                        self.game_nw = r["nw"]
+        except OSError:
+            pass
+
+    def avg_nw(self, setup):
+        ok = [float(r["nw"]) for r in self.rows if r["setup"] == setup and r["status"] == "ok"]
+        return sum(ok) / len(ok) if ok else None
+
+    def tick(self):
+        self.read()
+        t = self.text
+        t.configure(state="normal")
+        t.delete("1.0", "end")
+        setups = list(dict.fromkeys(self.order)) or list(dict.fromkeys(r["setup"] for r in self.rows))
+        base = setups[0] if setups else None
+        t.insert("end", "* ", "orange")
+        t.insert("end", "Tinker bot batch  ", "orange")
+        t.insert("end", " vs ".join(setups) + "\n", "dim")
+        total, done, now = len(self.order), len(self.rows), time.time()
+        finished = bool(self.status.get("done")) or bool(total and done >= total)
+        frac_game = 0.0
+        if not finished and self.game_clock is not None:
+            frac_game = min(1.0, max(0.0, (self.game_clock - DRILL_FROM) / (DRILL_TO - DRILL_FROM)))
+        cur = self.order[done] if done < total else None
+        t.insert("end", "  game     ", "dim")
+        if finished:
+            t.insert("end", f"{done}/{total} played\n")
+        else:
+            t.insert("end", f"{done + 1}/{total or '?'}  ")
+            t.insert("end", cur or "?", "orange")
+            t.insert("end", "  clock ", "dim")
+            if self.game_clock is None or self.game_clock < 0:
+                t.insert("end", "starting…\n", "dim")
+            else:
+                t.insert("end", f"{clock(self.game_clock)}/{clock(DRILL_TO)}")
+                if self.game_nw is not None:
+                    t.insert("end", "  nw ", "dim")
+                    t.insert("end", f"{self.game_nw:,}")
+                t.insert("end", "\n")
+        elapsed = now - self.start
+        progress = done + frac_game
+        eta = elapsed / progress * (total - progress) if progress > 0.2 and total and not finished else None
+        t.insert("end", "  elapsed  ", "dim")
+        t.insert("end", clock(elapsed) if not finished else "-")
+        t.insert("end", "   eta  ", "dim")
+        t.insert("end", clock(eta) if eta else "--:--")
+        t.insert("end", "   done ≈ ", "dim")
+        t.insert("end", (time.strftime("%H:%M", time.localtime(now + eta)) if eta else "--:--") + "\n")
+        t.insert("end", f"  {'setup':8s} {'games':>5s} {'nw avg':>7s} {'lh avg':>6s} {'Δ nw vs ' + (base or '')[:6]:>14s}\n", "dim")
+        bnw = self.avg_nw(base) if base else None
+        for s in setups:
+            ok = [r for r in self.rows if r["setup"] == s and r["status"] == "ok"]
+            bad = sum(1 for r in self.rows if r["setup"] == s and r["status"] != "ok")
+            t.insert("end", f"  {s[:8]:8s} ", "orange" if s == cur and not finished else "")
+            t.insert("end", f"{len(ok):>5d} ")
+            nw = self.avg_nw(s)
+            lh = sum(float(r["lh"]) for r in ok) / len(ok) if ok else None
+            t.insert("end", f"{nw:>7,.0f} " if nw is not None else f"{'-':>7s} ")
+            t.insert("end", f"{lh:>6.1f} " if lh is not None else f"{'-':>6s} ")
+            if s == base or nw is None or bnw is None:
+                t.insert("end", f"{'-':>14s}", "dim")
+            else:
+                d = nw - bnw
+                t.insert("end", f"{d:>+14,.0f}", "green" if d > 0 else "red" if d < 0 else "")
+            if bad:
+                t.insert("end", f"  {bad} failed", "red")
+            t.insert("end", "\n")
+        frac = progress / total if total else 0
+        fill = int(round(frac * BAR_W))
+        t.insert("end", "  ")
+        t.insert("end", "█" * fill, "green")
+        t.insert("end", "░" * (BAR_W - fill), "barbg")
+        t.insert("end", f" {frac * 100:5.1f}%\n", "green")
+        fails = sum(1 for r in self.rows if r["status"] != "ok")
+        tail = f" · {fails} failed" if fails else ""
+        if finished:
+            status, scol = "done" + tail, "red" if fails else "green"
+        elif self.status.get("stopped"):
+            status, scol = "stopped", "red"
+        elif self.game_wall and (self.game_clock or -1) >= 0 and now - self.game_wall > 60:
+            status, scol = "stalled (game log quiet for 60 s)", "red"
+        else:
+            status, scol = "running" + tail, "red" if fails else "green"
+        t.insert("end", "  ● ", scol)
+        t.insert("end", status, scol)
+        t.configure(state="disabled")
+        self.root.after(1000, self.tick)
+
+
 def main():
-    path = sys.argv[1] if len(sys.argv) > 1 else latest_lab()
+    ap = argparse.ArgumentParser(description="progress window for the March lab or a bot batch")
+    ap.add_argument("path", nargs="?", help="a lab run (.jsonl) or a batch (.csv)")
+    ap.add_argument("--batch", nargs="?", const="latest", help="follow a bot_batch.py batch (default: the latest)")
+    ap.add_argument("--runs", type=int, default=5, help="batch: games per setup, if the batch has no status file")
+    a = ap.parse_args()
+    path = a.path
+    if a.batch:
+        path = latest_batch() if a.batch == "latest" else a.batch
+    elif not path:                                                    # whichever started last
+        path = max([p for p in (latest_lab(), latest_batch()) if p], key=os.path.getctime, default=None)
     if not path:
-        sys.exit("no lab run found in bot_runs/")
-    Hud(path).root.mainloop()
+        sys.exit("no lab run or batch found in bot_runs/")
+    if path.endswith(".csv"):
+        BatchHud(path, a.runs).root.mainloop()
+    else:
+        Hud(path).root.mainloop()
 
 
 if __name__ == "__main__":

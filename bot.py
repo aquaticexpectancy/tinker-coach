@@ -137,7 +137,8 @@ def install(advisor: str, speed: float, end_at: int, lane_speed: float = 1.0, dr
         "skip_dead_marches": tricks, "wave_laser": tricks, "future_wave": tricks,
         # user: fixed March counts (3 at small camps; at March 4: 2, C 3 + Laser the biggest ancient) and never
         # the same place twice in a row; auto: thresholds and skips decide the March count
-        "fixed_marches": plan == "user", "no_repeat": plan == "user",
+        # lab: like user, but the March count and the closing Laser per station come from the March lab (10-01 1820)
+        "fixed_marches": plan in ("user", "lab"), "no_repeat": plan in ("user", "lab"), "lab_counts": plan == "lab",
         "skill_order": {i + 1: s for i, s in enumerate(SKILLS) if s},
         "buy": buy_list(),
     }
@@ -464,6 +465,8 @@ def main():
                          f"(default: your best F11 run, session {DRILL_DEFAULT})")
     ap.add_argument("--video", action="store_true", help="film the screen to bot_runs/<run>.mp4 (~300 MB a run)")
     ap.add_argument("--no-video", action="store_true", help="(the default now; kept so old commands still work)")
+    ap.add_argument("--hud", action="store_true", help="show the Tinker x Jev panel (off by default; X toggles it)")
+    ap.add_argument("--no-hud", action="store_true", help="(the default now; kept so old commands still work)")
     ap.add_argument("--aim", choices=["on", "off", "d"], default="off",
                     help="on: Marches at C/D/E aim at the creeps; d: at D only; off: the Immortal replay facing")
     ap.add_argument("--marches", choices=["immortal", "mana"], default="mana",
@@ -476,8 +479,9 @@ def main():
     ap.add_argument("--lab-map", default="creeptests", help="lab: the map (default creeptests, empty; dota = the real map)")
     ap.add_argument("--lab-probe", type=int, default=None, metavar="MINUTES",
                     help="lab: instead of tests, log a fresh creep family's HP and buffs every game minute up to MINUTES")
-    ap.add_argument("--plan", choices=["user", "auto"], default="user",
-                    help="user: fixed March counts by March level + never the same place twice in a row; auto: skips decide")
+    ap.add_argument("--plan", choices=["user", "lab", "auto"], default="user",
+                    help="user: fixed March counts by March level + never the same place twice in a row; "
+                         "lab: same with the lab's per-station counts + a Laser after the last March; auto: skips decide")
     ap.add_argument("--tricks", choices=["on", "off"], default="on",
                     help="on: skip 3rd+ Marches with nothing to kill, Laser ranged/flag bearer at mid, March the next wave early")
     ap.add_argument("--ready", choices=["fresh", "old"], default="fresh",
@@ -534,11 +538,22 @@ def main():
             pass
         (HERE / "manual_drill.flag").unlink(missing_ok=True)
         return
+    if not a.hud and not (a.video and not a.no_video):
+        try:
+            while not bridge.done.wait(0.5):                  # no panel: just wait for the game to end
+                pass
+        except KeyboardInterrupt:
+            pass
+        return
     run_ui(bridge, record=a.video and not a.no_video)
 
 
+VK_X = 0x58
+
+
 def run_ui(bridge: Bridge, record: bool):
-    """Thinking panel on screen + whole-screen recording from the start of the game to the end card."""
+    """Thinking panel on screen + whole-screen recording from the start of the game to the end card. X hides/shows
+    the panel (a global key poll: the panel is click-through and never has focus, Dota keeps the keyboard)."""
     import ctypes
     import tkinter as tk
     import bot_hud
@@ -548,12 +563,18 @@ def run_ui(bridge: Bridge, record: bool):
     root.withdraw()
     hud = bot_hud.BotHud(root, sw, sh)
     rec = bot_hud.Recorder(bridge.path.with_suffix(".mp4")) if record else None
-    st = {"recording": False, "end_at": None}
+    st = {"recording": False, "end_at": None, "shown": True, "x_down": False}
 
     def tick():
+        down = bool(ctypes.windll.user32.GetAsyncKeyState(VK_X) & 0x8000)
+        if down and not st["x_down"]:                         # X pressed: toggle the panel
+            st["shown"] = not st["shown"]
+            hud.show(st["shown"])
+        st["x_down"] = down
         h = dict(bridge.hud)
         try:
-            hud.render(h)
+            if st["shown"]:
+                hud.render(h)
         except Exception as ex:
             print("HUD:", ex)
         if rec and not st["recording"] and h.get("clock") is not None and h["clock"] >= -5:

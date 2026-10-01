@@ -509,6 +509,15 @@ end
 -- creeps one more March can still kill: HP under what a March deals a creep in its path. An estimate by March
 -- level, logged with every March (creeps / killable) to check against the kills that follow.
 local MARCH_KILL_HP = {200, 280, 350, 450}
+
+-- the March lab (run 10-01 1820, frozen creeps): Marches per station by March level and the Laser after the last
+-- one. A: the creep with the most HP left; C: the biggest ancient; D/E: a creep it kills, else the fattest.
+-- A Laser between Marches pulls creeps toward Tinker, so it only ever comes last. C at March 3 is never cleared.
+local LAB_PLAN = {
+	[3] = {A = {n = 3, laser = "most_hp"}, D = {n = 3, laser = "kill"}, E = {n = 3}},
+	[4] = {A = {n = 2, laser = "most_hp"}, D = {n = 3, laser = "kill"}, E = {n = 2, laser = "kill"},
+	       C = {n = 3, laser = "ancient"}},
+}
 function TinkerBot:MarchKillable(targets)
 	local cap = MARCH_KILL_HP[self:Ab("tinker_march_of_the_machines"):GetLevel()] or 350
 	local n = 0
@@ -1340,8 +1349,11 @@ function TinkerBot:Landed(t, now)
 			-- your rules: March 3 -> 3 Marches at the small camps (no ancients); March 4 -> 2 at small camps, 3 at C
 			local lvl = self:Ab("tinker_march_of_the_machines"):GetLevel()
 			local n = lvl >= 4 and (st == "C" and 3 or 2) or 3
+			local lab = CFG.lab_counts and LAB_PLAN[lvl >= 4 and 4 or 3][st]
+			if lab then n = lab.n end
 			self.trip.plan = {"walk", "M"}
 			for _ = 2, n do table.insert(self.trip.plan, "b"); table.insert(self.trip.plan, "R"); table.insert(self.trip.plan, "M") end
+			if lab and lab.laser then table.insert(self.trip.plan, "L"); self.trip.lab_laser = lab.laser end
 		end
 		if st == "B" and CFG.wave_laser ~= false then                          -- Laser while the robots work
 			for j, tok in ipairs(self.trip.plan) do if tok == "M" then table.insert(self.trip.plan, j + 1, "L") break end end
@@ -1901,8 +1913,17 @@ function TinkerBot:Trip(t, now)
 			return
 		end
 		if not self:Ready(laser) or #targets == 0 then return nxt() end
+		-- lab plan: the Laser went 1 s after the last March there (let the robots pick their targets first)
+		if tr.lab_laser and self.last_march and now - self.last_march < 1.0 then return end
+		if tr.lab_laser and h:GetMana() < laser:GetManaCost(-1) + kc then             -- keep the Keen home
+			self:Log("skip", {why = "lab Laser: mana kept for the Keen"}); return nxt()
+		end
 		local ldmg = CFG.laser_dmg[laser:GetLevel()] or 0
 		local best, why = nil, "kills it"
+		if tr.lab_laser == "most_hp" then
+			why = "lab: the most HP left"
+			for _, u in ipairs(targets) do if not best or u:GetHealth() > best:GetHealth() then best = u end end
+		end
 		if tr.station == "B" and CFG.wave_laser ~= false then
 			-- mid wave: the ranged creep or the flag bearer (the most gold), else the creep closest to dying
 			for _, u in ipairs(targets) do
