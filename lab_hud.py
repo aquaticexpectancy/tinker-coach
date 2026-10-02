@@ -13,6 +13,7 @@ import csv
 import glob
 import json
 import os
+import re
 import sys
 import time
 import tkinter as tk
@@ -189,13 +190,15 @@ class BatchHud(Window):
     the game log being written now. A batch without a status file: the plan is guessed from the CSV (setups in the
     order they first appear, round-robin, --runs each). The first setup is the baseline of the net worth column."""
 
-    def __init__(self, path, runs):
+    def __init__(self, path, runs, window=True):
         self.path, self.runs = path, runs
         self.base = os.path.splitext(os.path.basename(path))[0]
         self.game, self.game_pos, self.game_clock, self.game_wall, self.game_nw = None, 0, None, None, None
+        self.game_speed, self.infos = None, {}
         self.rows, self.order, self.start, self.status = [], [], None, {}
         self.read()
-        self.make_window(7 + max(2, len(set(self.order))))
+        if window:                                                 # lab_tele.py reads the same state, no window
+            self.make_window(8 + max(2, len(set(self.order))))
 
     def read(self):
         try:
@@ -225,6 +228,7 @@ class BatchHud(Window):
         newest = max(logs, key=os.path.getmtime) if logs else None
         if newest != self.game:
             self.game, self.game_pos, self.game_clock, self.game_wall, self.game_nw = newest, 0, None, None, None
+            self.game_speed = None
         if not self.game:
             return
         try:
@@ -244,12 +248,44 @@ class BatchHud(Window):
                         self.game_wall = r["wall"]
                     if r.get("nw") is not None:
                         self.game_nw = r["nw"]
+                    if r.get("kind") == "speed":
+                        self.game_speed = r.get("x")
         except OSError:
             pass
 
     def avg_nw(self, setup):
         ok = [float(r["nw"]) for r in self.rows if r["setup"] == setup and r["status"] == "ok"]
         return sum(ok) / len(ok) if ok else None
+
+    def run_info(self, run):
+        """(jungle speed, real seconds for 5:00 -> 10:00) of a finished game, from its log; cached."""
+        if run in self.infos:
+            return self.infos[run]
+        speed, w0, w1 = None, None, None
+        try:
+            for line in open(os.path.join(HERE, "bot_runs", run), encoding="utf-8", errors="replace"):
+                try:
+                    r = json.loads(line)
+                except ValueError:
+                    continue
+                c, w = r.get("clock"), r.get("wall")
+                if r.get("kind") == "speed" and c is not None and c < DRILL_TO - 1:
+                    speed = r.get("x")                        # the last change before 10:00 = the jungle speed
+                if c is not None and w and c >= DRILL_FROM:
+                    w0 = w0 or w
+                    w1 = w
+        except OSError:
+            pass
+        self.infos[run] = (speed, (w1 - w0) if w0 and w1 else None)
+        return self.infos[run]
+
+    def setup_info(self, setup):
+        """(speed, average real seconds a game) over a setup's finished games."""
+        infos = [self.run_info(r["run"]) for r in self.rows if r["setup"] == setup and r.get("run")]
+        speeds = {s for s, _ in infos if s}
+        secs = [d for _, d in infos if d]
+        speed = "/".join(f"{s:g}x" for s in sorted(speeds)) if speeds else None
+        return speed, (sum(secs) / len(secs) if secs else None)
 
     def tick(self):
         self.read()
@@ -273,9 +309,14 @@ class BatchHud(Window):
         else:
             t.insert("end", f"{done + 1}/{total or '?'}  ")
             t.insert("end", cur or "?", "orange")
+            if self.game_speed and (self.game_clock or 0) >= DRILL_FROM - 5:
+                t.insert("end", f" {self.game_speed:g}x", "orange")
             t.insert("end", "  clock ", "dim")
-            if self.game_clock is None or self.game_clock < 0:
-                t.insert("end", "starting…\n", "dim")
+            gs = self.status.get("game_start")
+            if self.game_clock is None:                           # nothing logged yet: Dota launching / loading (~80 s)
+                t.insert("end", "Dota loading" + (f" {clock(now - gs)}" if gs else "…") + "\n", "dim")
+            elif self.game_clock < DRILL_FROM - 5:                 # pre-game + fast-forward to 5:00 (~35 s at 10x)
+                t.insert("end", f"to 5:00 {clock(max(0, self.game_clock))}\n", "dim")
             else:
                 t.insert("end", f"{clock(self.game_clock)}/{clock(DRILL_TO)}")
                 if self.game_nw is not None:
@@ -291,22 +332,39 @@ class BatchHud(Window):
         t.insert("end", clock(eta) if eta else "--:--")
         t.insert("end", "   done ≈ ", "dim")
         t.insert("end", (time.strftime("%H:%M", time.localtime(now + eta)) if eta else "--:--") + "\n")
-        t.insert("end", f"  {'setup':8s} {'games':>5s} {'nw avg':>7s} {'lh avg':>6s} {'Δ nw vs ' + (base or '')[:6]:>14s}\n", "dim")
+        # the order games are played in (round-robin), labelled by speed: done green, now orange, to come dim
+        labels = {}
+        for s in setups:
+            sp = self.setup_info(s)[0]
+            m = re.search(r"(\d+)x$", s)
+            labels[s] = sp or (m.group(1) + "x" if m else "2x")      # no game yet: from its name, else bot_batch's 2x
+        if len(set(labels.values())) < len(setups):              # same speed everywhere: label by setup instead
+            labels = {s: s[:4] for s in setups}
+        t.insert("end", "  order   ", "dim")
+        for i, s in enumerate(self.order):
+            tag = "green" if i < done else "orange" if i == done and not finished else "dim"
+            t.insert("end", ("▸" if tag == "orange" else " ") + labels[s], tag)
+        t.insert("end", "\n")
+        t.insert("end", f"  {'setup':8s} {'speed':>5s} {'games':>5s} {'nw avg':>7s} {'lh avg':>6s} {'s/game':>6s} "
+                        f"{'Δ nw vs ' + (base or '')[:4]:>12s}\n", "dim")
         bnw = self.avg_nw(base) if base else None
         for s in setups:
             ok = [r for r in self.rows if r["setup"] == s and r["status"] == "ok"]
             bad = sum(1 for r in self.rows if r["setup"] == s and r["status"] != "ok")
+            sp, secs = self.setup_info(s)
             t.insert("end", f"  {s[:8]:8s} ", "orange" if s == cur and not finished else "")
+            t.insert("end", f"{sp or '-':>5s} ")
             t.insert("end", f"{len(ok):>5d} ")
             nw = self.avg_nw(s)
             lh = sum(float(r["lh"]) for r in ok) / len(ok) if ok else None
             t.insert("end", f"{nw:>7,.0f} " if nw is not None else f"{'-':>7s} ")
             t.insert("end", f"{lh:>6.1f} " if lh is not None else f"{'-':>6s} ")
+            t.insert("end", f"{secs:>6.0f} " if secs else f"{'-':>6s} ")
             if s == base or nw is None or bnw is None:
-                t.insert("end", f"{'-':>14s}", "dim")
+                t.insert("end", f"{'-':>12s}", "dim")
             else:
                 d = nw - bnw
-                t.insert("end", f"{d:>+14,.0f}", "green" if d > 0 else "red" if d < 0 else "")
+                t.insert("end", f"{d:>+12,.0f}", "green" if d > 0 else "red" if d < 0 else "")
             if bad:
                 t.insert("end", f"  {bad} failed", "red")
             t.insert("end", "\n")

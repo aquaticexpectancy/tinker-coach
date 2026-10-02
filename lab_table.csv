@@ -1,0 +1,897 @@
+station,march,family,marches,laser,creeps,killed,cleared,left
+A,3,centaur_khan+centaur_outrunner+centaur_outrunner,1,0,3,0,False,centaur_khan:905;centaur_outrunner:171;centaur_outrunner:177
+A,3,centaur_khan+centaur_outrunner+centaur_outrunner,2,0,3,2,False,centaur_khan:208
+A,3,centaur_khan+centaur_outrunner+centaur_outrunner,3,0,3,3,True,
+A,3,centaur_khan+centaur_outrunner+centaur_outrunner,4,0,3,3,True,
+A,3,centaur_khan+centaur_outrunner+centaur_outrunner,1,1,3,2,False,centaur_khan:402
+A,3,centaur_khan+centaur_outrunner+centaur_outrunner,2,1,3,2,False,centaur_khan:127
+A,3,centaur_khan+centaur_outrunner+centaur_outrunner,3,1,3,3,True,
+A,3,centaur_khan+centaur_outrunner+centaur_outrunner,4,1,3,3,True,
+A,3,dark_troll+dark_troll+dark_troll_warlord,1,0,3,0,False,dark_troll:206;dark_troll:241;dark_troll_warlord:806
+A,3,dark_troll+dark_troll+dark_troll_warlord,2,0,3,2,False,dark_troll_warlord:237
+A,3,dark_troll+dark_troll+dark_troll_warlord,3,0,3,2,False,dark_troll_warlord:115
+A,3,dark_troll+dark_troll+dark_troll_warlord,4,0,3,3,True,
+A,3,dark_troll+dark_troll+dark_troll_warlord,1,1,3,2,False,dark_troll_warlord:147
+A,3,dark_troll+dark_troll+dark_troll_warlord,2,1,3,3,True,
+A,3,dark_troll+dark_troll+dark_troll_warlord,3,1,3,3,True,
+A,3,dark_troll+dark_troll+dark_troll_warlord,4,1,3,3,True,
+A,3,enraged_wildkin+wildkin+wildkin,1,0,3,2,False,enraged_wildkin:316
+A,3,enraged_wildkin+wildkin+wildkin,2,0,3,2,False,enraged_wildkin:44
+A,3,enraged_wildkin+wildkin+wildkin,3,0,3,3,True,
+A,3,enraged_wildkin+wildkin+wildkin,4,0,3,3,True,
+A,3,enraged_wildkin+wildkin+wildkin,1,1,3,1,False,enraged_wildkin:142;wildkin:222
+A,3,enraged_wildkin+wildkin+wildkin,2,1,3,2,False,enraged_wildkin:79
+A,3,enraged_wildkin+wildkin+wildkin,3,1,3,3,True,
+A,3,enraged_wildkin+wildkin+wildkin,4,1,3,3,True,
+A,3,polar_furbolg_champion+polar_furbolg_ursa_warrior,1,0,2,0,False,polar_furbolg_champion:423;polar_furbolg_ursa_warrior:598
+A,3,polar_furbolg_champion+polar_furbolg_ursa_warrior,2,0,2,2,True,
+A,3,polar_furbolg_champion+polar_furbolg_ursa_warrior,3,0,2,2,True,
+A,3,polar_furbolg_champion+polar_furbolg_ursa_warrior,4,0,2,2,True,
+A,3,polar_furbolg_champion+polar_furbolg_ursa_warrior,1,1,2,0,False,polar_furbolg_champion:83;polar_furbolg_ursa_warrior:280
+A,3,polar_furbolg_champion+polar_furbolg_ursa_warrior,2,1,2,2,True,
+A,3,polar_furbolg_champion+polar_furbolg_ursa_warrior,3,1,2,2,True,
+A,3,polar_furbolg_champion+polar_furbolg_ursa_warrior,4,1,2,2,True,
+A,3,satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,0,3,2,False,satyr_hellcaller:294
+A,3,satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,0,3,2,False,satyr_hellcaller:26
+A,3,satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,0,3,3,True,
+A,3,satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,0,3,3,True,
+A,3,satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,1,3,2,False,satyr_hellcaller:261
+A,3,satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,1,3,3,True,
+A,3,satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,1,3,3,True,
+A,3,satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,1,3,3,True,
+A,3,warpine_raider+warpine_raider,1,0,2,0,False,warpine_raider:650;warpine_raider:672
+A,3,warpine_raider+warpine_raider,2,0,2,0,False,warpine_raider:119;warpine_raider:97
+A,3,warpine_raider+warpine_raider,3,0,2,1,False,warpine_raider:68
+A,3,warpine_raider+warpine_raider,4,0,2,2,True,
+A,3,warpine_raider+warpine_raider,1,1,2,0,False,warpine_raider:438;warpine_raider:588
+A,3,warpine_raider+warpine_raider,2,1,2,1,False,warpine_raider:207
+A,3,warpine_raider+warpine_raider,3,1,2,2,True,
+A,3,warpine_raider+warpine_raider,4,1,2,2,True,
+A,4,centaur_khan+centaur_outrunner+centaur_outrunner,1,0,3,1,False,centaur_khan:616;centaur_outrunner:8
+A,4,centaur_khan+centaur_outrunner+centaur_outrunner,2,0,3,2,False,centaur_khan:303
+A,4,centaur_khan+centaur_outrunner+centaur_outrunner,3,0,3,3,True,
+A,4,centaur_khan+centaur_outrunner+centaur_outrunner,4,0,3,3,True,
+A,4,centaur_khan+centaur_outrunner+centaur_outrunner,1,1,3,2,False,centaur_khan:338
+A,4,centaur_khan+centaur_outrunner+centaur_outrunner,2,1,3,2,False,centaur_khan:63
+A,4,centaur_khan+centaur_outrunner+centaur_outrunner,3,1,3,3,True,
+A,4,centaur_khan+centaur_outrunner+centaur_outrunner,4,1,3,3,True,
+A,4,dark_troll+dark_troll+dark_troll_warlord,1,0,3,1,False,dark_troll:72;dark_troll_warlord:740
+A,4,dark_troll+dark_troll+dark_troll_warlord,2,0,3,2,False,dark_troll_warlord:25
+A,4,dark_troll+dark_troll+dark_troll_warlord,3,0,3,3,True,
+A,4,dark_troll+dark_troll+dark_troll_warlord,4,0,3,3,True,
+A,4,dark_troll+dark_troll+dark_troll_warlord,1,1,3,0,False,dark_troll:23;dark_troll:263;dark_troll_warlord:558
+A,4,dark_troll+dark_troll+dark_troll_warlord,2,1,3,3,True,
+A,4,dark_troll+dark_troll+dark_troll_warlord,3,1,3,3,True,
+A,4,dark_troll+dark_troll+dark_troll_warlord,4,1,3,3,True,
+A,4,enraged_wildkin+wildkin+wildkin,1,0,3,2,False,enraged_wildkin:507
+A,4,enraged_wildkin+wildkin+wildkin,2,0,3,3,True,
+A,4,enraged_wildkin+wildkin+wildkin,3,0,3,3,True,
+A,4,enraged_wildkin+wildkin+wildkin,4,0,3,3,True,
+A,4,enraged_wildkin+wildkin+wildkin,1,1,3,2,False,enraged_wildkin:205
+A,4,enraged_wildkin+wildkin+wildkin,2,1,3,3,True,
+A,4,enraged_wildkin+wildkin+wildkin,3,1,3,3,True,
+A,4,enraged_wildkin+wildkin+wildkin,4,1,3,3,True,
+A,4,polar_furbolg_champion+polar_furbolg_ursa_warrior,1,0,2,0,False,polar_furbolg_champion:132;polar_furbolg_ursa_warrior:355
+A,4,polar_furbolg_champion+polar_furbolg_ursa_warrior,2,0,2,2,True,
+A,4,polar_furbolg_champion+polar_furbolg_ursa_warrior,3,0,2,2,True,
+A,4,polar_furbolg_champion+polar_furbolg_ursa_warrior,4,0,2,2,True,
+A,4,polar_furbolg_champion+polar_furbolg_ursa_warrior,1,1,2,1,False,polar_furbolg_ursa_warrior:40
+A,4,polar_furbolg_champion+polar_furbolg_ursa_warrior,2,1,2,2,True,
+A,4,polar_furbolg_champion+polar_furbolg_ursa_warrior,3,1,2,2,True,
+A,4,polar_furbolg_champion+polar_furbolg_ursa_warrior,4,1,2,2,True,
+A,4,satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,0,3,2,False,satyr_hellcaller:489
+A,4,satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,0,3,2,False,satyr_hellcaller:14
+A,4,satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,0,3,3,True,
+A,4,satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,0,3,3,True,
+A,4,satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,1,3,3,True,
+A,4,satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,1,3,2,False,satyr_hellcaller:83
+A,4,satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,1,3,3,True,
+A,4,satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,1,3,3,True,
+A,4,warpine_raider+warpine_raider,1,0,2,0,False,warpine_raider:494;warpine_raider:546
+A,4,warpine_raider+warpine_raider,2,0,2,2,True,
+A,4,warpine_raider+warpine_raider,3,0,2,2,True,
+A,4,warpine_raider+warpine_raider,4,0,2,2,True,
+A,4,warpine_raider+warpine_raider,1,1,2,0,False,warpine_raider:589;warpine_raider:336
+A,4,warpine_raider+warpine_raider,2,1,2,1,False,warpine_raider:63
+A,4,warpine_raider+warpine_raider,3,1,2,2,True,
+A,4,warpine_raider+warpine_raider,4,1,2,2,True,
+C,3,alpha_wolf+giant_wolf+giant_wolf + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,0,6,0,False,alpha_wolf:866;giant_wolf:394;giant_wolf:611;big_thunder_lizard:1978;small_thunder_lizard:921;small_thunder_lizard:985
+C,3,alpha_wolf+giant_wolf+giant_wolf + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,0,6,2,False,alpha_wolf:73;big_thunder_lizard:1625;small_thunder_lizard:679;small_thunder_lizard:543
+C,3,alpha_wolf+giant_wolf+giant_wolf + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,0,6,3,False,big_thunder_lizard:1641;small_thunder_lizard:643;small_thunder_lizard:585
+C,3,alpha_wolf+giant_wolf+giant_wolf + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,0,6,3,False,big_thunder_lizard:1467;small_thunder_lizard:628;small_thunder_lizard:420
+C,3,alpha_wolf+giant_wolf+giant_wolf + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,1,6,0,False,alpha_wolf:713;giant_wolf:80;giant_wolf:432;big_thunder_lizard:1847;small_thunder_lizard:958;small_thunder_lizard:941
+C,3,alpha_wolf+giant_wolf+giant_wolf + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,1,6,1,False,alpha_wolf:279;giant_wolf:179;big_thunder_lizard:1475;small_thunder_lizard:753;small_thunder_lizard:592
+C,3,alpha_wolf+giant_wolf+giant_wolf + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,1,6,3,False,big_thunder_lizard:1191;small_thunder_lizard:472;small_thunder_lizard:296
+C,3,alpha_wolf+giant_wolf+giant_wolf + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,1,6,3,False,big_thunder_lizard:819;small_thunder_lizard:437;small_thunder_lizard:108
+C,3,alpha_wolf+giant_wolf+giant_wolf + black_dragon+black_drake+black_drake,1,0,6,0,False,alpha_wolf:744;giant_wolf:241;giant_wolf:644;black_dragon:2342;black_drake:1104;black_drake:1110
+C,3,alpha_wolf+giant_wolf+giant_wolf + black_dragon+black_drake+black_drake,2,0,6,3,False,black_dragon:2009;black_drake:580;black_drake:528
+C,3,alpha_wolf+giant_wolf+giant_wolf + black_dragon+black_drake+black_drake,3,0,6,3,False,black_dragon:1762;black_drake:521;black_drake:170
+C,3,alpha_wolf+giant_wolf+giant_wolf + black_dragon+black_drake+black_drake,4,0,6,5,False,black_dragon:1356
+C,3,alpha_wolf+giant_wolf+giant_wolf + black_dragon+black_drake+black_drake,1,1,6,0,False,alpha_wolf:868;giant_wolf:261;giant_wolf:358;black_dragon:2116;black_drake:568;black_drake:602
+C,3,alpha_wolf+giant_wolf+giant_wolf + black_dragon+black_drake+black_drake,2,1,6,2,False,alpha_wolf:125;black_dragon:1797;black_drake:759;black_drake:624
+C,3,alpha_wolf+giant_wolf+giant_wolf + black_dragon+black_drake+black_drake,3,1,6,3,False,black_dragon:1898;black_drake:352;black_drake:232
+C,3,alpha_wolf+giant_wolf+giant_wolf + black_dragon+black_drake+black_drake,4,1,6,4,False,black_dragon:1519;black_drake:187
+C,3,alpha_wolf+giant_wolf+giant_wolf + frostbitten_golem+frostbitten_golem+ice_shaman,1,0,6,0,False,alpha_wolf:774;giant_wolf:457;giant_wolf:736;frostbitten_golem:1178;frostbitten_golem:1050;ice_shaman:1748
+C,3,alpha_wolf+giant_wolf+giant_wolf + frostbitten_golem+frostbitten_golem+ice_shaman,2,0,6,3,False,frostbitten_golem:556;frostbitten_golem:497;ice_shaman:1268
+C,3,alpha_wolf+giant_wolf+giant_wolf + frostbitten_golem+frostbitten_golem+ice_shaman,3,0,6,3,False,frostbitten_golem:533;frostbitten_golem:278;ice_shaman:1330
+C,3,alpha_wolf+giant_wolf+giant_wolf + frostbitten_golem+frostbitten_golem+ice_shaman,4,0,6,4,False,frostbitten_golem:333;ice_shaman:479
+C,3,alpha_wolf+giant_wolf+giant_wolf + frostbitten_golem+frostbitten_golem+ice_shaman,1,1,6,1,False,alpha_wolf:375;giant_wolf:121;frostbitten_golem:991;frostbitten_golem:755;ice_shaman:1269
+C,3,alpha_wolf+giant_wolf+giant_wolf + frostbitten_golem+frostbitten_golem+ice_shaman,2,1,6,1,False,alpha_wolf:156;giant_wolf:366;frostbitten_golem:723;frostbitten_golem:679;ice_shaman:1118
+C,3,alpha_wolf+giant_wolf+giant_wolf + frostbitten_golem+frostbitten_golem+ice_shaman,3,1,6,4,False,frostbitten_golem:39;ice_shaman:706
+C,3,alpha_wolf+giant_wolf+giant_wolf + frostbitten_golem+frostbitten_golem+ice_shaman,4,1,6,3,False,frostbitten_golem:350;frostbitten_golem:352;ice_shaman:951
+C,3,alpha_wolf+giant_wolf+giant_wolf + granite_golem+rock_golem+rock_golem,1,0,6,0,False,alpha_wolf:927;giant_wolf:656;giant_wolf:815;granite_golem:1925;rock_golem:937;rock_golem:922
+C,3,alpha_wolf+giant_wolf+giant_wolf + granite_golem+rock_golem+rock_golem,2,0,6,2,False,alpha_wolf:318;granite_golem:1709;rock_golem:851;rock_golem:737
+C,3,alpha_wolf+giant_wolf+giant_wolf + granite_golem+rock_golem+rock_golem,3,0,6,2,False,alpha_wolf:40;granite_golem:1481;rock_golem:464;rock_golem:222
+C,3,alpha_wolf+giant_wolf+giant_wolf + granite_golem+rock_golem+rock_golem,4,0,6,4,False,granite_golem:1150;rock_golem:411
+C,3,alpha_wolf+giant_wolf+giant_wolf + granite_golem+rock_golem+rock_golem,1,1,6,0,False,alpha_wolf:847;giant_wolf:302;giant_wolf:509;granite_golem:1862;rock_golem:853;rock_golem:1009
+C,3,alpha_wolf+giant_wolf+giant_wolf + granite_golem+rock_golem+rock_golem,2,1,6,1,False,alpha_wolf:70;giant_wolf:387;granite_golem:1473;rock_golem:807;rock_golem:565
+C,3,alpha_wolf+giant_wolf+giant_wolf + granite_golem+rock_golem+rock_golem,3,1,6,3,False,granite_golem:1689;rock_golem:519;rock_golem:475
+C,3,alpha_wolf+giant_wolf+giant_wolf + granite_golem+rock_golem+rock_golem,4,1,6,4,False,granite_golem:1016;rock_golem:356
+C,3,alpha_wolf+giant_wolf+giant_wolf + prowler_acolyte+prowler_acolyte+prowler_shaman,1,0,6,0,False,alpha_wolf:715;giant_wolf:549;giant_wolf:576;prowler_acolyte:862;prowler_acolyte:619;prowler_shaman:1522
+C,3,alpha_wolf+giant_wolf+giant_wolf + prowler_acolyte+prowler_acolyte+prowler_shaman,2,0,6,2,False,alpha_wolf:187;prowler_acolyte:324;prowler_acolyte:349;prowler_shaman:754
+C,3,alpha_wolf+giant_wolf+giant_wolf + prowler_acolyte+prowler_acolyte+prowler_shaman,3,0,6,4,False,prowler_acolyte:130;prowler_shaman:353
+C,3,alpha_wolf+giant_wolf+giant_wolf + prowler_acolyte+prowler_acolyte+prowler_shaman,4,0,6,4,False,prowler_acolyte:97;prowler_shaman:134
+C,3,alpha_wolf+giant_wolf+giant_wolf + prowler_acolyte+prowler_acolyte+prowler_shaman,1,1,6,0,False,alpha_wolf:729;giant_wolf:446;giant_wolf:342;prowler_acolyte:760;prowler_acolyte:188;prowler_shaman:750
+C,3,alpha_wolf+giant_wolf+giant_wolf + prowler_acolyte+prowler_acolyte+prowler_shaman,2,1,6,2,False,alpha_wolf:284;prowler_acolyte:336;prowler_acolyte:447;prowler_shaman:729
+C,3,alpha_wolf+giant_wolf+giant_wolf + prowler_acolyte+prowler_acolyte+prowler_shaman,3,1,6,3,False,prowler_acolyte:367;prowler_acolyte:55;prowler_shaman:286
+C,3,alpha_wolf+giant_wolf+giant_wolf + prowler_acolyte+prowler_acolyte+prowler_shaman,4,1,6,6,True,
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,0,6,0,False,centaur_khan:948;centaur_outrunner:19;centaur_outrunner:196;big_thunder_lizard:1741;small_thunder_lizard:758;small_thunder_lizard:761
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,0,6,2,False,centaur_khan:767;big_thunder_lizard:1131;small_thunder_lizard:400;small_thunder_lizard:260
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,0,6,2,False,centaur_khan:269;big_thunder_lizard:1130;small_thunder_lizard:344;small_thunder_lizard:232
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,0,6,3,False,big_thunder_lizard:973;small_thunder_lizard:252;small_thunder_lizard:33
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,1,6,2,False,centaur_khan:878;big_thunder_lizard:1463;small_thunder_lizard:582;small_thunder_lizard:625
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,1,6,2,False,centaur_khan:689;big_thunder_lizard:1163;small_thunder_lizard:591;small_thunder_lizard:441
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,1,6,3,False,big_thunder_lizard:1130;small_thunder_lizard:220;small_thunder_lizard:72
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,1,6,3,False,big_thunder_lizard:814;small_thunder_lizard:339;small_thunder_lizard:132
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + black_dragon+black_drake+black_drake,1,0,6,0,False,centaur_khan:987;centaur_outrunner:11;centaur_outrunner:211;black_dragon:1973;black_drake:730;black_drake:753
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + black_dragon+black_drake+black_drake,2,0,6,2,False,centaur_khan:491;black_dragon:1690;black_drake:411;black_drake:261
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + black_dragon+black_drake+black_drake,3,0,6,3,False,centaur_khan:391;black_dragon:1473;black_drake:306
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + black_dragon+black_drake+black_drake,4,0,6,5,False,black_dragon:1142
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + black_dragon+black_drake+black_drake,1,1,6,2,False,centaur_khan:665;black_dragon:1800;black_drake:560;black_drake:627
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + black_dragon+black_drake+black_drake,2,1,6,2,False,centaur_khan:424;black_dragon:1563;black_drake:584;black_drake:452
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + black_dragon+black_drake+black_drake,3,1,6,5,False,black_dragon:1339
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + black_dragon+black_drake+black_drake,4,1,6,4,False,centaur_khan:40;black_dragon:847
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + frostbitten_golem+frostbitten_golem+ice_shaman,1,0,6,0,False,centaur_khan:1017;centaur_outrunner:66;centaur_outrunner:266;frostbitten_golem:734;frostbitten_golem:688;ice_shaman:1257
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + frostbitten_golem+frostbitten_golem+ice_shaman,2,0,6,2,False,centaur_khan:407;frostbitten_golem:273;frostbitten_golem:260;ice_shaman:1080
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + frostbitten_golem+frostbitten_golem+ice_shaman,3,0,6,2,False,centaur_khan:235;frostbitten_golem:285;frostbitten_golem:279;ice_shaman:864
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + frostbitten_golem+frostbitten_golem+ice_shaman,4,0,6,5,False,ice_shaman:292
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + frostbitten_golem+frostbitten_golem+ice_shaman,1,1,6,2,False,centaur_khan:764;frostbitten_golem:673;frostbitten_golem:559;ice_shaman:1425
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + frostbitten_golem+frostbitten_golem+ice_shaman,2,1,6,2,False,centaur_khan:360;frostbitten_golem:434;frostbitten_golem:471;ice_shaman:953
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + frostbitten_golem+frostbitten_golem+ice_shaman,3,1,6,4,False,frostbitten_golem:43;ice_shaman:758
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + frostbitten_golem+frostbitten_golem+ice_shaman,4,1,6,3,False,frostbitten_golem:69;frostbitten_golem:154;ice_shaman:250
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + granite_golem+rock_golem+rock_golem,1,0,6,0,False,centaur_khan:1182;centaur_outrunner:103;centaur_outrunner:307;granite_golem:1738;rock_golem:856;rock_golem:696
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + granite_golem+rock_golem+rock_golem,2,0,6,2,False,centaur_khan:469;granite_golem:1395;rock_golem:568;rock_golem:513
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + granite_golem+rock_golem+rock_golem,3,0,6,2,False,centaur_khan:663;granite_golem:1349;rock_golem:396;rock_golem:181
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + granite_golem+rock_golem+rock_golem,4,0,6,4,False,centaur_khan:54;granite_golem:863
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + granite_golem+rock_golem+rock_golem,1,1,6,2,False,centaur_khan:1062;granite_golem:1570;rock_golem:589;rock_golem:659
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + granite_golem+rock_golem+rock_golem,2,1,6,2,False,centaur_khan:578;granite_golem:1415;rock_golem:562;rock_golem:469
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + granite_golem+rock_golem+rock_golem,3,1,6,2,False,centaur_khan:231;granite_golem:1179;rock_golem:259;rock_golem:185
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + granite_golem+rock_golem+rock_golem,4,1,6,3,False,centaur_khan:31;granite_golem:911;rock_golem:49
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + prowler_acolyte+prowler_acolyte+prowler_shaman,1,0,6,0,False,centaur_khan:1024;centaur_outrunner:50;centaur_outrunner:218;prowler_acolyte:746;prowler_acolyte:328;prowler_shaman:1136
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + prowler_acolyte+prowler_acolyte+prowler_shaman,2,0,6,2,False,centaur_khan:768;prowler_acolyte:203;prowler_acolyte:143;prowler_shaman:640
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + prowler_acolyte+prowler_acolyte+prowler_shaman,3,0,6,3,False,centaur_khan:399;prowler_acolyte:158;prowler_shaman:303
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + prowler_acolyte+prowler_acolyte+prowler_shaman,4,0,6,6,True,
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + prowler_acolyte+prowler_acolyte+prowler_shaman,1,1,6,1,False,centaur_khan:1004;centaur_outrunner:11;prowler_acolyte:759;prowler_acolyte:389;prowler_shaman:1081
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + prowler_acolyte+prowler_acolyte+prowler_shaman,2,1,6,2,False,centaur_khan:467;prowler_acolyte:349;prowler_acolyte:235;prowler_shaman:621
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + prowler_acolyte+prowler_acolyte+prowler_shaman,3,1,6,4,False,centaur_khan:214;prowler_shaman:362
+C,3,centaur_khan+centaur_outrunner+centaur_outrunner + prowler_acolyte+prowler_acolyte+prowler_shaman,4,1,6,6,True,
+C,3,mud_golem+mud_golem + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,0,5,0,False,mud_golem:842;mud_golem:480;big_thunder_lizard:1755;small_thunder_lizard:710;small_thunder_lizard:703
+C,3,mud_golem+mud_golem + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,0,5,0,False,mud_golem:408;mud_golem:233;big_thunder_lizard:1400;small_thunder_lizard:583;small_thunder_lizard:419
+C,3,mud_golem+mud_golem + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,0,5,0,False,mud_golem:84;mud_golem:63;big_thunder_lizard:1342;small_thunder_lizard:456;small_thunder_lizard:344
+C,3,mud_golem+mud_golem + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,0,5,3,False,big_thunder_lizard:1058;small_thunder_lizard:170
+C,3,mud_golem+mud_golem + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,1,5,0,False,mud_golem:636;mud_golem:647;big_thunder_lizard:1572;small_thunder_lizard:581;small_thunder_lizard:636
+C,3,mud_golem+mud_golem + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,1,5,0,False,mud_golem:435;mud_golem:325;big_thunder_lizard:1157;small_thunder_lizard:547;small_thunder_lizard:354
+C,3,mud_golem+mud_golem + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,1,5,2,False,big_thunder_lizard:1036;small_thunder_lizard:232;small_thunder_lizard:44
+C,3,mud_golem+mud_golem + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,1,5,2,False,mud_golem:21;big_thunder_lizard:855;small_thunder_lizard:62
+C,3,mud_golem+mud_golem + black_dragon+black_drake+black_drake,1,0,5,0,False,mud_golem:790;mud_golem:725;black_dragon:2017;black_drake:780;black_drake:837
+C,3,mud_golem+mud_golem + black_dragon+black_drake+black_drake,2,0,5,0,False,mud_golem:179;mud_golem:271;black_dragon:1684;black_drake:454;black_drake:211
+C,3,mud_golem+mud_golem + black_dragon+black_drake+black_drake,3,0,5,1,False,mud_golem:333;black_dragon:1585;black_drake:289;black_drake:47
+C,3,mud_golem+mud_golem + black_dragon+black_drake+black_drake,4,0,5,4,False,black_dragon:1350
+C,3,mud_golem+mud_golem + black_dragon+black_drake+black_drake,1,1,5,0,False,mud_golem:748;mud_golem:498;black_dragon:1878;black_drake:548;black_drake:580
+C,3,mud_golem+mud_golem + black_dragon+black_drake+black_drake,2,1,5,0,False,mud_golem:352;mud_golem:265;black_dragon:1559;black_drake:648;black_drake:432
+C,3,mud_golem+mud_golem + black_dragon+black_drake+black_drake,3,1,5,3,False,mud_golem:180;black_dragon:1516
+C,3,mud_golem+mud_golem + black_dragon+black_drake+black_drake,4,1,5,3,False,black_dragon:1157;black_drake:147
+C,3,mud_golem+mud_golem + frostbitten_golem+frostbitten_golem+ice_shaman,1,0,5,0,False,mud_golem:878;mud_golem:747;frostbitten_golem:714;frostbitten_golem:707;ice_shaman:1393
+C,3,mud_golem+mud_golem + frostbitten_golem+frostbitten_golem+ice_shaman,2,0,5,0,False,mud_golem:305;mud_golem:156;frostbitten_golem:431;frostbitten_golem:263;ice_shaman:1213
+C,3,mud_golem+mud_golem + frostbitten_golem+frostbitten_golem+ice_shaman,3,0,5,1,False,mud_golem:209;frostbitten_golem:249;frostbitten_golem:183;ice_shaman:1002
+C,3,mud_golem+mud_golem + frostbitten_golem+frostbitten_golem+ice_shaman,4,0,5,4,False,ice_shaman:454
+C,3,mud_golem+mud_golem + frostbitten_golem+frostbitten_golem+ice_shaman,1,1,5,0,False,mud_golem:771;mud_golem:679;frostbitten_golem:952;frostbitten_golem:779;ice_shaman:1160
+C,3,mud_golem+mud_golem + frostbitten_golem+frostbitten_golem+ice_shaman,2,1,5,0,False,mud_golem:668;mud_golem:515;frostbitten_golem:386;frostbitten_golem:360;ice_shaman:1134
+C,3,mud_golem+mud_golem + frostbitten_golem+frostbitten_golem+ice_shaman,3,1,5,0,False,mud_golem:56;mud_golem:74;frostbitten_golem:77;frostbitten_golem:3;ice_shaman:614
+C,3,mud_golem+mud_golem + frostbitten_golem+frostbitten_golem+ice_shaman,4,1,5,4,False,ice_shaman:784
+C,3,mud_golem+mud_golem + granite_golem+rock_golem+rock_golem,1,0,5,0,False,mud_golem:1034;mud_golem:792;granite_golem:1785;rock_golem:748;rock_golem:778
+C,3,mud_golem+mud_golem + granite_golem+rock_golem+rock_golem,2,0,5,0,False,mud_golem:608;mud_golem:380;granite_golem:1405;rock_golem:284;rock_golem:495
+C,3,mud_golem+mud_golem + granite_golem+rock_golem+rock_golem,3,0,5,0,False,mud_golem:488;mud_golem:335;granite_golem:1462;rock_golem:324;rock_golem:214
+C,3,mud_golem+mud_golem + granite_golem+rock_golem+rock_golem,4,0,5,4,False,granite_golem:1072
+C,3,mud_golem+mud_golem + granite_golem+rock_golem+rock_golem,1,1,5,0,False,mud_golem:864;mud_golem:722;granite_golem:1581;rock_golem:498;rock_golem:591
+C,3,mud_golem+mud_golem + granite_golem+rock_golem+rock_golem,2,1,5,0,False,mud_golem:568;mud_golem:324;granite_golem:1098;rock_golem:573;rock_golem:287
+C,3,mud_golem+mud_golem + granite_golem+rock_golem+rock_golem,3,1,5,0,False,mud_golem:152;mud_golem:97;granite_golem:982;rock_golem:402;rock_golem:33
+C,3,mud_golem+mud_golem + granite_golem+rock_golem+rock_golem,4,1,5,2,False,mud_golem:90;granite_golem:790;rock_golem:267
+C,3,mud_golem+mud_golem + prowler_acolyte+prowler_acolyte+prowler_shaman,1,0,5,0,False,mud_golem:863;mud_golem:691;prowler_acolyte:709;prowler_acolyte:574;prowler_shaman:1306
+C,3,mud_golem+mud_golem + prowler_acolyte+prowler_acolyte+prowler_shaman,2,0,5,0,False,mud_golem:473;mud_golem:375;prowler_acolyte:181;prowler_acolyte:439;prowler_shaman:658
+C,3,mud_golem+mud_golem + prowler_acolyte+prowler_acolyte+prowler_shaman,3,0,5,3,False,mud_golem:303;mud_golem:201
+C,3,mud_golem+mud_golem + prowler_acolyte+prowler_acolyte+prowler_shaman,4,0,5,5,True,
+C,3,mud_golem+mud_golem + prowler_acolyte+prowler_acolyte+prowler_shaman,1,1,5,0,False,mud_golem:674;mud_golem:661;prowler_acolyte:659;prowler_acolyte:261;prowler_shaman:647
+C,3,mud_golem+mud_golem + prowler_acolyte+prowler_acolyte+prowler_shaman,2,1,5,0,False,mud_golem:447;mud_golem:375;prowler_acolyte:9;prowler_acolyte:160;prowler_shaman:364
+C,3,mud_golem+mud_golem + prowler_acolyte+prowler_acolyte+prowler_shaman,3,1,5,2,False,mud_golem:330;mud_golem:212;prowler_shaman:135
+C,3,mud_golem+mud_golem + prowler_acolyte+prowler_acolyte+prowler_shaman,4,1,5,4,False,prowler_shaman:70
+C,3,ogre_magi+ogre_mauler+ogre_mauler + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,0,6,0,False,ogre_magi:685;ogre_mauler:430;ogre_mauler:761;big_thunder_lizard:1766;small_thunder_lizard:902;small_thunder_lizard:875
+C,3,ogre_magi+ogre_mauler+ogre_mauler + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,0,6,2,False,ogre_magi:162;big_thunder_lizard:1122;small_thunder_lizard:509;small_thunder_lizard:344
+C,3,ogre_magi+ogre_mauler+ogre_mauler + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,0,6,2,False,ogre_mauler:83;big_thunder_lizard:1241;small_thunder_lizard:426;small_thunder_lizard:266
+C,3,ogre_magi+ogre_mauler+ogre_mauler + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,0,6,4,False,big_thunder_lizard:920;small_thunder_lizard:124
+C,3,ogre_magi+ogre_mauler+ogre_mauler + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,1,6,0,False,ogre_magi:566;ogre_mauler:318;ogre_mauler:370;big_thunder_lizard:1684;small_thunder_lizard:705;small_thunder_lizard:689
+C,3,ogre_magi+ogre_mauler+ogre_mauler + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,1,6,0,False,ogre_magi:5;ogre_mauler:112;ogre_mauler:143;big_thunder_lizard:1378;small_thunder_lizard:632;small_thunder_lizard:574
+C,3,ogre_magi+ogre_mauler+ogre_mauler + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,1,6,3,False,big_thunder_lizard:1307;small_thunder_lizard:378;small_thunder_lizard:309
+C,3,ogre_magi+ogre_mauler+ogre_mauler + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,1,6,3,False,big_thunder_lizard:865;small_thunder_lizard:156;small_thunder_lizard:1
+C,3,ogre_magi+ogre_mauler+ogre_mauler + black_dragon+black_drake+black_drake,1,0,6,0,False,ogre_magi:501;ogre_mauler:360;ogre_mauler:608;black_dragon:2031;black_drake:814;black_drake:838
+C,3,ogre_magi+ogre_mauler+ogre_mauler + black_dragon+black_drake+black_drake,2,0,6,1,False,ogre_mauler:26;ogre_mauler:87;black_dragon:1686;black_drake:462;black_drake:312
+C,3,ogre_magi+ogre_mauler+ogre_mauler + black_dragon+black_drake+black_drake,3,0,6,3,False,black_dragon:1647;black_drake:171;black_drake:39
+C,3,ogre_magi+ogre_mauler+ogre_mauler + black_dragon+black_drake+black_drake,4,0,6,4,False,black_dragon:1235;black_drake:101
+C,3,ogre_magi+ogre_mauler+ogre_mauler + black_dragon+black_drake+black_drake,1,1,6,0,False,ogre_magi:532;ogre_mauler:369;ogre_mauler:400;black_dragon:1851;black_drake:512;black_drake:502
+C,3,ogre_magi+ogre_mauler+ogre_mauler + black_dragon+black_drake+black_drake,2,1,6,1,False,ogre_magi:160;ogre_mauler:454;black_dragon:1470;black_drake:493;black_drake:319
+C,3,ogre_magi+ogre_mauler+ogre_mauler + black_dragon+black_drake+black_drake,3,1,6,4,False,black_dragon:1562;black_drake:183
+C,3,ogre_magi+ogre_mauler+ogre_mauler + black_dragon+black_drake+black_drake,4,1,6,5,False,black_dragon:1413
+C,3,ogre_magi+ogre_mauler+ogre_mauler + frostbitten_golem+frostbitten_golem+ice_shaman,1,0,6,0,False,ogre_magi:686;ogre_mauler:638;ogre_mauler:886;frostbitten_golem:780;frostbitten_golem:856;ice_shaman:1536
+C,3,ogre_magi+ogre_mauler+ogre_mauler + frostbitten_golem+frostbitten_golem+ice_shaman,2,0,6,2,False,ogre_mauler:47;frostbitten_golem:464;frostbitten_golem:430;ice_shaman:1243
+C,3,ogre_magi+ogre_mauler+ogre_mauler + frostbitten_golem+frostbitten_golem+ice_shaman,3,0,6,3,False,frostbitten_golem:290;frostbitten_golem:214;ice_shaman:919
+C,3,ogre_magi+ogre_mauler+ogre_mauler + frostbitten_golem+frostbitten_golem+ice_shaman,4,0,6,4,False,frostbitten_golem:134;ice_shaman:785
+C,3,ogre_magi+ogre_mauler+ogre_mauler + frostbitten_golem+frostbitten_golem+ice_shaman,1,1,6,0,False,ogre_magi:477;ogre_mauler:417;ogre_mauler:600;frostbitten_golem:620;frostbitten_golem:466;ice_shaman:1318
+C,3,ogre_magi+ogre_mauler+ogre_mauler + frostbitten_golem+frostbitten_golem+ice_shaman,2,1,6,1,False,ogre_mauler:82;ogre_mauler:547;frostbitten_golem:492;frostbitten_golem:542;ice_shaman:1075
+C,3,ogre_magi+ogre_mauler+ogre_mauler + frostbitten_golem+frostbitten_golem+ice_shaman,3,1,6,4,False,frostbitten_golem:224;ice_shaman:740
+C,3,ogre_magi+ogre_mauler+ogre_mauler + frostbitten_golem+frostbitten_golem+ice_shaman,4,1,6,4,False,frostbitten_golem:106;ice_shaman:312
+C,3,ogre_magi+ogre_mauler+ogre_mauler + granite_golem+rock_golem+rock_golem,1,0,6,0,False,ogre_magi:850;ogre_mauler:825;ogre_mauler:980;granite_golem:1872;rock_golem:969;rock_golem:911
+C,3,ogre_magi+ogre_mauler+ogre_mauler + granite_golem+rock_golem+rock_golem,2,0,6,0,False,ogre_magi:319;ogre_mauler:245;ogre_mauler:346;granite_golem:1632;rock_golem:760;rock_golem:427
+C,3,ogre_magi+ogre_mauler+ogre_mauler + granite_golem+rock_golem+rock_golem,3,0,6,2,False,ogre_mauler:141;granite_golem:1518;rock_golem:499;rock_golem:257
+C,3,ogre_magi+ogre_mauler+ogre_mauler + granite_golem+rock_golem+rock_golem,4,0,6,5,False,granite_golem:650
+C,3,ogre_magi+ogre_mauler+ogre_mauler + granite_golem+rock_golem+rock_golem,1,1,6,0,False,ogre_magi:434;ogre_mauler:387;ogre_mauler:597;granite_golem:1718;rock_golem:773;rock_golem:831
+C,3,ogre_magi+ogre_mauler+ogre_mauler + granite_golem+rock_golem+rock_golem,2,1,6,0,False,ogre_magi:143;ogre_mauler:32;ogre_mauler:428;granite_golem:1490;rock_golem:580;rock_golem:468
+C,3,ogre_magi+ogre_mauler+ogre_mauler + granite_golem+rock_golem+rock_golem,3,1,6,3,False,granite_golem:1284;rock_golem:230;rock_golem:23
+C,3,ogre_magi+ogre_mauler+ogre_mauler + granite_golem+rock_golem+rock_golem,4,1,6,3,False,granite_golem:860;rock_golem:170;rock_golem:30
+C,3,ogre_magi+ogre_mauler+ogre_mauler + prowler_acolyte+prowler_acolyte+prowler_shaman,1,0,6,0,False,ogre_magi:799;ogre_mauler:642;ogre_mauler:994;prowler_acolyte:738;prowler_acolyte:269;prowler_shaman:1090
+C,3,ogre_magi+ogre_mauler+ogre_mauler + prowler_acolyte+prowler_acolyte+prowler_shaman,2,0,6,0,False,ogre_magi:38;ogre_mauler:42;ogre_mauler:337;prowler_acolyte:473;prowler_acolyte:449;prowler_shaman:789
+C,3,ogre_magi+ogre_mauler+ogre_mauler + prowler_acolyte+prowler_acolyte+prowler_shaman,3,0,6,5,False,prowler_shaman:158
+C,3,ogre_magi+ogre_mauler+ogre_mauler + prowler_acolyte+prowler_acolyte+prowler_shaman,4,0,6,6,True,
+C,3,ogre_magi+ogre_mauler+ogre_mauler + prowler_acolyte+prowler_acolyte+prowler_shaman,1,1,6,0,False,ogre_magi:732;ogre_mauler:646;ogre_mauler:768;prowler_acolyte:705;prowler_acolyte:539;prowler_shaman:921
+C,3,ogre_magi+ogre_mauler+ogre_mauler + prowler_acolyte+prowler_acolyte+prowler_shaman,2,1,6,2,False,ogre_mauler:298;prowler_acolyte:250;prowler_acolyte:251;prowler_shaman:672
+C,3,ogre_magi+ogre_mauler+ogre_mauler + prowler_acolyte+prowler_acolyte+prowler_shaman,3,1,6,4,False,prowler_acolyte:142;prowler_shaman:428
+C,3,ogre_magi+ogre_mauler+ogre_mauler + prowler_acolyte+prowler_acolyte+prowler_shaman,4,1,6,5,False,prowler_shaman:216
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,0,7,0,False,satyr_soulstealer:745;satyr_soulstealer:466;satyr_trickster:383;satyr_trickster:352;big_thunder_lizard:2000;small_thunder_lizard:917;small_thunder_lizard:917
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,0,7,3,False,satyr_soulstealer:23;big_thunder_lizard:1754;small_thunder_lizard:763;small_thunder_lizard:742
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,0,7,3,False,satyr_soulstealer:4;big_thunder_lizard:1574;small_thunder_lizard:648;small_thunder_lizard:504
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,0,7,5,False,big_thunder_lizard:801;small_thunder_lizard:310
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,1,7,1,False,satyr_soulstealer:399;satyr_trickster:34;satyr_trickster:234;big_thunder_lizard:1768;small_thunder_lizard:802;small_thunder_lizard:831
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,1,7,3,False,satyr_soulstealer:312;big_thunder_lizard:1439;small_thunder_lizard:831;small_thunder_lizard:615
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,1,7,3,False,satyr_soulstealer:173;big_thunder_lizard:1230;small_thunder_lizard:413;small_thunder_lizard:237
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,1,7,5,False,big_thunder_lizard:788;small_thunder_lizard:272
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + black_dragon+black_drake+black_drake,1,0,7,0,False,satyr_soulstealer:746;satyr_soulstealer:188;satyr_trickster:322;satyr_trickster:198;black_dragon:2131;black_drake:886;black_drake:886
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + black_dragon+black_drake+black_drake,2,0,7,3,False,satyr_soulstealer:130;black_dragon:1694;black_drake:578;black_drake:251
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + black_dragon+black_drake+black_drake,3,0,7,4,False,black_dragon:1712;black_drake:584;black_drake:248
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + black_dragon+black_drake+black_drake,4,0,7,6,False,black_dragon:1245
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + black_dragon+black_drake+black_drake,1,1,7,0,False,satyr_soulstealer:469;satyr_soulstealer:113;satyr_trickster:293;satyr_trickster:14;black_dragon:2074;black_drake:807;black_drake:744
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + black_dragon+black_drake+black_drake,2,1,7,4,False,black_dragon:1554;black_drake:599;black_drake:248
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + black_dragon+black_drake+black_drake,3,1,7,5,False,black_dragon:1625;black_drake:241
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + black_dragon+black_drake+black_drake,4,1,7,5,False,black_dragon:1387;black_drake:345
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + frostbitten_golem+frostbitten_golem+ice_shaman,1,0,7,0,False,satyr_soulstealer:745;satyr_soulstealer:405;satyr_trickster:353;satyr_trickster:229;frostbitten_golem:906;frostbitten_golem:804;ice_shaman:1493
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + frostbitten_golem+frostbitten_golem+ice_shaman,2,0,7,4,False,frostbitten_golem:525;frostbitten_golem:490;ice_shaman:1121
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + frostbitten_golem+frostbitten_golem+ice_shaman,3,0,7,4,False,frostbitten_golem:286;frostbitten_golem:351;ice_shaman:1013
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + frostbitten_golem+frostbitten_golem+ice_shaman,4,0,7,6,False,ice_shaman:526
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + frostbitten_golem+frostbitten_golem+ice_shaman,1,1,7,2,False,satyr_soulstealer:453;satyr_trickster:138;frostbitten_golem:761;frostbitten_golem:607;ice_shaman:1244
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + frostbitten_golem+frostbitten_golem+ice_shaman,2,1,7,3,False,satyr_soulstealer:3;frostbitten_golem:592;frostbitten_golem:674;ice_shaman:1125
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + frostbitten_golem+frostbitten_golem+ice_shaman,3,1,7,5,False,frostbitten_golem:209;ice_shaman:734
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + frostbitten_golem+frostbitten_golem+ice_shaman,4,1,7,5,False,frostbitten_golem:118;ice_shaman:359
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + granite_golem+rock_golem+rock_golem,1,0,7,0,False,satyr_soulstealer:981;satyr_soulstealer:475;satyr_trickster:437;satyr_trickster:323;granite_golem:1972;rock_golem:1114;rock_golem:964
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + granite_golem+rock_golem+rock_golem,2,0,7,3,False,satyr_soulstealer:110;granite_golem:1751;rock_golem:741;rock_golem:613
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + granite_golem+rock_golem+rock_golem,3,0,7,4,False,granite_golem:1388;rock_golem:409;rock_golem:39
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + granite_golem+rock_golem+rock_golem,4,0,7,5,False,granite_golem:1125;rock_golem:164
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + granite_golem+rock_golem+rock_golem,1,1,7,1,False,satyr_soulstealer:462;satyr_soulstealer:227;satyr_trickster:37;granite_golem:1727;rock_golem:722;rock_golem:872
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + granite_golem+rock_golem+rock_golem,2,1,7,3,False,satyr_soulstealer:182;granite_golem:1694;rock_golem:961;rock_golem:791
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + granite_golem+rock_golem+rock_golem,3,1,7,4,False,granite_golem:1242;rock_golem:245;rock_golem:287
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + granite_golem+rock_golem+rock_golem,4,1,7,5,False,granite_golem:873;rock_golem:204
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + prowler_acolyte+prowler_acolyte+prowler_shaman,1,0,7,0,False,satyr_soulstealer:859;satyr_soulstealer:278;satyr_trickster:310;satyr_trickster:225;prowler_acolyte:868;prowler_acolyte:741;prowler_shaman:1429
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + prowler_acolyte+prowler_acolyte+prowler_shaman,2,0,7,3,False,satyr_soulstealer:409;prowler_acolyte:458;prowler_acolyte:252;prowler_shaman:805
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + prowler_acolyte+prowler_acolyte+prowler_shaman,3,0,7,4,False,prowler_acolyte:114;prowler_acolyte:48;prowler_shaman:380
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + prowler_acolyte+prowler_acolyte+prowler_shaman,4,0,7,7,True,
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + prowler_acolyte+prowler_acolyte+prowler_shaman,1,1,7,0,False,satyr_soulstealer:647;satyr_soulstealer:77;satyr_trickster:236;satyr_trickster:243;prowler_acolyte:803;prowler_acolyte:448;prowler_shaman:1071
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + prowler_acolyte+prowler_acolyte+prowler_shaman,2,1,7,3,False,satyr_soulstealer:121;prowler_acolyte:452;prowler_acolyte:373;prowler_shaman:672
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + prowler_acolyte+prowler_acolyte+prowler_shaman,3,1,7,4,False,prowler_acolyte:51;prowler_acolyte:8;prowler_shaman:164
+C,3,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + prowler_acolyte+prowler_acolyte+prowler_shaman,4,1,7,6,False,prowler_shaman:41
+C,4,alpha_wolf+giant_wolf+giant_wolf + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,0,6,0,False,alpha_wolf:821;giant_wolf:281;giant_wolf:561;big_thunder_lizard:1928;small_thunder_lizard:922;small_thunder_lizard:894
+C,4,alpha_wolf+giant_wolf+giant_wolf + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,0,6,2,False,alpha_wolf:77;big_thunder_lizard:1439;small_thunder_lizard:531;small_thunder_lizard:533
+C,4,alpha_wolf+giant_wolf+giant_wolf + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,0,6,4,False,big_thunder_lizard:1133;small_thunder_lizard:386
+C,4,alpha_wolf+giant_wolf+giant_wolf + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,0,6,3,False,big_thunder_lizard:1065;small_thunder_lizard:437;small_thunder_lizard:27
+C,4,alpha_wolf+giant_wolf+giant_wolf + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,1,6,0,False,alpha_wolf:755;giant_wolf:349;giant_wolf:502;big_thunder_lizard:1514;small_thunder_lizard:587;small_thunder_lizard:649
+C,4,alpha_wolf+giant_wolf+giant_wolf + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,1,6,3,False,big_thunder_lizard:1158;small_thunder_lizard:884;small_thunder_lizard:604
+C,4,alpha_wolf+giant_wolf+giant_wolf + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,1,6,3,False,big_thunder_lizard:1077;small_thunder_lizard:255;small_thunder_lizard:4
+C,4,alpha_wolf+giant_wolf+giant_wolf + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,1,6,3,False,big_thunder_lizard:876;small_thunder_lizard:577;small_thunder_lizard:155
+C,4,alpha_wolf+giant_wolf+giant_wolf + black_dragon+black_drake+black_drake,1,0,6,0,False,alpha_wolf:750;giant_wolf:291;giant_wolf:371;black_dragon:2157;black_drake:949;black_drake:949
+C,4,alpha_wolf+giant_wolf+giant_wolf + black_dragon+black_drake+black_drake,2,0,6,3,False,black_dragon:1680;black_drake:300;black_drake:78
+C,4,alpha_wolf+giant_wolf+giant_wolf + black_dragon+black_drake+black_drake,3,0,6,4,False,black_dragon:1766;black_drake:296
+C,4,alpha_wolf+giant_wolf+giant_wolf + black_dragon+black_drake+black_drake,4,0,6,5,False,black_dragon:1331
+C,4,alpha_wolf+giant_wolf+giant_wolf + black_dragon+black_drake+black_drake,1,1,6,1,False,alpha_wolf:341;giant_wolf:159;black_dragon:2109;black_drake:741;black_drake:784
+C,4,alpha_wolf+giant_wolf+giant_wolf + black_dragon+black_drake+black_drake,2,1,6,2,False,giant_wolf:133;black_dragon:1421;black_drake:438;black_drake:360
+C,4,alpha_wolf+giant_wolf+giant_wolf + black_dragon+black_drake+black_drake,3,1,6,5,False,black_dragon:1537
+C,4,alpha_wolf+giant_wolf+giant_wolf + black_dragon+black_drake+black_drake,4,1,6,5,False,black_dragon:1136
+C,4,alpha_wolf+giant_wolf+giant_wolf + frostbitten_golem+frostbitten_golem+ice_shaman,1,0,6,0,False,alpha_wolf:671;giant_wolf:398;giant_wolf:411;frostbitten_golem:854;frostbitten_golem:826;ice_shaman:1695
+C,4,alpha_wolf+giant_wolf+giant_wolf + frostbitten_golem+frostbitten_golem+ice_shaman,2,0,6,3,False,frostbitten_golem:217;frostbitten_golem:257;ice_shaman:1151
+C,4,alpha_wolf+giant_wolf+giant_wolf + frostbitten_golem+frostbitten_golem+ice_shaman,3,0,6,3,False,frostbitten_golem:181;frostbitten_golem:81;ice_shaman:979
+C,4,alpha_wolf+giant_wolf+giant_wolf + frostbitten_golem+frostbitten_golem+ice_shaman,4,0,6,5,False,ice_shaman:477
+C,4,alpha_wolf+giant_wolf+giant_wolf + frostbitten_golem+frostbitten_golem+ice_shaman,1,1,6,0,False,alpha_wolf:647;giant_wolf:111;giant_wolf:302;frostbitten_golem:890;frostbitten_golem:821;ice_shaman:1232
+C,4,alpha_wolf+giant_wolf+giant_wolf + frostbitten_golem+frostbitten_golem+ice_shaman,2,1,6,2,False,alpha_wolf:33;frostbitten_golem:674;frostbitten_golem:686;ice_shaman:423
+C,4,alpha_wolf+giant_wolf+giant_wolf + frostbitten_golem+frostbitten_golem+ice_shaman,3,1,6,3,False,frostbitten_golem:150;frostbitten_golem:97;ice_shaman:578
+C,4,alpha_wolf+giant_wolf+giant_wolf + frostbitten_golem+frostbitten_golem+ice_shaman,4,1,6,5,False,ice_shaman:393
+C,4,alpha_wolf+giant_wolf+giant_wolf + granite_golem+rock_golem+rock_golem,1,0,6,0,False,alpha_wolf:938;giant_wolf:412;giant_wolf:775;granite_golem:2121;rock_golem:1014;rock_golem:1098
+C,4,alpha_wolf+giant_wolf+giant_wolf + granite_golem+rock_golem+rock_golem,2,0,6,2,False,alpha_wolf:63;granite_golem:1508;rock_golem:698;rock_golem:453
+C,4,alpha_wolf+giant_wolf+giant_wolf + granite_golem+rock_golem+rock_golem,3,0,6,3,False,granite_golem:1323;rock_golem:349;rock_golem:34
+C,4,alpha_wolf+giant_wolf+giant_wolf + granite_golem+rock_golem+rock_golem,4,0,6,5,False,granite_golem:858
+C,4,alpha_wolf+giant_wolf+giant_wolf + granite_golem+rock_golem+rock_golem,1,1,6,2,False,alpha_wolf:541;granite_golem:1684;rock_golem:814;rock_golem:851
+C,4,alpha_wolf+giant_wolf+giant_wolf + granite_golem+rock_golem+rock_golem,2,1,6,1,False,alpha_wolf:220;giant_wolf:284;granite_golem:1647;rock_golem:1013;rock_golem:803
+C,4,alpha_wolf+giant_wolf+giant_wolf + granite_golem+rock_golem+rock_golem,3,1,6,3,False,granite_golem:1310;rock_golem:383;rock_golem:159
+C,4,alpha_wolf+giant_wolf+giant_wolf + granite_golem+rock_golem+rock_golem,4,1,6,4,False,granite_golem:913;rock_golem:121
+C,4,alpha_wolf+giant_wolf+giant_wolf + prowler_acolyte+prowler_acolyte+prowler_shaman,1,0,6,0,False,alpha_wolf:763;giant_wolf:186;giant_wolf:581;prowler_acolyte:757;prowler_acolyte:362;prowler_shaman:1283
+C,4,alpha_wolf+giant_wolf+giant_wolf + prowler_acolyte+prowler_acolyte+prowler_shaman,2,0,6,3,False,prowler_acolyte:458;prowler_acolyte:62;prowler_shaman:764
+C,4,alpha_wolf+giant_wolf+giant_wolf + prowler_acolyte+prowler_acolyte+prowler_shaman,3,0,6,4,False,prowler_acolyte:118;prowler_shaman:378
+C,4,alpha_wolf+giant_wolf+giant_wolf + prowler_acolyte+prowler_acolyte+prowler_shaman,4,0,6,6,True,
+C,4,alpha_wolf+giant_wolf+giant_wolf + prowler_acolyte+prowler_acolyte+prowler_shaman,1,1,6,1,False,alpha_wolf:560;giant_wolf:196;prowler_acolyte:746;prowler_acolyte:191;prowler_shaman:840
+C,4,alpha_wolf+giant_wolf+giant_wolf + prowler_acolyte+prowler_acolyte+prowler_shaman,2,1,6,3,False,prowler_acolyte:224;prowler_acolyte:275;prowler_shaman:464
+C,4,alpha_wolf+giant_wolf+giant_wolf + prowler_acolyte+prowler_acolyte+prowler_shaman,3,1,6,6,True,
+C,4,alpha_wolf+giant_wolf+giant_wolf + prowler_acolyte+prowler_acolyte+prowler_shaman,4,1,6,6,True,
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,0,6,1,False,centaur_khan:838;centaur_outrunner:87;big_thunder_lizard:1674;small_thunder_lizard:722;small_thunder_lizard:726
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,0,6,2,False,centaur_khan:305;big_thunder_lizard:1293;small_thunder_lizard:449;small_thunder_lizard:347
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,0,6,2,False,centaur_khan:78;big_thunder_lizard:1121;small_thunder_lizard:92;small_thunder_lizard:4
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,0,6,5,False,big_thunder_lizard:682
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,1,6,2,False,centaur_khan:856;big_thunder_lizard:1289;small_thunder_lizard:460;small_thunder_lizard:460
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,1,6,2,False,centaur_khan:378;big_thunder_lizard:1114;small_thunder_lizard:597;small_thunder_lizard:554
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,1,6,4,False,centaur_khan:146;big_thunder_lizard:656
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,1,6,4,False,big_thunder_lizard:494;small_thunder_lizard:83
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + black_dragon+black_drake+black_drake,1,0,6,0,False,centaur_khan:904;centaur_outrunner:121;centaur_outrunner:121;black_dragon:1962;black_drake:612;black_drake:699
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + black_dragon+black_drake+black_drake,2,0,6,2,False,centaur_khan:73;black_dragon:1666;black_drake:226;black_drake:8
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + black_dragon+black_drake+black_drake,3,0,6,3,False,centaur_khan:64;black_dragon:1254;black_drake:114
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + black_dragon+black_drake+black_drake,4,0,6,5,False,black_dragon:1073
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + black_dragon+black_drake+black_drake,1,1,6,2,False,centaur_khan:620;black_dragon:1968;black_drake:636;black_drake:633
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + black_dragon+black_drake+black_drake,2,1,6,2,False,centaur_khan:380;black_dragon:1275;black_drake:466;black_drake:185
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + black_dragon+black_drake+black_drake,3,1,6,5,False,black_dragon:1233
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + black_dragon+black_drake+black_drake,4,1,6,5,False,black_dragon:935
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + frostbitten_golem+frostbitten_golem+ice_shaman,1,0,6,1,False,centaur_khan:1000;centaur_outrunner:153;frostbitten_golem:804;frostbitten_golem:713;ice_shaman:1430
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + frostbitten_golem+frostbitten_golem+ice_shaman,2,0,6,2,False,centaur_khan:236;frostbitten_golem:118;frostbitten_golem:176;ice_shaman:554
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + frostbitten_golem+frostbitten_golem+ice_shaman,3,0,6,4,False,frostbitten_golem:85;ice_shaman:548
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + frostbitten_golem+frostbitten_golem+ice_shaman,4,0,6,5,False,ice_shaman:109
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + frostbitten_golem+frostbitten_golem+ice_shaman,1,1,6,2,False,centaur_khan:698;frostbitten_golem:552;frostbitten_golem:430;ice_shaman:960
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + frostbitten_golem+frostbitten_golem+ice_shaman,2,1,6,2,False,centaur_khan:475;frostbitten_golem:310;frostbitten_golem:208;ice_shaman:805
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + frostbitten_golem+frostbitten_golem+ice_shaman,3,1,6,5,False,ice_shaman:467
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + frostbitten_golem+frostbitten_golem+ice_shaman,4,1,6,6,True,
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + granite_golem+rock_golem+rock_golem,1,0,6,0,False,centaur_khan:1252;centaur_outrunner:120;centaur_outrunner:312;granite_golem:1791;rock_golem:897;rock_golem:945
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + granite_golem+rock_golem+rock_golem,2,0,6,3,False,centaur_khan:339;granite_golem:898;rock_golem:9
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + granite_golem+rock_golem+rock_golem,3,0,6,4,False,granite_golem:1294;rock_golem:296
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + granite_golem+rock_golem+rock_golem,4,0,6,5,False,granite_golem:427
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + granite_golem+rock_golem+rock_golem,1,1,6,1,False,centaur_khan:831;centaur_outrunner:125;granite_golem:1717;rock_golem:488;rock_golem:480
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + granite_golem+rock_golem+rock_golem,2,1,6,2,False,centaur_khan:571;granite_golem:1217;rock_golem:344;rock_golem:153
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + granite_golem+rock_golem+rock_golem,3,1,6,5,False,granite_golem:829
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + granite_golem+rock_golem+rock_golem,4,1,6,5,False,granite_golem:274
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + prowler_acolyte+prowler_acolyte+prowler_shaman,1,0,6,1,False,centaur_khan:864;centaur_outrunner:139;prowler_acolyte:638;prowler_acolyte:544;prowler_shaman:1210
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + prowler_acolyte+prowler_acolyte+prowler_shaman,2,0,6,4,False,centaur_khan:288;prowler_shaman:241
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + prowler_acolyte+prowler_acolyte+prowler_shaman,3,0,6,6,True,
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + prowler_acolyte+prowler_acolyte+prowler_shaman,4,0,6,6,True,
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + prowler_acolyte+prowler_acolyte+prowler_shaman,1,1,6,2,False,centaur_khan:920;prowler_acolyte:627;prowler_acolyte:163;prowler_shaman:813
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + prowler_acolyte+prowler_acolyte+prowler_shaman,2,1,6,2,False,centaur_khan:223;prowler_acolyte:90;prowler_acolyte:153;prowler_shaman:464
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + prowler_acolyte+prowler_acolyte+prowler_shaman,3,1,6,6,True,
+C,4,centaur_khan+centaur_outrunner+centaur_outrunner + prowler_acolyte+prowler_acolyte+prowler_shaman,4,1,6,6,True,
+C,4,mud_golem+mud_golem + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,0,5,0,False,mud_golem:848;mud_golem:681;big_thunder_lizard:1798;small_thunder_lizard:753;small_thunder_lizard:811
+C,4,mud_golem+mud_golem + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,0,5,1,False,mud_golem:40;big_thunder_lizard:1009;small_thunder_lizard:294;small_thunder_lizard:9
+C,4,mud_golem+mud_golem + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,0,5,2,False,mud_golem:97;big_thunder_lizard:1074;small_thunder_lizard:156
+C,4,mud_golem+mud_golem + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,0,5,4,False,big_thunder_lizard:904
+C,4,mud_golem+mud_golem + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,1,5,0,False,mud_golem:815;mud_golem:544;big_thunder_lizard:1429;small_thunder_lizard:507;small_thunder_lizard:492
+C,4,mud_golem+mud_golem + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,1,5,1,False,mud_golem:346;big_thunder_lizard:1092;small_thunder_lizard:754;small_thunder_lizard:510
+C,4,mud_golem+mud_golem + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,1,5,2,False,mud_golem:69;big_thunder_lizard:978;small_thunder_lizard:105
+C,4,mud_golem+mud_golem + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,1,5,3,False,big_thunder_lizard:600;small_thunder_lizard:114
+C,4,mud_golem+mud_golem + black_dragon+black_drake+black_drake,1,0,5,0,False,mud_golem:872;mud_golem:569;black_dragon:1931;black_drake:597;black_drake:484
+C,4,mud_golem+mud_golem + black_dragon+black_drake+black_drake,2,0,5,1,False,mud_golem:54;black_dragon:1611;black_drake:350;black_drake:136
+C,4,mud_golem+mud_golem + black_dragon+black_drake+black_drake,3,0,5,3,False,black_dragon:1501;black_drake:138
+C,4,mud_golem+mud_golem + black_dragon+black_drake+black_drake,4,0,5,4,False,black_dragon:861
+C,4,mud_golem+mud_golem + black_dragon+black_drake+black_drake,1,1,5,0,False,mud_golem:556;mud_golem:337;black_dragon:1768;black_drake:729;black_drake:634
+C,4,mud_golem+mud_golem + black_dragon+black_drake+black_drake,2,1,5,1,False,mud_golem:204;black_dragon:1460;black_drake:444;black_drake:263
+C,4,mud_golem+mud_golem + black_dragon+black_drake+black_drake,3,1,5,3,False,black_dragon:1503;black_drake:3
+C,4,mud_golem+mud_golem + black_dragon+black_drake+black_drake,4,1,5,4,False,black_dragon:977
+C,4,mud_golem+mud_golem + frostbitten_golem+frostbitten_golem+ice_shaman,1,0,5,0,False,mud_golem:875;mud_golem:626;frostbitten_golem:736;frostbitten_golem:567;ice_shaman:1497
+C,4,mud_golem+mud_golem + frostbitten_golem+frostbitten_golem+ice_shaman,2,0,5,0,False,mud_golem:123;mud_golem:60;frostbitten_golem:325;frostbitten_golem:342;ice_shaman:1024
+C,4,mud_golem+mud_golem + frostbitten_golem+frostbitten_golem+ice_shaman,3,0,5,2,False,frostbitten_golem:87;frostbitten_golem:70;ice_shaman:781
+C,4,mud_golem+mud_golem + frostbitten_golem+frostbitten_golem+ice_shaman,4,0,5,4,False,ice_shaman:346
+C,4,mud_golem+mud_golem + frostbitten_golem+frostbitten_golem+ice_shaman,1,1,5,0,False,mud_golem:612;mud_golem:473;frostbitten_golem:608;frostbitten_golem:491;ice_shaman:881
+C,4,mud_golem+mud_golem + frostbitten_golem+frostbitten_golem+ice_shaman,2,1,5,0,False,mud_golem:64;mud_golem:93;frostbitten_golem:280;frostbitten_golem:426;ice_shaman:806
+C,4,mud_golem+mud_golem + frostbitten_golem+frostbitten_golem+ice_shaman,3,1,5,4,False,ice_shaman:816
+C,4,mud_golem+mud_golem + frostbitten_golem+frostbitten_golem+ice_shaman,4,1,5,4,False,ice_shaman:229
+C,4,mud_golem+mud_golem + granite_golem+rock_golem+rock_golem,1,0,5,0,False,mud_golem:795;mud_golem:548;granite_golem:1761;rock_golem:715;rock_golem:597
+C,4,mud_golem+mud_golem + granite_golem+rock_golem+rock_golem,2,0,5,0,False,mud_golem:534;mud_golem:297;granite_golem:1422;rock_golem:243;rock_golem:22
+C,4,mud_golem+mud_golem + granite_golem+rock_golem+rock_golem,3,0,5,0,False,mud_golem:164;mud_golem:61;granite_golem:1039;rock_golem:180;rock_golem:45
+C,4,mud_golem+mud_golem + granite_golem+rock_golem+rock_golem,4,0,5,4,False,granite_golem:535
+C,4,mud_golem+mud_golem + granite_golem+rock_golem+rock_golem,1,1,5,0,False,mud_golem:693;mud_golem:680;granite_golem:1591;rock_golem:644;rock_golem:616
+C,4,mud_golem+mud_golem + granite_golem+rock_golem+rock_golem,2,1,5,0,False,mud_golem:240;mud_golem:60;granite_golem:1144;rock_golem:580;rock_golem:396
+C,4,mud_golem+mud_golem + granite_golem+rock_golem+rock_golem,3,1,5,2,False,mud_golem:35;granite_golem:842;rock_golem:206
+C,4,mud_golem+mud_golem + granite_golem+rock_golem+rock_golem,4,1,5,4,False,granite_golem:605
+C,4,mud_golem+mud_golem + prowler_acolyte+prowler_acolyte+prowler_shaman,1,0,5,0,False,mud_golem:938;mud_golem:689;prowler_acolyte:690;prowler_acolyte:529;prowler_shaman:1326
+C,4,mud_golem+mud_golem + prowler_acolyte+prowler_acolyte+prowler_shaman,2,0,5,1,False,mud_golem:431;mud_golem:409;prowler_acolyte:115;prowler_shaman:626
+C,4,mud_golem+mud_golem + prowler_acolyte+prowler_acolyte+prowler_shaman,3,0,5,3,False,mud_golem:219;prowler_shaman:336
+C,4,mud_golem+mud_golem + prowler_acolyte+prowler_acolyte+prowler_shaman,4,0,5,5,True,
+C,4,mud_golem+mud_golem + prowler_acolyte+prowler_acolyte+prowler_shaman,1,1,5,0,False,mud_golem:566;mud_golem:428;prowler_acolyte:433;prowler_acolyte:26;prowler_shaman:407
+C,4,mud_golem+mud_golem + prowler_acolyte+prowler_acolyte+prowler_shaman,2,1,5,1,False,mud_golem:482;mud_golem:279;prowler_acolyte:25;prowler_acolyte:87
+C,4,mud_golem+mud_golem + prowler_acolyte+prowler_acolyte+prowler_shaman,3,1,5,5,True,
+C,4,mud_golem+mud_golem + prowler_acolyte+prowler_acolyte+prowler_shaman,4,1,5,5,True,
+C,4,ogre_magi+ogre_mauler+ogre_mauler + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,0,6,0,False,ogre_magi:511;ogre_mauler:351;ogre_mauler:751;big_thunder_lizard:1888;small_thunder_lizard:872;small_thunder_lizard:872
+C,4,ogre_magi+ogre_mauler+ogre_mauler + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,0,6,3,False,big_thunder_lizard:1266;small_thunder_lizard:621;small_thunder_lizard:301
+C,4,ogre_magi+ogre_mauler+ogre_mauler + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,0,6,3,False,big_thunder_lizard:1303;small_thunder_lizard:130;small_thunder_lizard:35
+C,4,ogre_magi+ogre_mauler+ogre_mauler + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,0,6,5,False,big_thunder_lizard:715
+C,4,ogre_magi+ogre_mauler+ogre_mauler + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,1,6,1,False,ogre_magi:339;ogre_mauler:273;big_thunder_lizard:1543;small_thunder_lizard:679;small_thunder_lizard:659
+C,4,ogre_magi+ogre_mauler+ogre_mauler + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,1,6,2,False,ogre_mauler:153;big_thunder_lizard:1144;small_thunder_lizard:748;small_thunder_lizard:581
+C,4,ogre_magi+ogre_mauler+ogre_mauler + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,1,6,3,False,big_thunder_lizard:1068;small_thunder_lizard:230;small_thunder_lizard:137
+C,4,ogre_magi+ogre_mauler+ogre_mauler + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,1,6,4,False,big_thunder_lizard:709;small_thunder_lizard:145
+C,4,ogre_magi+ogre_mauler+ogre_mauler + black_dragon+black_drake+black_drake,1,0,6,0,False,ogre_magi:680;ogre_mauler:561;ogre_mauler:801;black_dragon:2178;black_drake:803;black_drake:803
+C,4,ogre_magi+ogre_mauler+ogre_mauler + black_dragon+black_drake+black_drake,2,0,6,3,False,black_dragon:1697;black_drake:317;black_drake:325
+C,4,ogre_magi+ogre_mauler+ogre_mauler + black_dragon+black_drake+black_drake,3,0,6,4,False,black_dragon:1421;black_drake:312
+C,4,ogre_magi+ogre_mauler+ogre_mauler + black_dragon+black_drake+black_drake,4,0,6,5,False,black_dragon:1289
+C,4,ogre_magi+ogre_mauler+ogre_mauler + black_dragon+black_drake+black_drake,1,1,6,0,False,ogre_magi:667;ogre_mauler:447;ogre_mauler:423;black_dragon:1828;black_drake:750;black_drake:675
+C,4,ogre_magi+ogre_mauler+ogre_mauler + black_dragon+black_drake+black_drake,2,1,6,2,False,ogre_mauler:3;black_dragon:1475;black_drake:587;black_drake:250
+C,4,ogre_magi+ogre_mauler+ogre_mauler + black_dragon+black_drake+black_drake,3,1,6,4,False,black_dragon:1530;black_drake:237
+C,4,ogre_magi+ogre_mauler+ogre_mauler + black_dragon+black_drake+black_drake,4,1,6,5,False,black_dragon:1065
+C,4,ogre_magi+ogre_mauler+ogre_mauler + frostbitten_golem+frostbitten_golem+ice_shaman,1,0,6,0,False,ogre_magi:681;ogre_mauler:481;ogre_mauler:801;frostbitten_golem:764;frostbitten_golem:729;ice_shaman:1409
+C,4,ogre_magi+ogre_mauler+ogre_mauler + frostbitten_golem+frostbitten_golem+ice_shaman,2,0,6,3,False,frostbitten_golem:133;frostbitten_golem:42;ice_shaman:1079
+C,4,ogre_magi+ogre_mauler+ogre_mauler + frostbitten_golem+frostbitten_golem+ice_shaman,3,0,6,4,False,frostbitten_golem:267;ice_shaman:469
+C,4,ogre_magi+ogre_mauler+ogre_mauler + frostbitten_golem+frostbitten_golem+ice_shaman,4,0,6,5,False,ice_shaman:177
+C,4,ogre_magi+ogre_mauler+ogre_mauler + frostbitten_golem+frostbitten_golem+ice_shaman,1,1,6,1,False,ogre_magi:251;ogre_mauler:143;frostbitten_golem:700;frostbitten_golem:495;ice_shaman:1192
+C,4,ogre_magi+ogre_mauler+ogre_mauler + frostbitten_golem+frostbitten_golem+ice_shaman,2,1,6,2,False,ogre_mauler:163;frostbitten_golem:133;frostbitten_golem:316;ice_shaman:751
+C,4,ogre_magi+ogre_mauler+ogre_mauler + frostbitten_golem+frostbitten_golem+ice_shaman,3,1,6,4,False,frostbitten_golem:57;ice_shaman:717
+C,4,ogre_magi+ogre_mauler+ogre_mauler + frostbitten_golem+frostbitten_golem+ice_shaman,4,1,6,6,True,
+C,4,ogre_magi+ogre_mauler+ogre_mauler + granite_golem+rock_golem+rock_golem,1,0,6,0,False,ogre_magi:764;ogre_mauler:543;ogre_mauler:989;granite_golem:1924;rock_golem:957;rock_golem:956
+C,4,ogre_magi+ogre_mauler+ogre_mauler + granite_golem+rock_golem+rock_golem,2,0,6,1,False,ogre_magi:213;ogre_mauler:168;granite_golem:1260;rock_golem:419;rock_golem:179
+C,4,ogre_magi+ogre_mauler+ogre_mauler + granite_golem+rock_golem+rock_golem,3,0,6,4,False,granite_golem:1305;rock_golem:188
+C,4,ogre_magi+ogre_mauler+ogre_mauler + granite_golem+rock_golem+rock_golem,4,0,6,5,False,granite_golem:868
+C,4,ogre_magi+ogre_mauler+ogre_mauler + granite_golem+rock_golem+rock_golem,1,1,6,0,False,ogre_magi:418;ogre_mauler:134;ogre_mauler:228;granite_golem:1622;rock_golem:622;rock_golem:690
+C,4,ogre_magi+ogre_mauler+ogre_mauler + granite_golem+rock_golem+rock_golem,2,1,6,1,False,ogre_mauler:118;ogre_mauler:238;granite_golem:1293;rock_golem:802;rock_golem:705
+C,4,ogre_magi+ogre_mauler+ogre_mauler + granite_golem+rock_golem+rock_golem,3,1,6,4,False,granite_golem:1239;rock_golem:38
+C,4,ogre_magi+ogre_mauler+ogre_mauler + granite_golem+rock_golem+rock_golem,4,1,6,4,False,granite_golem:812;rock_golem:65
+C,4,ogre_magi+ogre_mauler+ogre_mauler + prowler_acolyte+prowler_acolyte+prowler_shaman,1,0,6,0,False,ogre_magi:754;ogre_mauler:491;ogre_mauler:954;prowler_acolyte:771;prowler_acolyte:458;prowler_shaman:1095
+C,4,ogre_magi+ogre_mauler+ogre_mauler + prowler_acolyte+prowler_acolyte+prowler_shaman,2,0,6,4,False,prowler_acolyte:255;prowler_shaman:181
+C,4,ogre_magi+ogre_mauler+ogre_mauler + prowler_acolyte+prowler_acolyte+prowler_shaman,3,0,6,6,True,
+C,4,ogre_magi+ogre_mauler+ogre_mauler + prowler_acolyte+prowler_acolyte+prowler_shaman,4,0,6,6,True,
+C,4,ogre_magi+ogre_mauler+ogre_mauler + prowler_acolyte+prowler_acolyte+prowler_shaman,1,1,6,0,False,ogre_magi:368;ogre_mauler:363;ogre_mauler:168;prowler_acolyte:840;prowler_acolyte:350;prowler_shaman:809
+C,4,ogre_magi+ogre_mauler+ogre_mauler + prowler_acolyte+prowler_acolyte+prowler_shaman,2,1,6,3,False,ogre_mauler:124;prowler_acolyte:63;prowler_shaman:269
+C,4,ogre_magi+ogre_mauler+ogre_mauler + prowler_acolyte+prowler_acolyte+prowler_shaman,3,1,6,6,True,
+C,4,ogre_magi+ogre_mauler+ogre_mauler + prowler_acolyte+prowler_acolyte+prowler_shaman,4,1,6,6,True,
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,0,7,0,False,satyr_soulstealer:721;satyr_soulstealer:441;satyr_trickster:221;satyr_trickster:181;big_thunder_lizard:1870;small_thunder_lizard:813;small_thunder_lizard:837
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,0,7,4,False,big_thunder_lizard:1409;small_thunder_lizard:384;small_thunder_lizard:429
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,0,7,4,False,big_thunder_lizard:1249;small_thunder_lizard:329;small_thunder_lizard:218
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,0,7,5,False,big_thunder_lizard:937;small_thunder_lizard:206
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,1,1,7,2,False,satyr_soulstealer:411;satyr_soulstealer:11;big_thunder_lizard:1664;small_thunder_lizard:696;small_thunder_lizard:640
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,2,1,7,3,False,satyr_trickster:103;big_thunder_lizard:1212;small_thunder_lizard:863;small_thunder_lizard:576
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,3,1,7,4,False,big_thunder_lizard:1170;small_thunder_lizard:438;small_thunder_lizard:160
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + big_thunder_lizard+small_thunder_lizard+small_thunder_lizard,4,1,7,5,False,big_thunder_lizard:634;small_thunder_lizard:180
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + black_dragon+black_drake+black_drake,1,0,7,0,False,satyr_soulstealer:740;satyr_soulstealer:381;satyr_trickster:241;satyr_trickster:81;black_dragon:2125;black_drake:862;black_drake:737
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + black_dragon+black_drake+black_drake,2,0,7,4,False,satyr_soulstealer:5;black_dragon:1559;black_drake:488
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + black_dragon+black_drake+black_drake,3,0,7,5,False,black_dragon:1315;black_drake:415
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + black_dragon+black_drake+black_drake,4,0,7,6,False,black_dragon:1327
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + black_dragon+black_drake+black_drake,1,1,7,2,False,satyr_soulstealer:223;satyr_trickster:43;black_dragon:1878;black_drake:538;black_drake:656
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + black_dragon+black_drake+black_drake,2,1,7,3,False,satyr_soulstealer:143;black_dragon:1386;black_drake:516;black_drake:246
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + black_dragon+black_drake+black_drake,3,1,7,6,False,black_dragon:1297
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + black_dragon+black_drake+black_drake,4,1,7,6,False,black_dragon:1071
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + frostbitten_golem+frostbitten_golem+ice_shaman,1,0,7,0,False,satyr_soulstealer:771;satyr_soulstealer:85;satyr_trickster:391;satyr_trickster:231;frostbitten_golem:794;frostbitten_golem:824;ice_shaman:1554
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + frostbitten_golem+frostbitten_golem+ice_shaman,2,0,7,4,False,frostbitten_golem:429;frostbitten_golem:464;ice_shaman:902
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + frostbitten_golem+frostbitten_golem+ice_shaman,3,0,7,6,False,ice_shaman:552
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + frostbitten_golem+frostbitten_golem+ice_shaman,4,0,7,6,False,ice_shaman:306
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + frostbitten_golem+frostbitten_golem+ice_shaman,1,1,7,3,False,satyr_trickster:189;frostbitten_golem:624;frostbitten_golem:311;ice_shaman:1308
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + frostbitten_golem+frostbitten_golem+ice_shaman,2,1,7,3,False,satyr_soulstealer:13;frostbitten_golem:263;frostbitten_golem:350;ice_shaman:786
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + frostbitten_golem+frostbitten_golem+ice_shaman,3,1,7,6,False,ice_shaman:580
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + frostbitten_golem+frostbitten_golem+ice_shaman,4,1,7,6,False,ice_shaman:610
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + granite_golem+rock_golem+rock_golem,1,0,7,0,False,satyr_soulstealer:879;satyr_soulstealer:386;satyr_trickster:238;satyr_trickster:291;granite_golem:1963;rock_golem:948;rock_golem:974
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + granite_golem+rock_golem+rock_golem,2,0,7,5,False,granite_golem:1080;rock_golem:61
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + granite_golem+rock_golem+rock_golem,3,0,7,5,False,granite_golem:1108;rock_golem:280
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + granite_golem+rock_golem+rock_golem,4,0,7,6,False,granite_golem:768
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + granite_golem+rock_golem+rock_golem,1,1,7,2,False,satyr_soulstealer:306;satyr_trickster:261;granite_golem:1655;rock_golem:757;rock_golem:909
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + granite_golem+rock_golem+rock_golem,2,1,7,4,False,granite_golem:1513;rock_golem:794;rock_golem:444
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + granite_golem+rock_golem+rock_golem,3,1,7,4,False,granite_golem:1113;rock_golem:111;rock_golem:218
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + granite_golem+rock_golem+rock_golem,4,1,7,5,False,granite_golem:784;rock_golem:42
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + prowler_acolyte+prowler_acolyte+prowler_shaman,1,0,7,0,False,satyr_soulstealer:419;satyr_soulstealer:265;satyr_trickster:119;satyr_trickster:125;prowler_acolyte:991;prowler_acolyte:557;prowler_shaman:1330
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + prowler_acolyte+prowler_acolyte+prowler_shaman,2,0,7,4,False,prowler_acolyte:180;prowler_acolyte:180;prowler_shaman:536
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + prowler_acolyte+prowler_acolyte+prowler_shaman,3,0,7,7,True,
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + prowler_acolyte+prowler_acolyte+prowler_shaman,4,0,7,7,True,
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + prowler_acolyte+prowler_acolyte+prowler_shaman,1,1,7,1,False,satyr_soulstealer:497;satyr_trickster:54;satyr_trickster:189;prowler_acolyte:908;prowler_acolyte:427;prowler_shaman:1087
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + prowler_acolyte+prowler_acolyte+prowler_shaman,2,1,7,4,False,prowler_acolyte:197;prowler_acolyte:178;prowler_shaman:245
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + prowler_acolyte+prowler_acolyte+prowler_shaman,3,1,7,7,True,
+C,4,satyr_soulstealer+satyr_soulstealer+satyr_trickster+satyr_trickster + prowler_acolyte+prowler_acolyte+prowler_shaman,4,1,7,7,True,
+D,3,fel_beast+fel_beast+ghost + centaur_khan+centaur_outrunner+centaur_outrunner,1,0,6,0,False,fel_beast:445;fel_beast:383;ghost:482;centaur_khan:1541;centaur_outrunner:665;centaur_outrunner:666
+D,3,fel_beast+fel_beast+ghost + centaur_khan+centaur_outrunner+centaur_outrunner,2,0,6,2,False,fel_beast:105;fel_beast:19;ghost:241;centaur_khan:944
+D,3,fel_beast+fel_beast+ghost + centaur_khan+centaur_outrunner+centaur_outrunner,3,0,6,5,False,centaur_khan:624
+D,3,fel_beast+fel_beast+ghost + centaur_khan+centaur_outrunner+centaur_outrunner,4,0,6,5,False,centaur_khan:49
+D,3,fel_beast+fel_beast+ghost + centaur_khan+centaur_outrunner+centaur_outrunner,1,1,6,1,False,fel_beast:124;fel_beast:118;ghost:286;centaur_khan:1006;centaur_outrunner:48
+D,3,fel_beast+fel_beast+ghost + centaur_khan+centaur_outrunner+centaur_outrunner,2,1,6,2,False,fel_beast:217;ghost:432;centaur_khan:946;centaur_outrunner:243
+D,3,fel_beast+fel_beast+ghost + centaur_khan+centaur_outrunner+centaur_outrunner,3,1,6,5,False,centaur_khan:164
+D,3,fel_beast+fel_beast+ghost + centaur_khan+centaur_outrunner+centaur_outrunner,4,1,6,5,False,centaur_khan:819
+D,3,fel_beast+fel_beast+ghost + dark_troll+dark_troll+dark_troll_warlord,1,0,6,0,False,fel_beast:303;fel_beast:531;ghost:470;dark_troll:1039;dark_troll:446;dark_troll_warlord:1265
+D,3,fel_beast+fel_beast+ghost + dark_troll+dark_troll+dark_troll_warlord,2,0,6,5,False,dark_troll_warlord:417
+D,3,fel_beast+fel_beast+ghost + dark_troll+dark_troll+dark_troll_warlord,3,0,6,4,False,dark_troll:268;dark_troll_warlord:373
+D,3,fel_beast+fel_beast+ghost + dark_troll+dark_troll+dark_troll_warlord,4,0,6,6,True,
+D,3,fel_beast+fel_beast+ghost + dark_troll+dark_troll+dark_troll_warlord,1,1,6,0,False,fel_beast:375;fel_beast:495;ghost:241;dark_troll:626;dark_troll:347;dark_troll_warlord:712
+D,3,fel_beast+fel_beast+ghost + dark_troll+dark_troll+dark_troll_warlord,2,1,6,2,False,fel_beast:63;ghost:229;dark_troll:111;dark_troll_warlord:407
+D,3,fel_beast+fel_beast+ghost + dark_troll+dark_troll+dark_troll_warlord,3,1,6,6,True,
+D,3,fel_beast+fel_beast+ghost + dark_troll+dark_troll+dark_troll_warlord,4,1,6,5,False,dark_troll_warlord:3
+D,3,fel_beast+fel_beast+ghost + enraged_wildkin+wildkin+wildkin,1,0,6,0,False,fel_beast:380;fel_beast:493;ghost:459;enraged_wildkin:1488;wildkin:423;wildkin:547
+D,3,fel_beast+fel_beast+ghost + enraged_wildkin+wildkin+wildkin,2,0,6,5,False,enraged_wildkin:541
+D,3,fel_beast+fel_beast+ghost + enraged_wildkin+wildkin+wildkin,3,0,6,5,False,enraged_wildkin:531
+D,3,fel_beast+fel_beast+ghost + enraged_wildkin+wildkin+wildkin,4,0,6,6,True,
+D,3,fel_beast+fel_beast+ghost + enraged_wildkin+wildkin+wildkin,1,1,6,2,False,fel_beast:519;fel_beast:506;ghost:186;enraged_wildkin:994
+D,3,fel_beast+fel_beast+ghost + enraged_wildkin+wildkin+wildkin,2,1,6,2,False,fel_beast:320;fel_beast:242;ghost:197;enraged_wildkin:653
+D,3,fel_beast+fel_beast+ghost + enraged_wildkin+wildkin+wildkin,3,1,6,5,False,enraged_wildkin:399
+D,3,fel_beast+fel_beast+ghost + enraged_wildkin+wildkin+wildkin,4,1,6,5,False,enraged_wildkin:68
+D,3,fel_beast+fel_beast+ghost + polar_furbolg_champion+polar_furbolg_ursa_warrior,1,0,5,0,False,fel_beast:217;fel_beast:383;ghost:382;polar_furbolg_champion:1147;polar_furbolg_ursa_warrior:1088
+D,3,fel_beast+fel_beast+ghost + polar_furbolg_champion+polar_furbolg_ursa_warrior,2,0,5,1,False,fel_beast:311;fel_beast:36;polar_furbolg_champion:238;polar_furbolg_ursa_warrior:267
+D,3,fel_beast+fel_beast+ghost + polar_furbolg_champion+polar_furbolg_ursa_warrior,3,0,5,4,False,polar_furbolg_champion:283
+D,3,fel_beast+fel_beast+ghost + polar_furbolg_champion+polar_furbolg_ursa_warrior,4,0,5,5,True,
+D,3,fel_beast+fel_beast+ghost + polar_furbolg_champion+polar_furbolg_ursa_warrior,1,1,5,0,False,fel_beast:313;fel_beast:225;ghost:170;polar_furbolg_champion:557;polar_furbolg_ursa_warrior:511
+D,3,fel_beast+fel_beast+ghost + polar_furbolg_champion+polar_furbolg_ursa_warrior,2,1,5,3,False,polar_furbolg_champion:591;polar_furbolg_ursa_warrior:508
+D,3,fel_beast+fel_beast+ghost + polar_furbolg_champion+polar_furbolg_ursa_warrior,3,1,5,5,True,
+D,3,fel_beast+fel_beast+ghost + polar_furbolg_champion+polar_furbolg_ursa_warrior,4,1,5,5,True,
+D,3,fel_beast+fel_beast+ghost + satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,0,6,0,False,fel_beast:9;fel_beast:214;ghost:314;satyr_hellcaller:1586;satyr_soulstealer:682;satyr_trickster:382
+D,3,fel_beast+fel_beast+ghost + satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,0,6,4,False,satyr_hellcaller:861;satyr_soulstealer:155
+D,3,fel_beast+fel_beast+ghost + satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,0,6,4,False,ghost:11;satyr_hellcaller:872
+D,3,fel_beast+fel_beast+ghost + satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,0,6,6,True,
+D,3,fel_beast+fel_beast+ghost + satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,1,6,2,False,fel_beast:14;satyr_hellcaller:1129;satyr_soulstealer:422;satyr_trickster:96
+D,3,fel_beast+fel_beast+ghost + satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,1,6,2,False,fel_beast:61;satyr_hellcaller:979;satyr_soulstealer:231;satyr_trickster:85
+D,3,fel_beast+fel_beast+ghost + satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,1,6,5,False,satyr_hellcaller:434
+D,3,fel_beast+fel_beast+ghost + satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,1,6,6,True,
+D,3,fel_beast+fel_beast+ghost + warpine_raider+warpine_raider,1,0,5,0,False,fel_beast:331;fel_beast:537;ghost:436;warpine_raider:1346;warpine_raider:1192
+D,3,fel_beast+fel_beast+ghost + warpine_raider+warpine_raider,2,0,5,3,False,warpine_raider:670;warpine_raider:501
+D,3,fel_beast+fel_beast+ghost + warpine_raider+warpine_raider,3,0,5,3,False,warpine_raider:729;warpine_raider:707
+D,3,fel_beast+fel_beast+ghost + warpine_raider+warpine_raider,4,0,5,5,True,
+D,3,fel_beast+fel_beast+ghost + warpine_raider+warpine_raider,1,1,5,0,False,fel_beast:306;fel_beast:26;ghost:61;warpine_raider:994;warpine_raider:1034
+D,3,fel_beast+fel_beast+ghost + warpine_raider+warpine_raider,2,1,5,2,False,fel_beast:11;warpine_raider:741;warpine_raider:674
+D,3,fel_beast+fel_beast+ghost + warpine_raider+warpine_raider,3,1,5,3,False,warpine_raider:473;warpine_raider:469
+D,3,fel_beast+fel_beast+ghost + warpine_raider+warpine_raider,4,1,5,4,False,warpine_raider:56
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + centaur_khan+centaur_outrunner+centaur_outrunner,1,0,6,0,False,forest_troll_berserker:839;forest_troll_berserker:560;forest_troll_high_priest:635;centaur_khan:1525;centaur_outrunner:551;centaur_outrunner:576
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + centaur_khan+centaur_outrunner+centaur_outrunner,2,0,6,3,False,forest_troll_berserker:346;forest_troll_berserker:115;centaur_khan:741
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + centaur_khan+centaur_outrunner+centaur_outrunner,3,0,6,5,False,centaur_khan:954
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + centaur_khan+centaur_outrunner+centaur_outrunner,4,0,6,5,False,centaur_khan:136
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + centaur_khan+centaur_outrunner+centaur_outrunner,1,1,6,0,False,forest_troll_berserker:626;forest_troll_berserker:224;forest_troll_high_priest:268;centaur_khan:1128;centaur_outrunner:286;centaur_outrunner:236
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + centaur_khan+centaur_outrunner+centaur_outrunner,2,1,6,1,False,forest_troll_berserker:241;forest_troll_berserker:95;forest_troll_high_priest:27;centaur_khan:831;centaur_outrunner:153
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + centaur_khan+centaur_outrunner+centaur_outrunner,3,1,6,5,False,centaur_khan:426
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + centaur_khan+centaur_outrunner+centaur_outrunner,4,1,6,5,False,centaur_khan:256
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + dark_troll+dark_troll+dark_troll_warlord,1,0,6,0,False,forest_troll_berserker:615;forest_troll_berserker:167;forest_troll_high_priest:340;dark_troll:826;dark_troll:548;dark_troll_warlord:1241
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + dark_troll+dark_troll+dark_troll_warlord,2,0,6,5,False,dark_troll_warlord:171
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + dark_troll+dark_troll+dark_troll_warlord,3,0,6,3,False,forest_troll_berserker:183;dark_troll:23;dark_troll_warlord:314
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + dark_troll+dark_troll+dark_troll_warlord,4,0,6,6,True,
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + dark_troll+dark_troll+dark_troll_warlord,1,1,6,0,False,forest_troll_berserker:795;forest_troll_berserker:305;forest_troll_high_priest:458;dark_troll:767;dark_troll:213;dark_troll_warlord:672
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + dark_troll+dark_troll+dark_troll_warlord,2,1,6,2,False,forest_troll_berserker:305;forest_troll_berserker:119;dark_troll:238;dark_troll_warlord:621
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + dark_troll+dark_troll+dark_troll_warlord,3,1,6,6,True,
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + dark_troll+dark_troll+dark_troll_warlord,4,1,6,6,True,
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + enraged_wildkin+wildkin+wildkin,1,0,6,0,False,forest_troll_berserker:777;forest_troll_berserker:529;forest_troll_high_priest:652;enraged_wildkin:1305;wildkin:334;wildkin:520
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + enraged_wildkin+wildkin+wildkin,2,0,6,4,False,forest_troll_berserker:113;enraged_wildkin:530
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + enraged_wildkin+wildkin+wildkin,3,0,6,3,False,forest_troll_berserker:143;forest_troll_berserker:50;enraged_wildkin:533
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + enraged_wildkin+wildkin+wildkin,4,0,6,6,True,
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + enraged_wildkin+wildkin+wildkin,1,1,6,0,False,forest_troll_berserker:793;forest_troll_berserker:416;forest_troll_high_priest:379;enraged_wildkin:781;wildkin:225;wildkin:99
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + enraged_wildkin+wildkin+wildkin,2,1,6,2,False,forest_troll_berserker:175;forest_troll_berserker:237;enraged_wildkin:691;wildkin:397
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + enraged_wildkin+wildkin+wildkin,3,1,6,4,False,forest_troll_berserker:143;enraged_wildkin:350
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + enraged_wildkin+wildkin+wildkin,4,1,6,5,False,enraged_wildkin:194
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + polar_furbolg_champion+polar_furbolg_ursa_warrior,1,0,5,0,False,forest_troll_berserker:671;forest_troll_berserker:268;forest_troll_high_priest:478;polar_furbolg_champion:995;polar_furbolg_ursa_warrior:1029
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + polar_furbolg_champion+polar_furbolg_ursa_warrior,2,0,5,2,False,forest_troll_berserker:87;polar_furbolg_champion:296;polar_furbolg_ursa_warrior:541
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + polar_furbolg_champion+polar_furbolg_ursa_warrior,3,0,5,3,False,polar_furbolg_champion:534;polar_furbolg_ursa_warrior:262
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + polar_furbolg_champion+polar_furbolg_ursa_warrior,4,0,5,5,True,
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + polar_furbolg_champion+polar_furbolg_ursa_warrior,1,1,5,0,False,forest_troll_berserker:616;forest_troll_berserker:182;forest_troll_high_priest:144;polar_furbolg_champion:702;polar_furbolg_ursa_warrior:786
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + polar_furbolg_champion+polar_furbolg_ursa_warrior,2,1,5,3,False,polar_furbolg_champion:531;polar_furbolg_ursa_warrior:449
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + polar_furbolg_champion+polar_furbolg_ursa_warrior,3,1,5,5,True,
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + polar_furbolg_champion+polar_furbolg_ursa_warrior,4,1,5,4,False,polar_furbolg_champion:57
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,0,6,0,False,forest_troll_berserker:644;forest_troll_berserker:489;forest_troll_high_priest:480;satyr_hellcaller:1373;satyr_soulstealer:594;satyr_trickster:541
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,0,6,4,False,forest_troll_berserker:333;satyr_hellcaller:700
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,0,6,5,False,satyr_hellcaller:783
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,0,6,6,True,
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,1,6,1,False,forest_troll_berserker:626;forest_troll_berserker:32;satyr_hellcaller:918;satyr_soulstealer:367;satyr_trickster:269
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,1,6,3,False,forest_troll_berserker:316;satyr_hellcaller:983;satyr_soulstealer:295
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,1,6,4,False,forest_troll_berserker:176;satyr_hellcaller:122
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,1,6,5,False,satyr_hellcaller:365
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + warpine_raider+warpine_raider,1,0,5,0,False,forest_troll_berserker:678;forest_troll_berserker:484;forest_troll_high_priest:304;warpine_raider:1256;warpine_raider:1169
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + warpine_raider+warpine_raider,2,0,5,2,False,forest_troll_berserker:178;warpine_raider:495;warpine_raider:525
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + warpine_raider+warpine_raider,3,0,5,3,False,warpine_raider:725;warpine_raider:484
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + warpine_raider+warpine_raider,4,0,5,3,False,warpine_raider:273;warpine_raider:37
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + warpine_raider+warpine_raider,1,1,5,0,False,forest_troll_berserker:826;forest_troll_berserker:112;forest_troll_high_priest:370;warpine_raider:878;warpine_raider:909
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + warpine_raider+warpine_raider,2,1,5,1,False,forest_troll_berserker:177;forest_troll_berserker:52;warpine_raider:782;warpine_raider:584
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + warpine_raider+warpine_raider,3,1,5,2,False,forest_troll_berserker:240;warpine_raider:232;warpine_raider:93
+D,3,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + warpine_raider+warpine_raider,4,1,5,3,False,warpine_raider:426;warpine_raider:141
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + centaur_khan+centaur_outrunner+centaur_outrunner,1,0,6,0,False,gnoll_assassin:515;gnoll_assassin:466;gnoll_assassin:363;centaur_khan:1582;centaur_outrunner:606;centaur_outrunner:656
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + centaur_khan+centaur_outrunner+centaur_outrunner,2,0,6,2,False,gnoll_assassin:456;gnoll_assassin:285;gnoll_assassin:42;centaur_khan:907
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + centaur_khan+centaur_outrunner+centaur_outrunner,3,0,6,1,False,gnoll_assassin:465;gnoll_assassin:365;gnoll_assassin:190;centaur_khan:940;centaur_outrunner:85
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + centaur_khan+centaur_outrunner+centaur_outrunner,4,0,6,5,False,centaur_khan:86
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + centaur_khan+centaur_outrunner+centaur_outrunner,1,1,6,1,False,gnoll_assassin:931;gnoll_assassin:499;gnoll_assassin:266;centaur_khan:1041;centaur_outrunner:208
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + centaur_khan+centaur_outrunner+centaur_outrunner,2,1,6,1,False,gnoll_assassin:128;gnoll_assassin:277;centaur_khan:1111;centaur_outrunner:108;centaur_outrunner:133
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + centaur_khan+centaur_outrunner+centaur_outrunner,3,1,6,4,False,gnoll_assassin:358;centaur_khan:920
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + centaur_khan+centaur_outrunner+centaur_outrunner,4,1,6,5,False,centaur_khan:391
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + dark_troll+dark_troll+dark_troll_warlord,1,0,6,0,False,gnoll_assassin:665;gnoll_assassin:585;gnoll_assassin:523;dark_troll:1037;dark_troll:758;dark_troll_warlord:1296
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + dark_troll+dark_troll+dark_troll_warlord,2,0,6,2,False,gnoll_assassin:2;gnoll_assassin:292;dark_troll:132;dark_troll_warlord:407
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + dark_troll+dark_troll+dark_troll_warlord,3,0,6,3,False,dark_troll:482;dark_troll:359;dark_troll_warlord:866
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + dark_troll+dark_troll+dark_troll_warlord,4,0,6,6,True,
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + dark_troll+dark_troll+dark_troll_warlord,1,1,6,0,False,gnoll_assassin:877;gnoll_assassin:105;gnoll_assassin:598;dark_troll:781;dark_troll:389;dark_troll_warlord:807
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + dark_troll+dark_troll+dark_troll_warlord,2,1,6,1,False,gnoll_assassin:240;gnoll_assassin:281;dark_troll:387;dark_troll:233;dark_troll_warlord:559
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + dark_troll+dark_troll+dark_troll_warlord,3,1,6,5,False,gnoll_assassin:122
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + dark_troll+dark_troll+dark_troll_warlord,4,1,6,4,False,gnoll_assassin:13;dark_troll_warlord:248
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + enraged_wildkin+wildkin+wildkin,1,0,6,0,False,gnoll_assassin:632;gnoll_assassin:732;gnoll_assassin:508;enraged_wildkin:1578;wildkin:544;wildkin:761
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + enraged_wildkin+wildkin+wildkin,2,0,6,4,False,enraged_wildkin:830;wildkin:14
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + enraged_wildkin+wildkin+wildkin,3,0,6,3,False,gnoll_assassin:412;gnoll_assassin:195;enraged_wildkin:372
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + enraged_wildkin+wildkin+wildkin,4,0,6,6,True,
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + enraged_wildkin+wildkin+wildkin,1,1,6,0,False,gnoll_assassin:763;gnoll_assassin:453;gnoll_assassin:367;enraged_wildkin:1190;wildkin:386;wildkin:41
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + enraged_wildkin+wildkin+wildkin,2,1,6,2,False,gnoll_assassin:269;gnoll_assassin:183;enraged_wildkin:928;wildkin:174
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + enraged_wildkin+wildkin+wildkin,3,1,6,4,False,gnoll_assassin:364;enraged_wildkin:460
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + enraged_wildkin+wildkin+wildkin,4,1,6,5,False,enraged_wildkin:34
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + polar_furbolg_champion+polar_furbolg_ursa_warrior,1,0,5,0,False,gnoll_assassin:727;gnoll_assassin:709;gnoll_assassin:616;polar_furbolg_champion:1237;polar_furbolg_ursa_warrior:1271
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + polar_furbolg_champion+polar_furbolg_ursa_warrior,2,0,5,1,False,gnoll_assassin:549;gnoll_assassin:178;polar_furbolg_champion:373;polar_furbolg_ursa_warrior:410
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + polar_furbolg_champion+polar_furbolg_ursa_warrior,3,0,5,2,False,gnoll_assassin:166;polar_furbolg_champion:280;polar_furbolg_ursa_warrior:504
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + polar_furbolg_champion+polar_furbolg_ursa_warrior,4,0,5,5,True,
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + polar_furbolg_champion+polar_furbolg_ursa_warrior,1,1,5,0,False,gnoll_assassin:538;gnoll_assassin:238;gnoll_assassin:74;polar_furbolg_champion:814;polar_furbolg_ursa_warrior:842
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + polar_furbolg_champion+polar_furbolg_ursa_warrior,2,1,5,0,False,gnoll_assassin:75;gnoll_assassin:394;gnoll_assassin:2;polar_furbolg_champion:556;polar_furbolg_ursa_warrior:469
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + polar_furbolg_champion+polar_furbolg_ursa_warrior,3,1,5,2,False,gnoll_assassin:261;polar_furbolg_champion:131;polar_furbolg_ursa_warrior:290
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + polar_furbolg_champion+polar_furbolg_ursa_warrior,4,1,5,5,True,
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,0,6,0,False,gnoll_assassin:970;gnoll_assassin:800;gnoll_assassin:783;satyr_hellcaller:1700;satyr_soulstealer:741;satyr_trickster:534
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,0,6,3,False,gnoll_assassin:413;satyr_hellcaller:1017;satyr_soulstealer:334
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,0,6,2,False,gnoll_assassin:187;satyr_hellcaller:961;satyr_soulstealer:302;satyr_trickster:3
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,0,6,5,False,satyr_hellcaller:584
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,1,6,1,False,gnoll_assassin:534;gnoll_assassin:337;gnoll_assassin:169;satyr_hellcaller:1108;satyr_soulstealer:434
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,1,6,0,False,gnoll_assassin:592;gnoll_assassin:559;gnoll_assassin:226;satyr_hellcaller:1138;satyr_soulstealer:568;satyr_trickster:176
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,1,6,4,False,gnoll_assassin:119;satyr_hellcaller:251
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,1,6,6,True,
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + warpine_raider+warpine_raider,1,0,5,0,False,gnoll_assassin:673;gnoll_assassin:674;gnoll_assassin:456;warpine_raider:1412;warpine_raider:1304
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + warpine_raider+warpine_raider,2,0,5,1,False,gnoll_assassin:504;gnoll_assassin:368;warpine_raider:935;warpine_raider:785
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + warpine_raider+warpine_raider,3,0,5,1,False,gnoll_assassin:153;gnoll_assassin:72;warpine_raider:949;warpine_raider:685
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + warpine_raider+warpine_raider,4,0,5,4,False,warpine_raider:569
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + warpine_raider+warpine_raider,1,1,5,1,False,gnoll_assassin:747;gnoll_assassin:152;warpine_raider:1063;warpine_raider:1169
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + warpine_raider+warpine_raider,2,1,5,1,False,gnoll_assassin:337;gnoll_assassin:236;warpine_raider:635;warpine_raider:588
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + warpine_raider+warpine_raider,3,1,5,2,False,gnoll_assassin:184;warpine_raider:541;warpine_raider:537
+D,3,gnoll_assassin+gnoll_assassin+gnoll_assassin + warpine_raider+warpine_raider,4,1,5,2,False,gnoll_assassin:136;warpine_raider:322;warpine_raider:273
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + centaur_khan+centaur_outrunner+centaur_outrunner,1,0,8,0,False,kobold:388;kobold:430;kobold:91;kobold_taskmaster:886;kobold_tunneler:509;centaur_khan:1722;centaur_outrunner:596;centaur_outrunner:821
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + centaur_khan+centaur_outrunner+centaur_outrunner,2,0,8,1,False,kobold:91;kobold:87;kobold:11;kobold_taskmaster:269;centaur_khan:1380;centaur_outrunner:200;centaur_outrunner:230
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + centaur_khan+centaur_outrunner+centaur_outrunner,3,0,8,6,False,kobold_taskmaster:106;centaur_khan:931
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + centaur_khan+centaur_outrunner+centaur_outrunner,4,0,8,7,False,centaur_khan:135
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + centaur_khan+centaur_outrunner+centaur_outrunner,1,1,8,2,False,kobold:166;kobold:210;kobold_taskmaster:457;centaur_khan:1326;centaur_outrunner:206;centaur_outrunner:128
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + centaur_khan+centaur_outrunner+centaur_outrunner,2,1,8,2,False,kobold:180;kobold_taskmaster:178;kobold_tunneler:127;centaur_khan:1151;centaur_outrunner:223;centaur_outrunner:448
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + centaur_khan+centaur_outrunner+centaur_outrunner,3,1,8,6,False,kobold_taskmaster:328;centaur_khan:750
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + centaur_khan+centaur_outrunner+centaur_outrunner,4,1,8,7,False,centaur_khan:366
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + dark_troll+dark_troll+dark_troll_warlord,1,0,8,0,False,kobold:54;kobold:167;kobold:157;kobold_taskmaster:706;kobold_tunneler:388;dark_troll:1220;dark_troll:848;dark_troll_warlord:1417
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + dark_troll+dark_troll+dark_troll_warlord,2,0,8,6,False,dark_troll:278;dark_troll_warlord:271
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + dark_troll+dark_troll+dark_troll_warlord,3,0,8,5,False,dark_troll:510;dark_troll:263;dark_troll_warlord:925
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + dark_troll+dark_troll+dark_troll_warlord,4,0,8,8,True,
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + dark_troll+dark_troll+dark_troll_warlord,1,1,8,2,False,kobold:555;kobold:462;kobold_taskmaster:940;dark_troll:974;dark_troll:555;dark_troll_warlord:1184
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + dark_troll+dark_troll+dark_troll_warlord,2,1,8,3,False,kobold:343;kobold_taskmaster:291;dark_troll:447;dark_troll:106;dark_troll_warlord:618
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + dark_troll+dark_troll+dark_troll_warlord,3,1,8,7,False,dark_troll_warlord:91
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + dark_troll+dark_troll+dark_troll_warlord,4,1,8,8,True,
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + enraged_wildkin+wildkin+wildkin,1,0,8,0,False,kobold:393;kobold:525;kobold:165;kobold_taskmaster:723;kobold_tunneler:517;enraged_wildkin:1699;wildkin:851;wildkin:975
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + enraged_wildkin+wildkin+wildkin,2,0,8,6,False,kobold_taskmaster:4;enraged_wildkin:627
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + enraged_wildkin+wildkin+wildkin,3,0,8,7,False,enraged_wildkin:339
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + enraged_wildkin+wildkin+wildkin,4,0,8,7,False,enraged_wildkin:218
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + enraged_wildkin+wildkin+wildkin,1,1,8,3,False,kobold:348;kobold_taskmaster:529;enraged_wildkin:967;wildkin:39;wildkin:400
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + enraged_wildkin+wildkin+wildkin,2,1,8,1,False,kobold:319;kobold:496;kobold_taskmaster:314;kobold_tunneler:395;enraged_wildkin:775;wildkin:201;wildkin:264
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + enraged_wildkin+wildkin+wildkin,3,1,8,8,True,
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + enraged_wildkin+wildkin+wildkin,4,1,8,7,False,enraged_wildkin:464
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + polar_furbolg_champion+polar_furbolg_ursa_warrior,1,0,7,0,False,kobold:518;kobold:681;kobold:332;kobold_taskmaster:914;kobold_tunneler:519;polar_furbolg_champion:1358;polar_furbolg_ursa_warrior:1361
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + polar_furbolg_champion+polar_furbolg_ursa_warrior,2,0,7,2,False,kobold:311;kobold:216;kobold_taskmaster:349;polar_furbolg_champion:120;polar_furbolg_ursa_warrior:323
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + polar_furbolg_champion+polar_furbolg_ursa_warrior,3,0,7,5,False,polar_furbolg_champion:153;polar_furbolg_ursa_warrior:129
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + polar_furbolg_champion+polar_furbolg_ursa_warrior,4,0,7,7,True,
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + polar_furbolg_champion+polar_furbolg_ursa_warrior,1,1,7,3,False,kobold:361;kobold_taskmaster:696;polar_furbolg_champion:1012;polar_furbolg_ursa_warrior:1138
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + polar_furbolg_champion+polar_furbolg_ursa_warrior,2,1,7,1,False,kobold:653;kobold:95;kobold_taskmaster:78;kobold_tunneler:490;polar_furbolg_champion:770;polar_furbolg_ursa_warrior:775
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + polar_furbolg_champion+polar_furbolg_ursa_warrior,3,1,7,7,True,
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + polar_furbolg_champion+polar_furbolg_ursa_warrior,4,1,7,6,False,polar_furbolg_champion:248
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,0,8,0,False,kobold:423;kobold:451;kobold:284;kobold_taskmaster:770;kobold_tunneler:582;satyr_hellcaller:1880;satyr_soulstealer:986;satyr_trickster:748
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,0,8,3,False,kobold:56;kobold:332;kobold_taskmaster:318;kobold_tunneler:80;satyr_hellcaller:815
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,0,8,6,False,kobold:19;satyr_hellcaller:712
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,0,8,7,False,satyr_hellcaller:390
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,1,8,4,False,kobold:283;kobold_taskmaster:553;satyr_hellcaller:1246;satyr_soulstealer:416
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,1,8,4,False,kobold_taskmaster:119;satyr_hellcaller:978;satyr_soulstealer:379;satyr_trickster:297
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,1,8,6,False,satyr_hellcaller:720;satyr_soulstealer:149
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,1,8,7,False,satyr_hellcaller:697
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + warpine_raider+warpine_raider,1,0,7,0,False,kobold:559;kobold:698;kobold:574;kobold_taskmaster:730;kobold_tunneler:662;warpine_raider:1548;warpine_raider:1174
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + warpine_raider+warpine_raider,2,0,7,5,False,warpine_raider:1074;warpine_raider:900
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + warpine_raider+warpine_raider,3,0,7,4,False,kobold_taskmaster:224;warpine_raider:599;warpine_raider:533
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + warpine_raider+warpine_raider,4,0,7,5,False,warpine_raider:390;warpine_raider:106
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + warpine_raider+warpine_raider,1,1,7,0,False,kobold:666;kobold:287;kobold:310;kobold_taskmaster:724;kobold_tunneler:376;warpine_raider:1325;warpine_raider:1174
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + warpine_raider+warpine_raider,2,1,7,4,False,kobold_taskmaster:226;warpine_raider:831;warpine_raider:810
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + warpine_raider+warpine_raider,3,1,7,5,False,warpine_raider:620;warpine_raider:312
+D,3,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + warpine_raider+warpine_raider,4,1,7,5,False,warpine_raider:389;warpine_raider:412
+D,4,fel_beast+fel_beast+ghost + centaur_khan+centaur_outrunner+centaur_outrunner,1,0,6,0,False,fel_beast:558;fel_beast:502;ghost:571;centaur_khan:1640;centaur_outrunner:475;centaur_outrunner:603
+D,4,fel_beast+fel_beast+ghost + centaur_khan+centaur_outrunner+centaur_outrunner,2,0,6,5,False,centaur_khan:826
+D,4,fel_beast+fel_beast+ghost + centaur_khan+centaur_outrunner+centaur_outrunner,3,0,6,5,False,centaur_khan:505
+D,4,fel_beast+fel_beast+ghost + centaur_khan+centaur_outrunner+centaur_outrunner,4,0,6,6,True,
+D,4,fel_beast+fel_beast+ghost + centaur_khan+centaur_outrunner+centaur_outrunner,1,1,6,3,False,fel_beast:393;centaur_khan:1081;centaur_outrunner:218
+D,4,fel_beast+fel_beast+ghost + centaur_khan+centaur_outrunner+centaur_outrunner,2,1,6,2,False,fel_beast:95;ghost:87;centaur_khan:686;centaur_outrunner:93
+D,4,fel_beast+fel_beast+ghost + centaur_khan+centaur_outrunner+centaur_outrunner,3,1,6,5,False,centaur_khan:396
+D,4,fel_beast+fel_beast+ghost + centaur_khan+centaur_outrunner+centaur_outrunner,4,1,6,5,False,centaur_khan:334
+D,4,fel_beast+fel_beast+ghost + dark_troll+dark_troll+dark_troll_warlord,1,0,6,0,False,fel_beast:272;fel_beast:383;ghost:634;dark_troll:990;dark_troll:790;dark_troll_warlord:1351
+D,4,fel_beast+fel_beast+ghost + dark_troll+dark_troll+dark_troll_warlord,2,0,6,6,True,
+D,4,fel_beast+fel_beast+ghost + dark_troll+dark_troll+dark_troll_warlord,3,0,6,6,True,
+D,4,fel_beast+fel_beast+ghost + dark_troll+dark_troll+dark_troll_warlord,4,0,6,6,True,
+D,4,fel_beast+fel_beast+ghost + dark_troll+dark_troll+dark_troll_warlord,1,1,6,1,False,fel_beast:259;ghost:34;dark_troll:702;dark_troll:131;dark_troll_warlord:402
+D,4,fel_beast+fel_beast+ghost + dark_troll+dark_troll+dark_troll_warlord,2,1,6,4,False,dark_troll:32;dark_troll_warlord:88
+D,4,fel_beast+fel_beast+ghost + dark_troll+dark_troll+dark_troll_warlord,3,1,6,5,False,dark_troll_warlord:13
+D,4,fel_beast+fel_beast+ghost + dark_troll+dark_troll+dark_troll_warlord,4,1,6,6,True,
+D,4,fel_beast+fel_beast+ghost + enraged_wildkin+wildkin+wildkin,1,0,6,0,False,fel_beast:354;fel_beast:393;ghost:593;enraged_wildkin:1460;wildkin:581;wildkin:701
+D,4,fel_beast+fel_beast+ghost + enraged_wildkin+wildkin+wildkin,2,0,6,4,False,fel_beast:69;enraged_wildkin:38
+D,4,fel_beast+fel_beast+ghost + enraged_wildkin+wildkin+wildkin,3,0,6,5,False,enraged_wildkin:344
+D,4,fel_beast+fel_beast+ghost + enraged_wildkin+wildkin+wildkin,4,0,6,6,True,
+D,4,fel_beast+fel_beast+ghost + enraged_wildkin+wildkin+wildkin,1,1,6,0,False,fel_beast:530;fel_beast:467;ghost:462;enraged_wildkin:958;wildkin:127;wildkin:319
+D,4,fel_beast+fel_beast+ghost + enraged_wildkin+wildkin+wildkin,2,1,6,3,False,fel_beast:52;enraged_wildkin:702;wildkin:102
+D,4,fel_beast+fel_beast+ghost + enraged_wildkin+wildkin+wildkin,3,1,6,6,True,
+D,4,fel_beast+fel_beast+ghost + enraged_wildkin+wildkin+wildkin,4,1,6,5,False,enraged_wildkin:147
+D,4,fel_beast+fel_beast+ghost + polar_furbolg_champion+polar_furbolg_ursa_warrior,1,0,5,0,False,fel_beast:538;fel_beast:691;ghost:512;polar_furbolg_champion:1190;polar_furbolg_ursa_warrior:1042
+D,4,fel_beast+fel_beast+ghost + polar_furbolg_champion+polar_furbolg_ursa_warrior,2,0,5,4,False,ghost:64
+D,4,fel_beast+fel_beast+ghost + polar_furbolg_champion+polar_furbolg_ursa_warrior,3,0,5,4,False,polar_furbolg_champion:355
+D,4,fel_beast+fel_beast+ghost + polar_furbolg_champion+polar_furbolg_ursa_warrior,4,0,5,5,True,
+D,4,fel_beast+fel_beast+ghost + polar_furbolg_champion+polar_furbolg_ursa_warrior,1,1,5,0,False,fel_beast:652;fel_beast:396;ghost:527;polar_furbolg_champion:463;polar_furbolg_ursa_warrior:456
+D,4,fel_beast+fel_beast+ghost + polar_furbolg_champion+polar_furbolg_ursa_warrior,2,1,5,2,False,ghost:104;polar_furbolg_champion:153;polar_furbolg_ursa_warrior:61
+D,4,fel_beast+fel_beast+ghost + polar_furbolg_champion+polar_furbolg_ursa_warrior,3,1,5,5,True,
+D,4,fel_beast+fel_beast+ghost + polar_furbolg_champion+polar_furbolg_ursa_warrior,4,1,5,5,True,
+D,4,fel_beast+fel_beast+ghost + satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,0,6,0,False,fel_beast:410;fel_beast:291;ghost:531;satyr_hellcaller:1389;satyr_soulstealer:648;satyr_trickster:590
+D,4,fel_beast+fel_beast+ghost + satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,0,6,5,False,satyr_hellcaller:251
+D,4,fel_beast+fel_beast+ghost + satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,0,6,5,False,satyr_hellcaller:461
+D,4,fel_beast+fel_beast+ghost + satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,0,6,6,True,
+D,4,fel_beast+fel_beast+ghost + satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,1,6,1,False,fel_beast:323;fel_beast:281;ghost:74;satyr_hellcaller:1148;satyr_soulstealer:630
+D,4,fel_beast+fel_beast+ghost + satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,1,6,3,False,ghost:152;satyr_hellcaller:923;satyr_soulstealer:63
+D,4,fel_beast+fel_beast+ghost + satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,1,6,6,True,
+D,4,fel_beast+fel_beast+ghost + satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,1,6,6,True,
+D,4,fel_beast+fel_beast+ghost + warpine_raider+warpine_raider,1,0,5,0,False,fel_beast:485;fel_beast:445;ghost:635;warpine_raider:1260;warpine_raider:1176
+D,4,fel_beast+fel_beast+ghost + warpine_raider+warpine_raider,2,0,5,3,False,warpine_raider:461;warpine_raider:357
+D,4,fel_beast+fel_beast+ghost + warpine_raider+warpine_raider,3,0,5,3,False,warpine_raider:551;warpine_raider:524
+D,4,fel_beast+fel_beast+ghost + warpine_raider+warpine_raider,4,0,5,5,True,
+D,4,fel_beast+fel_beast+ghost + warpine_raider+warpine_raider,1,1,5,1,False,fel_beast:263;ghost:159;warpine_raider:732;warpine_raider:780
+D,4,fel_beast+fel_beast+ghost + warpine_raider+warpine_raider,2,1,5,3,False,warpine_raider:512;warpine_raider:401
+D,4,fel_beast+fel_beast+ghost + warpine_raider+warpine_raider,3,1,5,5,True,
+D,4,fel_beast+fel_beast+ghost + warpine_raider+warpine_raider,4,1,5,5,True,
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + centaur_khan+centaur_outrunner+centaur_outrunner,1,0,6,0,False,forest_troll_berserker:712;forest_troll_berserker:448;forest_troll_high_priest:445;centaur_khan:1423;centaur_outrunner:257;centaur_outrunner:321
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + centaur_khan+centaur_outrunner+centaur_outrunner,2,0,6,4,False,forest_troll_berserker:59;centaur_khan:711
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + centaur_khan+centaur_outrunner+centaur_outrunner,3,0,6,5,False,centaur_khan:759
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + centaur_khan+centaur_outrunner+centaur_outrunner,4,0,6,6,True,
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + centaur_khan+centaur_outrunner+centaur_outrunner,1,1,6,1,False,forest_troll_berserker:817;forest_troll_berserker:477;forest_troll_high_priest:399;centaur_khan:988;centaur_outrunner:154
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + centaur_khan+centaur_outrunner+centaur_outrunner,2,1,6,4,False,centaur_khan:1140;centaur_outrunner:99
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + centaur_khan+centaur_outrunner+centaur_outrunner,3,1,6,6,True,
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + centaur_khan+centaur_outrunner+centaur_outrunner,4,1,6,5,False,centaur_khan:99
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + dark_troll+dark_troll+dark_troll_warlord,1,0,6,0,False,forest_troll_berserker:479;forest_troll_berserker:341;forest_troll_high_priest:317;dark_troll:901;dark_troll:501;dark_troll_warlord:1301
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + dark_troll+dark_troll+dark_troll_warlord,2,0,6,4,False,dark_troll:65;dark_troll_warlord:235
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + dark_troll+dark_troll+dark_troll_warlord,3,0,6,4,False,dark_troll:144;dark_troll_warlord:265
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + dark_troll+dark_troll+dark_troll_warlord,4,0,6,6,True,
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + dark_troll+dark_troll+dark_troll_warlord,1,1,6,2,False,forest_troll_berserker:823;forest_troll_high_priest:328;dark_troll:388;dark_troll_warlord:178
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + dark_troll+dark_troll+dark_troll_warlord,2,1,6,4,False,dark_troll:182;dark_troll_warlord:543
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + dark_troll+dark_troll+dark_troll_warlord,3,1,6,5,False,dark_troll_warlord:277
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + dark_troll+dark_troll+dark_troll_warlord,4,1,6,6,True,
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + enraged_wildkin+wildkin+wildkin,1,0,6,0,False,forest_troll_berserker:730;forest_troll_berserker:499;forest_troll_high_priest:588;enraged_wildkin:1371;wildkin:411;wildkin:451
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + enraged_wildkin+wildkin+wildkin,2,0,6,4,False,forest_troll_berserker:42;enraged_wildkin:347
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + enraged_wildkin+wildkin+wildkin,3,0,6,5,False,enraged_wildkin:254
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + enraged_wildkin+wildkin+wildkin,4,0,6,6,True,
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + enraged_wildkin+wildkin+wildkin,1,1,6,4,False,forest_troll_berserker:680;enraged_wildkin:928
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + enraged_wildkin+wildkin+wildkin,2,1,6,4,False,enraged_wildkin:388;wildkin:93
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + enraged_wildkin+wildkin+wildkin,3,1,6,6,True,
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + enraged_wildkin+wildkin+wildkin,4,1,6,6,True,
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + polar_furbolg_champion+polar_furbolg_ursa_warrior,1,0,5,0,False,forest_troll_berserker:559;forest_troll_berserker:100;forest_troll_high_priest:397;polar_furbolg_champion:741;polar_furbolg_ursa_warrior:792
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + polar_furbolg_champion+polar_furbolg_ursa_warrior,2,0,5,2,False,forest_troll_berserker:190;polar_furbolg_champion:170;polar_furbolg_ursa_warrior:221
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + polar_furbolg_champion+polar_furbolg_ursa_warrior,3,0,5,5,True,
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + polar_furbolg_champion+polar_furbolg_ursa_warrior,4,0,5,5,True,
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + polar_furbolg_champion+polar_furbolg_ursa_warrior,1,1,5,0,False,forest_troll_berserker:506;forest_troll_berserker:225;forest_troll_high_priest:322;polar_furbolg_champion:596;polar_furbolg_ursa_warrior:432
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + polar_furbolg_champion+polar_furbolg_ursa_warrior,2,1,5,2,False,forest_troll_berserker:187;forest_troll_berserker:68;polar_furbolg_champion:103
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + polar_furbolg_champion+polar_furbolg_ursa_warrior,3,1,5,5,True,
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + polar_furbolg_champion+polar_furbolg_ursa_warrior,4,1,5,5,True,
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,0,6,0,False,forest_troll_berserker:809;forest_troll_berserker:408;forest_troll_high_priest:471;satyr_hellcaller:1419;satyr_soulstealer:520;satyr_trickster:340
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,0,6,4,False,forest_troll_berserker:164;satyr_hellcaller:163
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,0,6,5,False,satyr_hellcaller:368
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,0,6,6,True,
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,1,6,1,False,forest_troll_berserker:750;forest_troll_berserker:226;forest_troll_high_priest:360;satyr_hellcaller:1260;satyr_soulstealer:308
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,1,6,5,False,satyr_hellcaller:1108
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,1,6,5,False,satyr_hellcaller:179
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,1,6,6,True,
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + warpine_raider+warpine_raider,1,0,5,0,False,forest_troll_berserker:580;forest_troll_berserker:430;forest_troll_high_priest:152;warpine_raider:1254;warpine_raider:1086
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + warpine_raider+warpine_raider,2,0,5,2,False,forest_troll_berserker:133;warpine_raider:614;warpine_raider:369
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + warpine_raider+warpine_raider,3,0,5,3,False,warpine_raider:462;warpine_raider:461
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + warpine_raider+warpine_raider,4,0,5,5,True,
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + warpine_raider+warpine_raider,1,1,5,0,False,forest_troll_berserker:732;forest_troll_berserker:132;forest_troll_high_priest:187;warpine_raider:601;warpine_raider:585
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + warpine_raider+warpine_raider,2,1,5,3,False,warpine_raider:589;warpine_raider:619
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + warpine_raider+warpine_raider,3,1,5,3,False,warpine_raider:33;warpine_raider:107
+D,4,forest_troll_berserker+forest_troll_berserker+forest_troll_high_priest + warpine_raider+warpine_raider,4,1,5,5,True,
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + centaur_khan+centaur_outrunner+centaur_outrunner,1,0,6,0,False,gnoll_assassin:610;gnoll_assassin:545;gnoll_assassin:386;centaur_khan:1636;centaur_outrunner:533;centaur_outrunner:661
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + centaur_khan+centaur_outrunner+centaur_outrunner,2,0,6,4,False,gnoll_assassin:47;centaur_khan:499
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + centaur_khan+centaur_outrunner+centaur_outrunner,3,0,6,3,False,gnoll_assassin:547;gnoll_assassin:179;centaur_khan:892
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + centaur_khan+centaur_outrunner+centaur_outrunner,4,0,6,6,True,
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + centaur_khan+centaur_outrunner+centaur_outrunner,1,1,6,2,False,gnoll_assassin:731;gnoll_assassin:665;gnoll_assassin:364;centaur_khan:951
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + centaur_khan+centaur_outrunner+centaur_outrunner,2,1,6,3,False,gnoll_assassin:206;gnoll_assassin:198;centaur_khan:806
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + centaur_khan+centaur_outrunner+centaur_outrunner,3,1,6,5,False,centaur_khan:361
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + centaur_khan+centaur_outrunner+centaur_outrunner,4,1,6,5,False,centaur_khan:216
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + dark_troll+dark_troll+dark_troll_warlord,1,0,6,0,False,gnoll_assassin:779;gnoll_assassin:621;gnoll_assassin:581;dark_troll:1080;dark_troll:641;dark_troll_warlord:1441
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + dark_troll+dark_troll+dark_troll_warlord,2,0,6,1,False,gnoll_assassin:385;gnoll_assassin:105;dark_troll:123;dark_troll:72;dark_troll_warlord:613
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + dark_troll+dark_troll+dark_troll_warlord,3,0,6,5,False,gnoll_assassin:55
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + dark_troll+dark_troll+dark_troll_warlord,4,0,6,6,True,
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + dark_troll+dark_troll+dark_troll_warlord,1,1,6,0,False,gnoll_assassin:597;gnoll_assassin:131;gnoll_assassin:105;dark_troll:670;dark_troll:99;dark_troll_warlord:466
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + dark_troll+dark_troll+dark_troll_warlord,2,1,6,1,False,gnoll_assassin:187;gnoll_assassin:253;gnoll_assassin:39;dark_troll:242;dark_troll_warlord:418
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + dark_troll+dark_troll+dark_troll_warlord,3,1,6,4,False,gnoll_assassin:224;dark_troll_warlord:127
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + dark_troll+dark_troll+dark_troll_warlord,4,1,6,6,True,
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + enraged_wildkin+wildkin+wildkin,1,0,6,0,False,gnoll_assassin:996;gnoll_assassin:629;gnoll_assassin:716;enraged_wildkin:1550;wildkin:751;wildkin:671
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + enraged_wildkin+wildkin+wildkin,2,0,6,4,False,gnoll_assassin:141;enraged_wildkin:753
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + enraged_wildkin+wildkin+wildkin,3,0,6,3,False,gnoll_assassin:31;gnoll_assassin:63;enraged_wildkin:514
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + enraged_wildkin+wildkin+wildkin,4,0,6,6,True,
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + enraged_wildkin+wildkin+wildkin,1,1,6,2,False,gnoll_assassin:699;gnoll_assassin:539;gnoll_assassin:203;enraged_wildkin:917
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + enraged_wildkin+wildkin+wildkin,2,1,6,1,False,gnoll_assassin:421;gnoll_assassin:564;gnoll_assassin:133;enraged_wildkin:1112;wildkin:152
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + enraged_wildkin+wildkin+wildkin,3,1,6,5,False,gnoll_assassin:167
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + enraged_wildkin+wildkin+wildkin,4,1,6,6,True,
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + polar_furbolg_champion+polar_furbolg_ursa_warrior,1,0,5,0,False,gnoll_assassin:981;gnoll_assassin:541;gnoll_assassin:541;polar_furbolg_champion:1121;polar_furbolg_ursa_warrior:1052
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + polar_furbolg_champion+polar_furbolg_ursa_warrior,2,0,5,2,False,gnoll_assassin:279;polar_furbolg_champion:127;polar_furbolg_ursa_warrior:98
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + polar_furbolg_champion+polar_furbolg_ursa_warrior,3,0,5,4,False,polar_furbolg_champion:405
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + polar_furbolg_champion+polar_furbolg_ursa_warrior,4,0,5,5,True,
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + polar_furbolg_champion+polar_furbolg_ursa_warrior,1,1,5,0,False,gnoll_assassin:665;gnoll_assassin:187;gnoll_assassin:187;polar_furbolg_champion:700;polar_furbolg_ursa_warrior:799
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + polar_furbolg_champion+polar_furbolg_ursa_warrior,2,1,5,2,False,gnoll_assassin:93;gnoll_assassin:93;polar_furbolg_champion:243
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + polar_furbolg_champion+polar_furbolg_ursa_warrior,3,1,5,5,True,
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + polar_furbolg_champion+polar_furbolg_ursa_warrior,4,1,5,5,True,
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,0,6,0,False,gnoll_assassin:518;gnoll_assassin:400;gnoll_assassin:315;satyr_hellcaller:1631;satyr_soulstealer:738;satyr_trickster:360
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,0,6,3,False,gnoll_assassin:226;satyr_hellcaller:894;satyr_soulstealer:84
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,0,6,4,False,gnoll_assassin:36;satyr_hellcaller:304
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,0,6,6,True,
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,1,6,2,False,gnoll_assassin:664;gnoll_assassin:53;satyr_hellcaller:1333;satyr_soulstealer:542
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,1,6,1,False,gnoll_assassin:282;gnoll_assassin:268;satyr_hellcaller:669;satyr_soulstealer:313;satyr_trickster:53
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,1,6,6,True,
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,1,6,6,True,
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + warpine_raider+warpine_raider,1,0,5,0,False,gnoll_assassin:804;gnoll_assassin:649;gnoll_assassin:444;warpine_raider:1350;warpine_raider:1126
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + warpine_raider+warpine_raider,2,0,5,3,False,warpine_raider:589;warpine_raider:640
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + warpine_raider+warpine_raider,3,0,5,3,False,warpine_raider:612;warpine_raider:500
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + warpine_raider+warpine_raider,4,0,5,4,False,warpine_raider:250
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + warpine_raider+warpine_raider,1,1,5,3,False,warpine_raider:993;warpine_raider:1078
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + warpine_raider+warpine_raider,2,1,5,1,False,gnoll_assassin:117;gnoll_assassin:494;warpine_raider:939;warpine_raider:687
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + warpine_raider+warpine_raider,3,1,5,3,False,warpine_raider:213;warpine_raider:223
+D,4,gnoll_assassin+gnoll_assassin+gnoll_assassin + warpine_raider+warpine_raider,4,1,5,4,False,warpine_raider:119
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + centaur_khan+centaur_outrunner+centaur_outrunner,1,0,8,0,False,kobold:447;kobold:442;kobold:42;kobold_taskmaster:684;kobold_tunneler:111;centaur_khan:1662;centaur_outrunner:527;centaur_outrunner:751
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + centaur_khan+centaur_outrunner+centaur_outrunner,2,0,8,6,False,kobold_taskmaster:165;centaur_khan:851
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + centaur_khan+centaur_outrunner+centaur_outrunner,3,0,8,7,False,centaur_khan:1180
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + centaur_khan+centaur_outrunner+centaur_outrunner,4,0,8,8,True,
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + centaur_khan+centaur_outrunner+centaur_outrunner,1,1,8,3,False,kobold:195;kobold_taskmaster:738;centaur_khan:1567;centaur_outrunner:377;centaur_outrunner:183
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + centaur_khan+centaur_outrunner+centaur_outrunner,2,1,8,5,False,kobold_taskmaster:77;centaur_khan:1024;centaur_outrunner:17
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + centaur_khan+centaur_outrunner+centaur_outrunner,3,1,8,7,False,centaur_khan:823
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + centaur_khan+centaur_outrunner+centaur_outrunner,4,1,8,7,False,centaur_khan:297
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + dark_troll+dark_troll+dark_troll_warlord,1,0,8,0,False,kobold:385;kobold:257;kobold:145;kobold_taskmaster:824;kobold_tunneler:73;dark_troll:1091;dark_troll:771;dark_troll_warlord:1491
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + dark_troll+dark_troll+dark_troll_warlord,2,0,8,6,False,dark_troll:96;dark_troll_warlord:2
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + dark_troll+dark_troll+dark_troll_warlord,3,0,8,7,False,dark_troll_warlord:95
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + dark_troll+dark_troll+dark_troll_warlord,4,0,8,8,True,
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + dark_troll+dark_troll+dark_troll_warlord,1,1,8,5,False,kobold_taskmaster:563;dark_troll:753;dark_troll_warlord:769
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + dark_troll+dark_troll+dark_troll_warlord,2,1,8,5,False,dark_troll:652;dark_troll:133;dark_troll_warlord:853
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + dark_troll+dark_troll+dark_troll_warlord,3,1,8,7,False,dark_troll:37
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + dark_troll+dark_troll+dark_troll_warlord,4,1,8,8,True,
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + enraged_wildkin+wildkin+wildkin,1,0,8,0,False,kobold:382;kobold:302;kobold:411;kobold_taskmaster:612;kobold_tunneler:270;enraged_wildkin:1561;wildkin:641;wildkin:801
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + enraged_wildkin+wildkin+wildkin,2,0,8,7,False,enraged_wildkin:857
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + enraged_wildkin+wildkin+wildkin,3,0,8,8,True,
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + enraged_wildkin+wildkin+wildkin,4,0,8,8,True,
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + enraged_wildkin+wildkin+wildkin,1,1,8,4,False,kobold:223;kobold_taskmaster:208;enraged_wildkin:1049;wildkin:58
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + enraged_wildkin+wildkin+wildkin,2,1,8,5,False,kobold_taskmaster:172;enraged_wildkin:442;wildkin:43
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + enraged_wildkin+wildkin+wildkin,3,1,8,7,False,enraged_wildkin:260
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + enraged_wildkin+wildkin+wildkin,4,1,8,8,True,
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + polar_furbolg_champion+polar_furbolg_ursa_warrior,1,0,7,0,False,kobold:697;kobold:512;kobold:537;kobold_taskmaster:672;kobold_tunneler:597;polar_furbolg_champion:1211;polar_furbolg_ursa_warrior:1142
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + polar_furbolg_champion+polar_furbolg_ursa_warrior,2,0,7,6,False,kobold_taskmaster:75
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + polar_furbolg_champion+polar_furbolg_ursa_warrior,3,0,7,6,False,polar_furbolg_champion:375
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + polar_furbolg_champion+polar_furbolg_ursa_warrior,4,0,7,7,True,
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + polar_furbolg_champion+polar_furbolg_ursa_warrior,1,1,7,4,False,kobold_taskmaster:173;polar_furbolg_champion:762;polar_furbolg_ursa_warrior:685
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + polar_furbolg_champion+polar_furbolg_ursa_warrior,2,1,7,3,False,kobold:314;kobold_taskmaster:193;polar_furbolg_champion:453;polar_furbolg_ursa_warrior:241
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + polar_furbolg_champion+polar_furbolg_ursa_warrior,3,1,7,6,False,polar_furbolg_ursa_warrior:49
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + polar_furbolg_champion+polar_furbolg_ursa_warrior,4,1,7,7,True,
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,0,8,0,False,kobold:405;kobold:484;kobold:205;kobold_taskmaster:555;kobold_tunneler:222;satyr_hellcaller:1650;satyr_soulstealer:630;satyr_trickster:569
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,0,8,7,False,satyr_hellcaller:938
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,0,8,7,False,satyr_hellcaller:640
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,0,8,8,True,
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + satyr_hellcaller+satyr_soulstealer+satyr_trickster,1,1,8,1,False,kobold:512;kobold:100;kobold:12;kobold_taskmaster:916;kobold_tunneler:54;satyr_hellcaller:1139;satyr_soulstealer:403
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + satyr_hellcaller+satyr_soulstealer+satyr_trickster,2,1,8,4,False,kobold_taskmaster:204;kobold_tunneler:71;satyr_hellcaller:918;satyr_soulstealer:243
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + satyr_hellcaller+satyr_soulstealer+satyr_trickster,3,1,8,8,True,
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + satyr_hellcaller+satyr_soulstealer+satyr_trickster,4,1,8,7,False,satyr_hellcaller:216
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + warpine_raider+warpine_raider,1,0,7,2,False,kobold:479;kobold:188;kobold_taskmaster:606;warpine_raider:1580;warpine_raider:1412
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + warpine_raider+warpine_raider,2,0,7,5,False,warpine_raider:823;warpine_raider:546
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + warpine_raider+warpine_raider,3,0,7,5,False,warpine_raider:759;warpine_raider:535
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + warpine_raider+warpine_raider,4,0,7,7,True,
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + warpine_raider+warpine_raider,1,1,7,2,False,kobold:573;kobold:43;kobold_taskmaster:589;warpine_raider:903;warpine_raider:991
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + warpine_raider+warpine_raider,2,1,7,4,False,kobold_taskmaster:29;warpine_raider:944;warpine_raider:806
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + warpine_raider+warpine_raider,3,1,7,6,False,warpine_raider:28
+D,4,kobold+kobold+kobold+kobold_taskmaster+kobold_tunneler + warpine_raider+warpine_raider,4,1,7,6,False,warpine_raider:48
+E,3,froglet+froglet+froglet+froglet+froglet_mage+grown_frog_mage,1,0,6,0,False,froglet:1233;froglet:1449;froglet:1047;froglet:1233;froglet_mage:1480;grown_frog_mage:1061
+E,3,froglet+froglet+froglet+froglet+froglet_mage+grown_frog_mage,2,0,6,0,False,froglet:635;froglet:954;froglet:766;froglet:752;froglet_mage:768;grown_frog_mage:735
+E,3,froglet+froglet+froglet+froglet+froglet_mage+grown_frog_mage,3,0,6,1,False,froglet:390;froglet:439;froglet:215;froglet_mage:453;grown_frog_mage:325
+E,3,froglet+froglet+froglet+froglet+froglet_mage+grown_frog_mage,4,0,6,6,True,
+E,3,froglet+froglet+froglet+froglet+froglet_mage+grown_frog_mage,1,1,6,0,False,froglet:1095;froglet:1265;froglet:981;froglet:1007;froglet_mage:1296;grown_frog_mage:946
+E,3,froglet+froglet+froglet+froglet+froglet_mage+grown_frog_mage,2,1,6,0,False,froglet:287;froglet:446;froglet:730;froglet:488;froglet_mage:611;grown_frog_mage:543
+E,3,froglet+froglet+froglet+froglet+froglet_mage+grown_frog_mage,3,1,6,0,False,froglet:483;froglet:338;froglet:298;froglet:324;froglet_mage:279;grown_frog_mage:210
+E,3,froglet+froglet+froglet+froglet+froglet_mage+grown_frog_mage,4,1,6,4,False,froglet:57;grown_frog_mage:44
+E,4,froglet+froglet+froglet+froglet+froglet_mage+grown_frog_mage,1,0,6,0,False,froglet:659;froglet:1152;froglet:806;froglet:926;froglet_mage:1299;grown_frog_mage:1054
+E,4,froglet+froglet+froglet+froglet+froglet_mage+grown_frog_mage,2,0,6,1,False,froglet:553;froglet:296;froglet:256;froglet_mage:634;grown_frog_mage:68
+E,4,froglet+froglet+froglet+froglet+froglet_mage+grown_frog_mage,3,0,6,4,False,froglet:31;froglet_mage:191
+E,4,froglet+froglet+froglet+froglet+froglet_mage+grown_frog_mage,4,0,6,6,True,
+E,4,froglet+froglet+froglet+froglet+froglet_mage+grown_frog_mage,1,1,6,0,False,froglet:753;froglet:1207;froglet:580;froglet:974;froglet_mage:1430;grown_frog_mage:849
+E,4,froglet+froglet+froglet+froglet+froglet_mage+grown_frog_mage,2,1,6,0,False,froglet:522;froglet:315;froglet:514;froglet:130;froglet_mage:524;grown_frog_mage:595
+E,4,froglet+froglet+froglet+froglet+froglet_mage+grown_frog_mage,3,1,6,5,False,froglet:144
+E,4,froglet+froglet+froglet+froglet+froglet_mage+grown_frog_mage,4,1,6,6,True,

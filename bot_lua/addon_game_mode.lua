@@ -169,12 +169,37 @@ end
 
 function TinkerBot:OnNPCSpawned(event)
 	local unit = EntIndexToHScript(event.entindex)
+	if self.sd and unit and unit:GetTeamNumber() == DOTA_TEAM_NEUTRALS then   -- stacking drill: the game's own spawns
+		local p = unit:GetAbsOrigin()
+		table.insert(self.sd.spawned, {id = event.entindex, name = (unit:GetUnitName():gsub("npc_dota_neutral_", "")),
+			t = self:Clock(), x = math.floor(p.x), y = math.floor(p.y)})
+	end
 	if unit and unit:IsRealHero() and self.hero == nil and unit:GetPlayerOwnerID() >= 0 then
 		self:Adopt(unit, "spawned")
 	end
 end
 
 function TinkerBot:OnChat(event)
+	if self.sd then                                                       -- stacking drill controls
+		local txt = event.text or ""
+		if txt == "-skip" then self.sd.skip = true
+		elseif txt == "-auto" then self.sd.auto = not self.sd.auto; GameRules:SendCustomMessage("auto-skip " .. (self.sd.auto and "on" or "off"), 0, 0)
+		elseif txt == "-reset" then self:StackDrillReset()
+		elseif txt:match("^%-goto") then self:StackDrillGoto(txt:match("^%-goto%s+(.+)$"))
+		elseif txt:match("^%-time") then                                 -- set the clock (you: dota_dev forcegametime)
+			local m, s = (txt:match("^%-time%s+(.+)$") or ""):match("(%d+):(%d+)")
+			if m then
+				local secs = tonumber(m) * 60 + tonumber(s)
+				SendToServerConsole("dota_dev forcegametime " .. secs)
+				self.sd.minute, self.sd.before, self.sd.watch = -1, nil, nil   -- a fresh minute
+				GameRules:SendCustomMessage("clock set to " .. clockstr(secs), 0, 0)
+				self:Log("stack_time", {to = secs})
+			else
+				GameRules:SendCustomMessage("use -time 7:50", 0, 0)
+			end
+		end
+		return
+	end
 	if event.text == "-bot" then
 		self.enabled = not self.enabled
 		GameRules:SendCustomMessage(self.enabled and "Bot: playing" or "Bot: paused, you have control", 0, 0)
@@ -321,12 +346,40 @@ function TinkerBot:UpdateCamps(now)
 			if keep then table.insert(self.camps, {st = spot.st, pos = pos, n = 4, seen = -1}) end
 		end
 		self.camp_minute = self:Minute()
+		-- the map's own spawn boxes, all of them (10-02: A's second camp spot matched no spawner and was dropped)
+		local all = {}
+		for _, b in ipairs(self:StackBoxes(Vector(0, 0, 0), 30000)) do
+			table.insert(all, {name = b.name, min = {math.floor(b.min.x), math.floor(b.min.y)}, max = {math.floor(b.max.x), math.floor(b.max.y)}})
+		end
+		local sps = {}
+		for _, sp in ipairs(spawners) do local q = sp:GetAbsOrigin(); table.insert(sps, {math.floor(q.x), math.floor(q.y)}) end
+		self:Log("camp_boxes", {boxes = all, spawners = sps})
+		if CFG.real_camps then
+			-- the camps = the map's spawn boxes within 1,300 of each stand spot (10-02: the replay spots tracked one
+			-- of A's two camps and one of E's two; A's south camp, 870 from the stand, was never counted)
+			self.camps = {}
+			for st, S in pairs(CFG.stations) do
+				if st ~= "B" and S.stand then
+					for _, b in ipairs(self:StackBoxes(vec(S.stand), 1300)) do
+						local pos = GetGroundPosition(Vector(b.center.x, b.center.y, 0), nil)   -- the trigger's middle is mid-air
+						table.insert(self.camps, {st = st, pos = pos, n = 4, seen = -1, box = b.name})
+						self:Log("camp_spot", {station = st, real = b.name, to_x = math.floor(b.center.x), to_y = math.floor(b.center.y)})
+					end
+				end
+			end
+		end
 	end
 	local m = self:Minute()
 	if m ~= self.camp_minute then
 		-- leftovers block a camp's :00 spawn, so only an empty camp gets a new set
 		-- (bot run 2026-09-30: camps left with creeps grew +0.7 per :00, not +4)
 		for _, c in ipairs(self.camps) do if c.n == 0 then c.n, c.left = c.full or 4, 0 end end
+		for _, c in ipairs(self.camps) do                                -- a stacked camp: a new set on top
+			if c.stacked and c.stacked < m and c.n > 0 then
+				c.n, c.left, c.stacked = c.n + (c.full or 4), 0, nil
+				self:Log("stack", {station = c.st, step = "new set on the stack", expected = c.n})
+			end
+		end
 		self.camp_minute = m
 	end
 	if now < (self.next_camp_scan or 0) then return end
@@ -456,6 +509,13 @@ function TinkerBot:CastPos(ab, pos) self:Order({OrderType = DOTA_UNIT_ORDER_CAST
 function TinkerBot:CastTarget(ab, u) self:Order({OrderType = DOTA_UNIT_ORDER_CAST_TARGET, AbilityIndex = ab:entindex(), TargetIndex = u:entindex()}) end
 function TinkerBot:CastNo(ab) self:Order({OrderType = DOTA_UNIT_ORDER_CAST_NO_TARGET, AbilityIndex = ab:entindex()}) end
 function TinkerBot:Attack(u) self:Order({OrderType = DOTA_UNIT_ORDER_ATTACK_TARGET, TargetIndex = u:entindex()}) end
+-- a sleeping neutral (night, modifier_neutral_sleep_ai) reads unselectable and Dota refuses a scripted attack order
+-- on it ("target is unselectable", batch 10-02), though your right-click works: walk up and attack it directly
+function TinkerBot:AttackAny(u)
+	local unsel = false
+	pcall(function() unsel = u:IsUnselectable() end)
+	if unsel then self.hero:MoveToTargetToAttack(u) else self:Attack(u) end
+end
 
 -- the March direction that sweeps the most creep HP: robots walk a strip ~450 either side of the line, ~1500
 -- long (estimate). Replaces the replay facings at camps: A's 325 pointed 77 deg off its only camp and the
@@ -667,7 +727,7 @@ function TinkerBot:Think()
 	if not self.enabled or not h:IsAlive() then return 0.1 end
 	local ok, err = pcall(function()
 		self:UpdateCamps(now)
-		if self.phase ~= "drill_ffwd" and self.phase ~= "lab" then
+		if self.phase ~= "drill_ffwd" and self.phase ~= "lab" and self.phase ~= "stackdrill" then
 			self:LevelUp()
 			self:Buy()
 		end
@@ -676,7 +736,10 @@ function TinkerBot:Think()
 	if not ok then print("[tinker_bot] step error: " .. tostring(err)); self:Log("error", {msg = tostring(err), phase = self.phase}) end
 	-- stuck guard: a phase that doesn't move on for 25 s goes home and starts over
 	if self.phase ~= "lane" and self.phase ~= "wait" and self.phase ~= "fountain" and self.phase ~= "drill_ffwd" and self.phase ~= "lab"
-			and now - self.phase_since > 40 then
+			and self.phase ~= "stackdrill" and now - self.phase_since > 40
+			-- the ancient stack trip waits for :53 and leaves after :00 by itself (validation 10-02: the guard sent
+			-- Tinker home at 8:00.6, before the stack check)
+			and not (self.phase == "trip" and self.trip and self.trip.stack_only and now - self.phase_since < 90) then
 		self:Log("stuck", {phase = self.phase})
 		self.pending = nil
 		self:SetPhase("go_home")
@@ -697,6 +760,7 @@ function TinkerBot:Step(t, now)
 	if p == "wait" then
 		if t > -CFG.pregame + 1 then
 			if CFG.lab then return self:LabStart() end
+			if CFG.stack_drill then return self:StackDrillStart() end
 			if CFG.drill then
 				self:SetSpeed(CFG.drill.ffwd_speed)
 				self.hero:AddNewModifier(self.hero, nil, "modifier_stunned", {})
@@ -711,6 +775,7 @@ function TinkerBot:Step(t, now)
 		return
 	end
 	if p == "lab" then return self:Lab(now) end
+	if p == "stackdrill" then return self:StackDrill(t, now) end
 	if p == "drill_ffwd" then
 		if t >= CFG.drill.start_at - 3 then self:ApplyDrillState(now) end
 		return
@@ -766,8 +831,26 @@ function TinkerBot:LabStart()
 		self:SetPhase("lab")
 		return
 	end
+	if L.footprint then
+		self:LabFootprintQueue(L.footprint)
+		self:SetSpeed(L.speed)
+		self:Log("lab_start", {tests = #self.fp.queue, footprint = true})
+		self:SetPhase("lab")
+		return
+	end
 	for _, n in ipairs({"tinker_rearm", "tinker_keen_teleport"}) do self:Ab(n):SetLevel(1) end
 	self.lab_queue = {}
+	if L.geo then
+		-- the A geometry lab: explicit tests {st, spawns, off (stand shift), face, march, n, laser}
+		for _, test in ipairs(L.geo) do
+			test.manual = true
+			table.insert(self.lab_queue, test)
+		end
+		self:SetSpeed(L.speed)
+		self:Log("lab_start", {tests = #self.lab_queue, manual = true, geo = true})
+		self:SetPhase("lab")
+		return
+	end
 	if L.camps then
 		-- v3: each family spawned by name at its real camp, one test at a time: every family gets tested, no
 		-- waiting on the :00 spawn, and Tinker can't block a camp (v2 blocked C's ancients from its stand spot)
@@ -899,9 +982,527 @@ local function bounty(u)
 	return ok and b or 35
 end
 
+-- ------------------------------------------------------------------ lab: the March footprint
+-- Where does one March do damage, and when? Tinker stands at the map centre and casts ONE March due east (yaw 0,
+-- cast point 250 ahead like the bot). Creeps are rooted and disarmed so only the robots move:
+--   grid    one high-HP dummy at a time on a 300-unit grid around Tinker: the damage area without shielding
+--   shield  two dummies one behind the other in the robots' direction: how much the front one protects the back
+--   angle   a real camp family (normal HP) 600 or 900 ahead, the March cast at 0-180 deg off it: the broom effect
+-- Each creep's HP is logged every 0.2 s for 7 s after the cast (lab_fp); then everything is removed.
+local FP_DUMMY_HP = 20000
+local FP_SETTLE = 7.0
+
+function TinkerBot:LabFootprintQueue(F)
+	local q = {}
+	for _ = 1, F.reps do
+		for _, lvl in ipairs(F.levels) do
+			for al = F.along[1], F.along[2], F.step do
+				for sd = F.side[1], F.side[2], F.step do
+					if math.abs(al) > 150 or math.abs(sd) > 150 then           -- not on top of Tinker
+						table.insert(q, {kind = "grid", march = lvl, creeps = {{name = F.dummy, al = al, sd = sd, dummy = true}}})
+					end
+				end
+			end
+			for _, front in ipairs(F.shield_front) do
+				for _, gap in ipairs(F.shield_gap) do
+					for _, sd in ipairs(F.shield_side) do
+						table.insert(q, {kind = "shield", march = lvl, front = front, gap = gap, side = sd,
+							creeps = {{name = F.dummy, al = front, sd = sd, dummy = true, role = "front"},
+							          {name = F.dummy, al = front + gap, sd = sd, dummy = true, role = "back"}}})
+					end
+				end
+			end
+			for _, fam in ipairs(F.families) do
+				for _, dist in ipairs(F.angle_dist) do
+					for _, off in ipairs(F.angle_off) do
+						-- the camp sits at bearing `off` from the March direction: off 0 = cast straight at it
+						local a = math.rad(off)
+						local cs = {}
+						for k, name in ipairs(fam) do
+							local ka = k * 2.4
+							table.insert(cs, {name = name, al = dist * math.cos(a) + math.cos(ka) * 110,
+								sd = dist * math.sin(a) + math.sin(ka) * 110})
+						end
+						table.insert(q, {kind = "angle", march = lvl, family = table.concat(fam, "+"), dist = dist, off = off, creeps = cs})
+					end
+				end
+			end
+		end
+	end
+	self.fp = {queue = q, n = #q}
+end
+
+function TinkerBot:LabFootprint(now)
+	local h, F = self.hero, self.fp
+	local march = self:Ab("tinker_march_of_the_machines")
+	local c = self.lab_center or h:GetAbsOrigin()
+	h:SetHealth(h:GetMaxHealth())
+	local cur = F.cur
+	if not cur then
+		if #F.queue == 0 then
+			if not self.ended then self.ended = true; self:Log("end", {lab = true}) end
+			return
+		end
+		if F.wait_until and now < F.wait_until then return end
+		cur = table.remove(F.queue, 1)
+		for _, u in ipairs(Entities:FindAllByClassnameWithin("npc_dota_creep_neutral", c, 3000)) do
+			if u:IsAlive() then u:ForceKill(false) end
+		end
+		FindClearSpaceForUnit(h, c, true)
+		h:Stop()
+		march:SetLevel(cur.march)
+		cur.units = {}
+		for _, sp in ipairs(cur.creeps) do
+			-- east = the March direction: along = +x, side = +y
+			local u = CreateUnitByName("npc_dota_neutral_" .. sp.name, c + Vector(sp.al, sp.sd, 0), false, nil, nil, DOTA_TEAM_NEUTRALS)
+			if u then
+				u:SetAbsOrigin(c + Vector(sp.al, sp.sd, 0))                     -- exactly there (no clear-space nudge)
+				u:RemoveModifierByName("modifier_neutral_upgrade")
+				u:AddNewModifier(u, nil, "modifier_rooted", {})
+				u:AddNewModifier(u, nil, "modifier_disarmed", {})
+				if sp.dummy then
+					u:SetBaseMaxHealth(FP_DUMMY_HP); u:SetMaxHealth(FP_DUMMY_HP); u:SetHealth(FP_DUMMY_HP)
+				end
+				table.insert(cur.units, {unit = u, sp = sp, hp0 = u:GetHealth(), max = u:GetMaxHealth(), tl = {}})
+			end
+		end
+		cur.cast_at = now + 0.5
+		F.cur = cur
+		return
+	end
+	if not cur.cast and now >= cur.cast_at then
+		march:EndCooldown()
+		h:SetMana(h:GetMaxMana())
+		self:CastPos(march, c + Vector(250, 0, 0))
+		cur.cast, cur.t0, cur.sampled = true, now, now - 1
+		return
+	end
+	if not cur.cast then return end
+	if now - cur.sampled >= 0.2 then
+		cur.sampled = now
+		local dt = math.floor((now - cur.t0) * 10 + 0.5) / 10
+		for _, x in ipairs(cur.units) do
+			if not x.died then
+				if IsValidEntity(x.unit) and x.unit:IsAlive() then
+					table.insert(x.tl, {dt, x.unit:GetHealth()})
+				else
+					x.died = dt
+				end
+			end
+		end
+	end
+	if now - cur.t0 >= FP_SETTLE then
+		local out = {}
+		for _, x in ipairs(cur.units) do
+			table.insert(out, {name = x.sp.name, al = x.sp.al, sd = x.sp.sd, role = x.sp.role, hp0 = x.hp0, max = x.max,
+				died = x.died, tl = x.tl})
+		end
+		self:Log("lab_fp", {test = cur.kind, march = cur.march, family = cur.family, dist = cur.dist, off = cur.off,
+			front = cur.front, gap = cur.gap, side = cur.side, cast_ok = march:GetCooldownTimeRemaining() > 0,
+			done = F.n - #F.queue, total = F.n, creeps = out})
+		for _, x in ipairs(cur.units) do
+			if IsValidEntity(x.unit) and x.unit:IsAlive() then x.unit:ForceKill(false) end
+		end
+		F.cur, F.wait_until = nil, now + 0.5
+	end
+end
+
+-- ------------------------------------------------------------------ stacking drill (you play, the script records)
+-- You stand at a camp; every minute the game runs fast until :40 (auto-skip), then at normal speed you stack.
+-- The spawn boxes are the map's own triggers (neutralcamp_good_N: origin + bounds, the way the Sandbox and
+-- Training Lab mods read them). At :59.5 every box near the station is checked for creeps / your hero touching
+-- it, at :03 the creeps are counted again: "stack OK 4 -> 8" or "blocked". Every 0.2 s from :40 to :03 your
+-- position, attack target and every creep near the station are logged (stack_sample), every order you give is
+-- logged (stack_order), each attempt ends in one stack_attempt record.
+-- Controls (chat or console, the HUD window sends the console ones): -skip / sd_skip (fast to the next :40),
+-- -auto / sd_auto (auto-skip on/off), -reset / sd_reset (kill the station's creeps, spawn fresh ones),
+-- -goto 7:40 / sd_goto 7:40 (fast-forward to that clock, forward only), sd_pause (pause / unpause).
+local SD_FAST = 10
+
+function TinkerBot:StackBoxes(center, radius)
+	local out = {}
+	for _, e in ipairs(Entities:FindAllByClassname("trigger_multiple")) do
+		local name = e:GetName() or ""
+		if name:find("neutralcamp") then
+			local o = e:GetAbsOrigin()
+			local mn, mx = o + e:GetBoundingMins(), o + e:GetBoundingMaxs()
+			local c = (mn + mx) * 0.5
+			if dist2(c, center) < radius then table.insert(out, {ent = e, name = name, min = mn, max = mx, center = c}) end
+		end
+	end
+	return out
+end
+
+function TinkerBot:StackDrillStart()
+	local h, S = self.hero, CFG.stack_drill
+	pcall(function() GameRules:SetCreepSpawningEnabled(false) end)        -- no lane creeps: only the camps
+	GameRules:SetTimeOfDay(0.5)                                            -- noon, and the day/night cycle stopped
+	SendToServerConsole("dota_time_of_day_rate 0")
+	-- no dota_spawn_neutrals here: on top of the game's own 0:00 spawn it doubled every camp (drill 10-01)
+	local st = CFG.stations[S.station]
+	self.sd = {station = S.station, stand = vec(st.stand), auto = true, minute = -1, samples = {}, orders = {},
+		goto_t = nil, skip = false, sampled = 0, spawned = {}}
+	self.sd.boxes = self:StackBoxes(self.sd.stand, 1600)
+	FindClearSpaceForUnit(h, self.sd.stand, true)
+	h:Stop()
+	-- no auto-attack: your hero only hits what you click (you: "remove auto attack"); the client setting too
+	pcall(function() h:SetIdleAcquire(false) end)
+	pcall(function() h:SetAcquisitionRange(0) end)
+	SendToServerConsole("dota_player_units_auto_attack_mode 0")
+	local boxes = {}
+	for _, b in ipairs(self.sd.boxes) do
+		table.insert(boxes, {name = b.name, min = {math.floor(b.min.x), math.floor(b.min.y)}, max = {math.floor(b.max.x), math.floor(b.max.y)}})
+	end
+	self:Log("stack_drill", {station = S.station, boxes = boxes, bot_tests = S.bot and #S.bot or nil})
+	if S.bot then                                                         -- the bot runs a sweep of stacking tests
+		self.sd.botq, self.sd.auto = {}, false
+		for _, x in ipairs(S.bot) do table.insert(self.sd.botq, x) end
+		self.sd.n_tests = #self.sd.botq
+	end
+	self:StackDrillReset(true)                                            -- creeps for the first round (none before 1:00)
+	GameRules:SendCustomMessage(string.format("Stacking drill at %s: %d spawn boxes. Fast to :47 each minute, then stack; " ..
+		"checked at :00, creeps reset at :16. Chat: -time 7:47 -reset -auto -skip", S.station, #self.sd.boxes), 0, 0)
+	local cmds = {
+		sd_skip = function() self.sd.skip = true end,
+		sd_auto = function() self.sd.auto = not self.sd.auto; GameRules:SendCustomMessage("auto-skip " .. (self.sd.auto and "on" or "off"), 0, 0) end,
+		sd_reset = function() self:StackDrillReset() end,
+		sd_pause = function() SendToServerConsole("dota_pause") end,
+	}
+	for name, fn in pairs(cmds) do pcall(function() Convars:RegisterCommand(name, function() fn() end, "stacking drill", 0) end) end
+	pcall(function() Convars:RegisterCommand("sd_goto", function(_, arg) self:StackDrillGoto(arg) end, "stacking drill: sd_goto 7:40", 0) end)
+	GameRules:GetGameModeEntity():SetExecuteOrderFilter(function(_, ev)
+		pcall(function()
+			local u0 = ev.units and (ev.units["0"] or ev.units[0])
+			if u0 ~= self.hero:entindex() then return end                   -- only your hero's orders (not the neutrals' AI)
+			local tgt = ev.entindex_target and ev.entindex_target > 0 and EntIndexToHScript(ev.entindex_target) or nil
+			table.insert(self.sd.orders, {t = math.floor(self:Clock() * 10) / 10, order = ev.order_type,
+				target = tgt and (tgt:GetUnitName():gsub("npc_dota_neutral_", "")) or nil, target_id = tgt and ev.entindex_target or nil,
+				x = math.floor(ev.position_x or 0), y = math.floor(ev.position_y or 0)})
+		end)
+		return true
+	end, self)
+	self:SetPhase("stackdrill")
+end
+
+function TinkerBot:StackDrillGoto(arg)
+	local m, s = tostring(arg or ""):match("(%d+):(%d+)")
+	if not m then GameRules:SendCustomMessage("goto: use 7:40", 0, 0) return end
+	local target = tonumber(m) * 60 + tonumber(s)
+	if target <= self:Clock() then GameRules:SendCustomMessage("goto: the clock only runs forward", 0, 0) return end
+	self.sd.goto_t = target
+	GameRules:SendCustomMessage("fast-forward to " .. clockstr(target), 0, 0)
+end
+
+function TinkerBot:StackDrillReset(auto, natural)
+	-- every neutral near the station, chasers included (wide radius), then fresh camps half a second later
+	-- (drill 10-01: killing in 1,800 and spawning at once left the same golems in the box minute after minute).
+	-- natural (the bot's sweep): no dota_spawn_neutrals, whose creeps came frozen / unselectable
+	-- (modifier_spawnlord_master_freeze, sweep 10-02); kill again at +3 / +10 s and let the next :00 spawn them
+	local n = 0
+	for _, u in ipairs(Entities:FindAllByClassnameWithin("npc_dota_creep_neutral", self.sd.stand, 3000)) do
+		if u:IsAlive() then u:ForceKill(false); n = n + 1 end
+	end
+	if natural then
+		local now = GameRules:GetGameTime()
+		self.sd.kill_again = {now + 3, now + 10}
+		self.sd.reset_minute = math.floor(self:Clock() / 60)
+	else
+		self.sd.respawn_at = GameRules:GetGameTime() + 0.5
+	end
+	self.sd.marked47 = {}
+	FindClearSpaceForUnit(self.hero, self.sd.stand, true)
+	self.hero:Stop()
+	if not auto then GameRules:SendCustomMessage("creeps reset", 0, 0) end
+	self:Log("stack_reset", {auto = auto or false, killed = n})
+end
+
+local function in_box(b, p, margin)
+	return p.x >= b.min.x - margin and p.x <= b.max.x + margin and p.y >= b.min.y - margin and p.y <= b.max.y + margin
+end
+
+-- which creeps (by entity id) stand in each spawn box (+150 margin), and every creep near the station
+function TinkerBot:StackSnapshot()
+	local snap = {all = {}, box = {}}
+	for _, b in ipairs(self.sd.boxes) do snap.box[b.name] = {} end
+	for _, u in ipairs(self:Units(self.sd.stand, 2200, true)) do
+		local id, p = u:entindex(), u:GetAbsOrigin()
+		snap.all[id] = true
+		for _, b in ipairs(self.sd.boxes) do
+			if in_box(b, p, 150) then table.insert(snap.box[b.name], id) end
+		end
+	end
+	return snap
+end
+
+function TinkerBot:StackDrill(t, now)
+	local sd, h = self.sd, self.hero
+	h:SetHealth(h:GetMaxHealth())                                         -- the ancients can't end the drill
+	if not GameRules:IsDaytime() then GameRules:SetTimeOfDay(0.5) end     -- always day (you: "so everything is bright")
+	local sec = t % 60
+	local minute = math.floor(t / 60)
+	-- each minute (you, 10-01): normal speed from :47, the box check at exactly :00, the "Neutral Creep Stacked"
+	-- buff watched until :16, the result logged, the station's creeps reset, then fast to the next :47
+	local fast = false
+	if sd.botq then                                                       -- the bot's sweep: all of it at speed
+		self:StackBot(t, now, sec, minute)
+		fast = true
+	elseif sd.goto_t then
+		if t < sd.goto_t - 0.3 then fast = true else sd.goto_t = nil; GameRules:SendCustomMessage("at " .. clockstr(t), 0, 0) end
+	elseif sd.ff_at then                                                  -- after a result: 1 s, then fast to :47
+		if now >= sd.ff_at and sec < 46.8 then fast = true elseif sec >= 46.8 then sd.ff_at = nil end
+	elseif sd.skip then
+		if sec >= 2 and sec < 47 then fast = true else sd.skip = false end
+	elseif sd.auto then
+		fast = sec >= 2 and sec < 47
+	end
+	self:SetSpeed(fast and SD_FAST or 1)
+	if minute ~= sd.minute then
+		if sd.minute >= 0 and sd.before then                             -- :00 exactly: the first tick of the minute
+			sd.watch = {minute = sd.minute, check = self:StackBoxCheck(), before = sd.before, buff = {}, said = false,
+				marked47 = sd.marked47}
+		end
+		sd.minute, sd.before = minute, nil
+	end
+	if sd.respawn_at and now >= sd.respawn_at then                        -- the second half of a reset
+		sd.respawn_at = nil
+		SendToServerConsole("dota_spawn_neutrals")
+	end
+	if sd.watch and now - (sd.watch.scanned or 0) >= 0.5 then             -- :00-:16 the stacked buff, every 0.5 s
+		sd.watch.scanned = now
+		for _, u in ipairs(self:Units(sd.stand, 1800, true)) do
+			for _, m in ipairs(u:FindAllModifiers()) do
+				local mn = m:GetName()
+				-- only a NEW marker: creeps already marked at :47 (an earlier stack, a reset) don't count again
+				if mn:lower():find("stack") and not (sd.watch.marked47 or {})[u:entindex()] then
+					local p = u:GetAbsOrigin()
+					local box = "-"
+					for _, b in ipairs(sd.boxes) do if in_box(b, p, 150) then box = b.name end end
+					sd.watch.buff[u:entindex()] = {modifier = mn, name = (u:GetUnitName():gsub("npc_dota_neutral_", "")), box = box,
+						t = math.floor(t * 10) / 10}
+					if not sd.watch.said then
+						sd.watch.said = true
+						GameRules:SendCustomMessage(clockstr(sd.watch.minute * 60 + 60) .. "  STACKED (" .. box:gsub("neutralcamp_", "") .. ", " .. mn .. ")", 0, 0)
+					end
+				end
+			end
+		end
+	end
+	-- the stack confirmed (a new marker, it shows at :00.1), or none by :01.5: log, reset the camp, 1 s, fast to :47
+	-- (forcegametime from the script didn't move the clock, drill 10-02; you: "confirm, reset, wait 1 sec, skip to 47")
+	if sd.watch and (sd.watch.said or (sec >= 1.5 and sec < 47)) then
+		self:StackDrillResult(sd.watch)
+		sd.watch = nil
+		self:StackDrillReset(true)                                         -- manual spawns are fine (petrify was the prowlers)
+		sd.ff_at = now + 1
+	end
+	if sd.kill_again and sd.kill_again[1] and now >= sd.kill_again[1] then   -- the natural reset's extra sweeps
+		table.remove(sd.kill_again, 1)
+		for _, u in ipairs(Entities:FindAllByClassnameWithin("npc_dota_creep_neutral", sd.stand, 3000)) do
+			if u:IsAlive() then u:ForceKill(false) end
+		end
+	end
+	if sec >= 47 and not sd.before then
+		sd.before = self:StackSnapshot(); sd.samples = {}; sd.orders = {}; sd.spawned = {}
+		sd.marked47 = {}                                                     -- creeps already carrying a stack marker
+		for _, u in ipairs(self:Units(sd.stand, 1800, true)) do
+			for _, m in ipairs(u:FindAllModifiers()) do
+				if m:GetName():lower():find("stack") then sd.marked47[u:entindex()] = true end
+			end
+		end
+	end
+	if (sec >= 47 or sec < 2) and now - sd.sampled >= 0.2 then           -- the stacking window, 0.2 s
+		sd.sampled = now
+		local p, tgt = h:GetAbsOrigin(), h:GetAttackTarget()
+		local cs = {}
+		for _, u in ipairs(self:Units(sd.stand, 1800, true)) do
+			local q = u:GetAbsOrigin()
+			table.insert(cs, {u:entindex(), (u:GetUnitName():gsub("npc_dota_neutral_", "")), u:GetHealth(), math.floor(q.x), math.floor(q.y)})
+		end
+		table.insert(sd.samples, {math.floor(t * 10) / 10, math.floor(p.x), math.floor(p.y), tgt and tgt:entindex() or 0, cs})
+	end
+end
+
+-- ------------------------------------------------------------------ the bot's stacking sweep (in the drill)
+-- One test a minute, from your 10 stacks (10-02): stand where you stood at the hit, right-click the nearest creep
+-- of the first box so the hit LANDS at test.land (s past the minute), optionally hit the nearest creep of the
+-- other box test.second s later, then walk test.walk units at test.dir degrees (yours: ~330). Hits are measured
+-- by the target's HP dropping. The retreat point is checked on the pathing grid (walkable, no tree within 120);
+-- if it isn't, the walk is shortened in 100 steps. The verdict is the game's own marker at :00, like yours.
+local SB_START = Vector(-4360, 150, 0)
+
+local function nearest_in_box(self, b, from)
+	-- only creeps your team can see: Dota drops an attack order on an unseen unit (sweep 10-02: the drakes on the
+	-- ancients' high ground, 700 away, the hero never moved)
+	local best, bd
+	for _, u in ipairs(self:Units(b.center, 1500, true)) do
+		-- and selectable: Dota refused attacks on full-HP lizards/golems, "target is unselectable" (sweep 10-02)
+		local unsel = false
+		pcall(function() unsel = u:IsUnselectable() end)
+		-- at night every camp creep reads unselectable (modifier_neutral_sleep_ai, batch 10-02: 6 of 6 seen ones):
+		-- only the prowler shaman's freeze rules a creep out; sleeping ones get tried, the HP drop tells if it hit
+		if unsel and not u:HasModifier("modifier_spawnlord_master_freeze") then unsel = false end
+		if unsel and not self.unsel_logged then                           -- (self, not self.sd: the real game has no drill)
+			self.unsel_logged = true
+			local mods = {}
+			for _, m in ipairs(u:FindAllModifiers()) do table.insert(mods, m:GetName()) end
+			self:Log("stack_unselectable", {unit = u:GetUnitName(), hp = u:GetHealth(), modifiers = mods, t = self:Clock()})
+		end
+		if in_box(b, u:GetAbsOrigin(), 150) and self.hero:CanEntityBeSeenByMyTeam(u) and not unsel then
+			local d = dist2(u:GetAbsOrigin(), from)
+			if not best or d < bd then best, bd = u, d end
+		end
+	end
+	return best
+end
+
+function TinkerBot:LandIn(u)
+	-- seconds until a right-click on u lands: walk into range, attack point, projectile
+	local h = self.hero
+	local d = dist2(h:GetAbsOrigin(), u:GetAbsOrigin())
+	local range = h:Script_GetAttackRange() + 40
+	local walk = math.max(0, d - range) / math.max(200, h:GetIdealSpeed())
+	local proj = (h:GetProjectileSpeed() > 0) and h:GetProjectileSpeed() or 900
+	return walk + 0.45 + math.min(d, range) / proj
+end
+
+function TinkerBot:RetreatPoint(from, deg, dist, tree)
+	local dir = Vector(math.cos(math.rad(deg)), math.sin(math.rad(deg)), 0)
+	local d = dist
+	while d > 0 do
+		local p = from + dir * d
+		local ok = GridNav:IsTraversable(p) and not GridNav:IsBlocked(p) and not GridNav:IsNearbyTree(p, tree or 120, true)
+		if ok then return p, d end
+		d = d - 100
+	end
+	return from, 0
+end
+
+function TinkerBot:StackBot(t, now, sec, minute)
+	local sd, h = self.sd, self.hero
+	local T = sd.test
+	-- a test only when a creep can be hit (seen, not petrified by a prowler shaman) in one of the boxes
+	local hittable = false
+	for _, b in ipairs(sd.boxes) do if nearest_in_box(self, b, SB_START) then hittable = true end end
+	if not T and sec >= 44 and sec < 50 and not sd.watch and not sd.respawn_at and hittable then
+		if #sd.botq == 0 then
+			if not self.ended then
+				self.ended = true
+				self:Log("end", {stack_bot = true})
+				GameRules:SendCustomMessage("stacking sweep done", 0, 0)
+			end
+			return
+		end
+		T = table.remove(sd.botq, 1)
+		sd.test = T
+		FindClearSpaceForUnit(h, SB_START, true)
+		h:Stop()
+		local b1, b2
+		for _, b in ipairs(sd.boxes) do if b.name == T.box1 then b1 = b else b2 = b end end
+		T.u1 = b1 and nearest_in_box(self, b1, SB_START)
+		T.u2 = b2 and nearest_in_box(self, b2, SB_START)
+		T.hp1 = T.u1 and T.u1:GetHealth()
+		T.hp2 = T.u2 and T.u2:GetHealth()
+		T.minute = minute
+		T.n = sd.n_tests - #sd.botq
+		return
+	end
+	if not T or T.minute ~= minute then return end
+	local valid = function(u) return u and IsValidEntity(u) and u:IsAlive() end
+	if not T.order1 then                                                  -- re-pick each tick: the nearest creep in view
+		local b1, b2
+		for _, b in ipairs(sd.boxes) do if b.name == T.box1 then b1 = b else b2 = b end end
+		local u1 = b1 and nearest_in_box(self, b1, h:GetAbsOrigin())
+		if not u1 and b2 then                                            -- box1 all petrified/unseen: start on the other
+			u1 = nearest_in_box(self, b2, h:GetAbsOrigin())
+			if u1 then T.box1, b1 = b2.name, b2 end
+		end
+		if u1 then
+			if u1 ~= T.u1 then T.u1, T.hp1 = u1, u1:GetHealth() end
+		elseif b1 and not T.approach then                                -- nothing in view: walk toward the camp
+			T.approach = true
+			self:Move(b1.center)
+		end
+		if u1 and T.approach and not T.stopped then T.stopped = true; h:Stop() end
+	end
+	if T.order1 and not T.u2pick then                                     -- the second camp's target, in view now
+		T.u2pick = true
+		for _, b in ipairs(sd.boxes) do
+			if b.name ~= T.box1 then
+				local u2 = nearest_in_box(self, b, h:GetAbsOrigin())
+				if u2 then T.u2, T.hp2 = u2, u2:GetHealth() end
+			end
+		end
+	end
+	if not T.order1 and valid(T.u1) and sec + self:LandIn(T.u1) >= T.land - 0.05 then
+		self:Attack(T.u1)
+		T.order1 = math.floor(sec * 10) / 10
+	end
+	if T.order1 and not T.hit1 and valid(T.u1) and T.u1:GetHealth() < T.hp1 then T.hit1 = math.floor(sec * 10) / 10 end
+	if T.hit1 and T.second and not T.order2 and valid(T.u2) and sec + self:LandIn(T.u2) >= T.hit1 + T.second - 0.05 then
+		self:Attack(T.u2)
+		T.order2 = math.floor(sec * 10) / 10
+	end
+	if T.order2 and not T.hit2 and valid(T.u2) and T.u2:GetHealth() < T.hp2 then T.hit2 = math.floor(sec * 10) / 10 end
+	local done_hitting = T.hit1 and ((not T.second and sec >= T.hit1 + 0.3) or (T.second and (T.hit2 or sec >= T.hit1 + T.second + 1.5)))
+	if not T.retreat and (done_hitting or sec >= 58.5) then
+		T.retreat = true
+		if T.walk > 0 then
+			local p, d = self:RetreatPoint(h:GetAbsOrigin(), T.dir, T.walk)
+			T.walked_to, T.walk_ok = {math.floor(p.x), math.floor(p.y)}, d
+			self:Move(p)
+		else
+			h:Stop()
+		end
+	end
+end
+
+-- :00 exactly: per box, which creeps (by position, the box itself) and whether your hero stand in it
+function TinkerBot:StackBoxCheck()
+	local out = {}
+	local hp = self.hero:GetAbsOrigin()
+	for _, b in ipairs(self.sd.boxes) do
+		local who = {}
+		for _, u in ipairs(self:Units(b.center, 1200, true)) do
+			if in_box(b, u:GetAbsOrigin(), 0) then table.insert(who, (u:GetUnitName():gsub("npc_dota_neutral_", ""))) end
+		end
+		table.insert(out, {name = b.name, creeps_in_box = who, hero_in_box = in_box(b, hp, 0)})
+	end
+	return out
+end
+
+-- :16: one stack_attempt record. Stacked = the game's own "Neutral Creep Stacked" buff seen on creeps of that box.
+function TinkerBot:StackDrillResult(W)
+	local sd = self.sd
+	local by_box, mod_name = {}, nil
+	for _, x in pairs(W.buff) do by_box[x.box] = (by_box[x.box] or 0) + 1; mod_name = x.modifier end
+	local res, lines = {}, {}
+	for _, c in ipairs(W.check) do
+		local nb = by_box[c.name] or 0
+		local blocked = #c.creeps_in_box > 0 or c.hero_in_box
+		local had = #((W.before and W.before.box[c.name]) or {})
+		table.insert(res, {box = c.name, creeps_at_47 = had, stacked = nb > 0, stacked_creeps = nb, blocked = blocked,
+			in_box = c.creeps_in_box, hero_in_box = c.hero_in_box})
+		local why = c.hero_in_box and "you in box" or (#c.creeps_in_box > 0 and (c.creeps_in_box[1] .. " in box") or "box clear")
+		table.insert(lines, (c.name:gsub("neutralcamp_", "")) .. " " .. (nb > 0 and ("STACKED x" .. nb) or ("no stack, " .. why)))
+	end
+	local test = nil
+	if sd.test then                                                      -- the bot's sweep: the test and what happened
+		local T = sd.test
+		test = {n = T.n, kind = T.kind, land = T.land, second = T.second or 0, walk = T.walk, dir = T.dir, box1 = T.box1,
+			order1 = T.order1, hit1 = T.hit1, order2 = T.order2, hit2 = T.hit2, walked_to = T.walked_to, walk_ok = T.walk_ok,
+			u1 = T.u1 and IsValidEntity(T.u1) and (T.u1:GetUnitName():gsub("npc_dota_neutral_", "")) or nil,
+			u2 = T.u2 and IsValidEntity(T.u2) and (T.u2:GetUnitName():gsub("npc_dota_neutral_", "")) or nil}
+		sd.test = nil
+	end
+	self:Log("stack_attempt", {minute = W.minute, station = sd.station, result = res, buff = mod_name, bot_test = test,
+		samples = sd.samples, orders = sd.orders, spawned = sd.spawned})
+	GameRules:SendCustomMessage(clockstr(W.minute * 60 + 60) .. "  " .. table.concat(lines, " | "), 0, 0)
+end
+
 function TinkerBot:Lab(now)
 	local h = self.hero
 	if self.probe then return self:LabProbe(now, GameRules:GetDOTATime(false, true)) end
+	if self.fp then return self:LabFootprint(now) end
 	local march, laser = self:Ab("tinker_march_of_the_machines"), self:Ab("tinker_laser")
 	local cur = self.lab_cur
 	h:SetHealth(h:GetMaxHealth())                                             -- the creeps can't kill the test
@@ -951,9 +1552,10 @@ function TinkerBot:Lab(now)
 				end
 				table.insert(cur.camps, fam)
 			end
-			FindClearSpaceForUnit(h, self:LabStand(cur.st), true)
+			local off = cur.off and Vector(cur.off[1], cur.off[2], 0) or Vector(0, 0, 0)
+			FindClearSpaceForUnit(h, self:LabStand(cur.st) + off, true)
 			h:Stop()
-			cur.cast, cur.next_at, cur.dir, cur.t0 = 0, now + 1.0, yawdir(S.face), now
+			cur.cast, cur.next_at, cur.dir, cur.t0 = 0, now + 1.0, yawdir(cur.face or S.face), now
 			self.lab_cur = cur
 			return
 		end
@@ -1084,6 +1686,7 @@ function TinkerBot:Lab(now)
 		table.insert(camps, {camp = fam.camp, family = fam.family, creeps = cs})
 	end
 	self:Log("lab_result", {station = cur.st, march = cur.march, marches = cur.n, laser = cur.laser,
+		off = cur.off, face = cur.face, tag = cur.tag,
 		creeps = #cur.units, killed = #cur.units - #left, gold = math.floor(cur.gold0 - gold_left), gold_camp = math.floor(cur.gold0),
 		left = left, camp = cur.names, camps = camps, seconds = math.floor((now - cur.t0) * 10) / 10,
 		casts = cur.casts, laser_info = cur.laser_info or (cur.laser_check and {name = cur.laser_check.name,
@@ -1351,12 +1954,33 @@ function TinkerBot:Landed(t, now)
 			local n = lvl >= 4 and (st == "C" and 3 or 2) or 3
 			local lab = CFG.lab_counts and LAB_PLAN[lvl >= 4 and 4 or 3][st]
 			if lab then n = lab.n end
+			-- A with March 4: 2 Marches left 1.9 creeps on 59 of 66 trips (batches 10-02), blocking A's next spawn,
+			-- and A visits/LH split the best games from the worst. Test: a set March count at A.
+			if CFG.a_marches and st == "A" and lvl >= 4 then n = CFG.a_marches end
+			if CFG.min_marches then n = math.max(n, CFG.min_marches) end   -- brute force: at least this many (mana allowing)
 			self.trip.plan = {"walk", "M"}
 			for _ = 2, n do table.insert(self.trip.plan, "b"); table.insert(self.trip.plan, "R"); table.insert(self.trip.plan, "M") end
 			if lab and lab.laser then table.insert(self.trip.plan, "L"); self.trip.lab_laser = lab.laser end
 		end
 		if st == "B" and CFG.wave_laser ~= false then                          -- Laser while the robots work
 			for j, tok in ipairs(self.trip.plan) do if tok == "M" then table.insert(self.trip.plan, j + 1, "L") break end end
+		end
+		-- farm + stack: any C visit 7:15-9:00 can stay for the pull, not only the forced one (validation 10-02: the
+		-- forced pick needs a decision at :18-:34 and two games never had one)
+		local any_c = st == "C" and CFG.ancient_stack and CFG.stack_mode ~= "trip" and not self.stack_started
+			and t >= 435 and t < 540 and self:Ab("tinker_march_of_the_machines"):GetLevel() >= 4
+		if st == "C" and (self.stack_next or any_c) then
+			self.stack_next = nil
+			if CFG.stack_mode == "trip" then                                   -- a trip only for the stack: no Marches
+				self.trip.stack_only = true
+				self.trip.plan = {"walk", "wait"}
+				self:Log("stack", {station = "C", step = "stack trip"})
+			else
+				-- farm C first, stay for the stack (batch 10-02: a stack-only trip cost ~35 s for 0 LH, more than the
+				-- doubled camp gave back; you farm C at ~7:40 and stack it at :53 on the same visit)
+				self.trip.stack_after = true
+				self:Log("stack", {station = "C", step = "farm, then stack"})
+			end
 		end
 		if CFG.two_marches_at_4 and st ~= "B" and self:Ab("tinker_march_of_the_machines"):GetLevel() >= 4 then  -- tested: fewer kills
 			-- March maxed: two Marches, then Laser the tanky creeps instead of a third March
@@ -1392,6 +2016,33 @@ function TinkerBot:Book(prev)
 				self:Log("camp_stuck", {station = c.st, creeps = c.n})
 			end
 		end
+	end
+	if prev.stack_only and prev.stack_ok == false then
+		-- the game's marker never showed: no doubled camp to count on, just what is standing there
+		for _, c in ipairs(self.camps or {}) do
+			if c.st == prev.station then c.left, c.low, c.stuck = 0, 0, nil end
+		end
+		self.last_trip_lh[prev.station] = nil
+		self:Log("stack", {station = prev.station, step = "not stacked, booked as seen", creeps = left})
+		return
+	end
+	if prev.stack_only then
+		-- an ancient stack, not leftovers: the pulled creeps left the spawn box at :53, so the :00 set spawns on top
+		-- (stack batch 10-01, game 2: booked as 7 leftovers, rated 2.7/s, never farmed)
+		for _, c in ipairs(self.camps or {}) do
+			if c.st == prev.station then
+				-- the minute of the pull (:53), not of the landing back home (smoke test 10-01: landed 8:00 -> booked as
+				-- minute 8, the new set only counted at 9:00, C farmed at 9:24 instead of ~8:10)
+				local sm = prev.stacked_minute or prev.stop_minute
+				c.left, c.low, c.stuck, c.stacked = 0, 0, nil, sm
+				if self:Minute() > sm and c.n > 0 then                           -- booked after the :00 already passed
+					c.n, c.stacked = c.n + (c.full or 4), nil
+				end
+			end
+		end
+		self.last_trip_lh[prev.station] = nil                              -- 0 LH by design, not a bad trip
+		self:Log("stack", {station = prev.station, step = "booked as a stack", creeps = left})
+		return
 	end
 	if prev.station ~= "B" and left == 0 then
 		self.last_cleared[prev.station] = math.max(self.last_cleared[prev.station] or -1, prev.stop_minute)
@@ -1572,9 +2223,36 @@ function TinkerBot:RateRoute(t, wave, here, in_f)
 	return options, pick, rates
 end
 
+-- your drill (09-29 18:51) and the Immortal targets: once, ~7:45, Keen to the ancients with nothing cast, pull them
+-- at :53 so they stack, leave; the next C visit Marches the doubled camp (you: 9 LH at 8:28). Due when the decision
+-- is early enough in the minute to land before :50 (fountain stop + Keen + walk ~12 s), at level 7+, March 4, and
+-- 600+ mana (Immortal C minimums).
+function TinkerBot:AncientStackDue(t, mana)
+	if not CFG.ancient_stack or self.ancient_stacked then return false end
+	local sec = t % 60
+	-- stack-only trip: decided at :32-:42 so Tinker lands ~:37-:47 (validation 10-02: decided 7:15, landed 7:20,
+	-- stood 25 s). Farm + stack: decided at :20-:30, lands ~:25-:35, the Marches take ~15 s, then the :53 pull.
+	local lo, hi = 18, 34
+	if CFG.stack_mode == "trip" then lo, hi = 32, 42 end
+	return t >= 435 and t < 540 and sec >= lo and sec <= hi and self.hero:GetLevel() >= 7
+		and self:Ab("tinker_march_of_the_machines"):GetLevel() >= 4 and mana >= 600
+end
+
 function TinkerBot:StationDecision(t)
 	local h = self.hero
 	local mana = self:InFountain() and math.min(h:GetMaxMana(), h:GetMana() + 250) or h:GetMana()   -- fountain refills before leaving
+	if self:AncientStackDue(t, mana) then
+		self.ancient_stacked, self.stack_next = true, true
+		self.stack_tries = (self.stack_tries or 0) + 1
+		self:Log("decision", {what = "station", pick = "C", rules = "C", src = "ancient stack", options = {"C"}})
+		if self:InFountain() then
+			self.next_station = "C"
+		else
+			self.go_to = "C"
+			self:SetPhase("go_station")
+		end
+		return
+	end
 	local facts, wave = self:StationFacts(t, mana)
 	local rules = self:StationRules(t, wave, mana)
 	local options = {}
@@ -1646,9 +2324,231 @@ function TinkerBot:OutOfSpawnBox(t)
 	return false
 end
 
+-- the ancient stack, from the drill (bot sweeps 10-02: 12/12 with these numbers at C): right-click the nearest
+-- seen, selectable creep of the ancients' box so the hit LANDS at :53.75, hit the nearest creep of the other box
+-- 1.5 s after it landed, walk 1,300 at 330 deg (walkable, no tree within 120), Keen home only after :00.
+-- It counts as a stack only if the game's own marker (modifier_stacked_neutral) shows on the new creeps.
+local AS = {box1 = "neutralcamp_good_8", land = 53.75, second = 1.5, walk = 1300, dir = 330}
+
+function TinkerBot:AncientStack(t, now)
+	local tr, h = self.trip, self.hero
+	if tr.plan[tr.i] ~= "wait" then return false end                     -- still walking to the stand spot
+	local sec, minute = t % 60, self:Minute()
+	local S = tr.stack
+	if not S then
+		if sec < 45 or sec >= 53 then return false end                    -- too late this minute: the wait token gives up
+		self.c_boxes = self.c_boxes or self:StackBoxes(vec(CFG.stations.C.stand), 1600)
+		S = {minute = minute, box1 = AS.box1}
+		tr.stack = S
+		tr.stack_only = true                                              -- booked as a stack from here on
+		self.stack_started, self.ancient_stacked = true, true             -- one stack a game
+		pcall(function() h:SetIdleAcquire(false) end)                     -- like the drill: only the hits we order
+		self:Log("stack", {station = "C", step = "start", boxes = #self.c_boxes})
+	end
+	local valid = function(u) return u and IsValidEntity(u) and u:IsAlive() end
+	local function boxes()
+		local b1, b2
+		for _, b in ipairs(self.c_boxes) do if b.name == S.box1 then b1 = b else b2 = b end end
+		return b1, b2
+	end
+	local function leave(why)
+		pcall(function() h:SetIdleAcquire(true) end)
+		self:Log("stack", {station = "C", step = "leave", why = why, stacked = tr.stack_ok, stacked_creeps = S.marked,
+			order1 = S.order1, hit1 = S.hit1, order2 = S.order2, hit2 = S.hit2, u1 = S.name1, u2 = S.name2,
+			asleep1 = S.asleep1, unsel1 = S.unsel1, by_march = S.by_march,
+			walked_to = S.walked_to, walk_ok = S.walk_ok, kites = S.kites, hp = h:GetHealth(), max_hp = h:GetMaxHealth()})
+		S.done = true
+		self:SetPhase("go_home")
+		return true
+	end
+	if S.done then return true end
+	if minute == S.minute then
+		if not S.order1 then                                              -- re-pick each tick: the nearest creep in view
+			local b1, b2 = boxes()
+			local u1 = b1 and nearest_in_box(self, b1, h:GetAbsOrigin())
+			if not u1 and b2 then                                        -- the ancients unseen/petrified: start on the other
+				u1 = nearest_in_box(self, b2, h:GetAbsOrigin())
+				if u1 then S.box1 = b2.name end
+			end
+			if not u1 then
+				if sec >= 53 then
+					-- why each creep near C was skipped (validation 10-02: "nothing to hit" with 9 creeps at C, at night)
+					local why = {}
+					for _, u in ipairs(self:Units(vec(CFG.stations.C.stand), 1600, true)) do
+						local q, unsel = u:GetAbsOrigin(), false
+						pcall(function() unsel = u:IsUnselectable() end)
+						local inb = "-"
+						for _, b in ipairs(self.c_boxes) do if in_box(b, q, 150) then inb = b.name:gsub("neutralcamp_", "") end end
+						table.insert(why, {(u:GetUnitName():gsub("npc_dota_neutral_", "")), math.floor(dist2(q, h:GetAbsOrigin())), inb,
+							h:CanEntityBeSeenByMyTeam(u), unsel})
+					end
+					self:Log("stack", {station = "C", step = "no target", creeps = why, night = not GameRules:IsDaytime()})
+					tr.stack_ok = false
+					return leave("nothing to hit")
+				end
+				local b1 = boxes()
+				if b1 and not S.approach then                                -- nothing in view: walk toward the camp
+					S.approach = true
+					self:Move(b1.center)
+				end
+				return true
+			end
+			if S.approach and not S.stopped then S.stopped = true; h:Stop() end
+			if u1 ~= S.u1 then S.u1, S.hp1 = u1, u1:GetHealth() end
+			-- asleep (night): no right-click or Laser lands on it (scripted orders refused, MoveToTargetToAttack too,
+			-- validation 10-02), but robot damage wakes it. March at the box so the robots hit ~:53.5.
+			local asleep = false
+			pcall(function() asleep = u1:IsUnselectable() end)
+			if asleep and CFG.stack_hit ~= "march" then
+				-- your right-click works on a sleeping creep; Dota refuses the scripted order, so: walk into range, stand
+				-- the attack point (0.45 s), then the engine's own attack (projectile and all) so it lands at :53.75
+				local d = dist2(h:GetAbsOrigin(), u1:GetAbsOrigin())
+				local range = h:Script_GetAttackRange() + 40
+				local proj = (h:GetProjectileSpeed() > 0) and h:GetProjectileSpeed() or 900
+				if S.fire_at then
+					if now >= S.fire_at then
+						h:PerformAttack(u1, true, true, true, true, true, false, true)
+						S.order1, S.name1 = math.floor(sec * 10) / 10, (u1:GetUnitName():gsub("npc_dota_neutral_", ""))
+						S.asleep1, S.performed = true, true
+						tr.stacked_minute = minute
+					end
+					return true
+				end
+				if d > range then
+					if sec + self:LandIn(u1) >= AS.land - 0.05 and not S.walking then S.walking = true; self:Move(u1:GetAbsOrigin()) end
+					return true
+				end
+				if sec + 0.45 + d / proj >= AS.land - 0.05 then
+					h:Stop()
+					h:FaceTowards(u1:GetAbsOrigin())
+					S.fire_at = now + 0.45
+				end
+				return true
+			end
+			if asleep then
+				local march, rearm = self:Ab("tinker_march_of_the_machines"), self:Ab("tinker_rearm")
+				if not march:IsCooldownReady() and not S.rearmed and sec >= 46 and self:Ready(rearm) then
+					S.rearmed = true
+					self:CastNo(rearm)
+					self:Log("cast", {ability = "rearm", why = "stack: March ready for :53"})
+					return true
+				end
+				if sec >= AS.land - 1.0 and self:Ready(march) then
+					local b1 = boxes()
+					local d = (b1 and b1.center or u1:GetAbsOrigin()) - h:GetAbsOrigin()
+					d.z = 0
+					self:MarchDir(d:Normalized(), "stack: wake the ancients")
+					S.order1, S.name1, S.by_march = math.floor(sec * 10) / 10, (u1:GetUnitName():gsub("npc_dota_neutral_", "")), true
+					S.asleep1 = true
+					tr.stacked_minute = minute
+				end
+				return true
+			end
+			if sec + self:LandIn(u1) >= AS.land - 0.05 then
+				self:AttackAny(u1)
+				S.order1, S.name1 = math.floor(sec * 10) / 10, (u1:GetUnitName():gsub("npc_dota_neutral_", ""))
+				pcall(function() S.asleep1 = u1:HasModifier("modifier_neutral_sleep_ai"); S.unsel1 = u1:IsUnselectable() end)
+				tr.stacked_minute = minute
+				local _, b2 = boxes()
+				local u2 = b2 and nearest_in_box(self, b2, h:GetAbsOrigin())
+				if u2 then S.u2, S.hp2, S.name2 = u2, u2:GetHealth(), (u2:GetUnitName():gsub("npc_dota_neutral_", "")) end
+			end
+			return true
+		end
+		if not S.hit1 and valid(S.u1) and S.u1:GetHealth() < S.hp1 then S.hit1 = math.floor(sec * 10) / 10 end
+		if S.hit1 and not S.order2 and valid(S.u2) and not S.by_march and sec + self:LandIn(S.u2) >= S.hit1 + AS.second - 0.05 then
+			self:AttackAny(S.u2)
+			S.order2 = math.floor(sec * 10) / 10
+		end
+		if S.order2 and not S.hit2 and valid(S.u2) and S.u2:GetHealth() < S.hp2 then S.hit2 = math.floor(sec * 10) / 10 end
+		local done = S.hit1 and (S.hit2 or not S.u2 or sec >= S.hit1 + AS.second + 1.5)
+		if not S.retreat and (done or sec >= 58.5) then S.retreat = true end
+	elseif not S.order1 then
+		tr.stack_ok = false
+		return leave("no hit before :00")
+	else
+		S.retreat = true
+	end
+	if S.retreat and not S.walked_to then
+		local p, d = self:RetreatPoint(h:GetAbsOrigin(), AS.dir, AS.walk)
+		S.walked_to, S.walk_ok, S.retreat_at = {math.floor(p.x), math.floor(p.y)}, d, now
+		self:Move(p)
+	end
+	-- the pulled ancients catch up at the end of the walk and beat on Tinker while he waits for :00 and Keens
+	-- (you, 10-02; 50x test: 868 -> 557 HP standing there). Keep walking away from them until they de-aggro.
+	local hp = h:GetAbsOrigin()
+	local chasers = {}
+	if S.walked_to then
+		for _, u in ipairs(self:Units(hp, 550, true)) do table.insert(chasers, u) end
+		-- only once the walk is over (batch 10-02 "freeze": a kite issued while the walk was starting found no free
+		-- spot in the trees, ordered a move to where he stood and cancelled the walk, 15 s in the ancients' box)
+		local arrived = dist2(hp, Vector(S.walked_to[1], S.walked_to[2], hp.z)) < 200 or now - (S.retreat_at or now) > 5
+		if #chasers > 0 and arrived and not h:IsMoving() and now - (S.kite_at or 0) >= 0.5 then
+			-- batch 10-02 (2 of 5 stacks failed, one near-death): Tinker froze at ~(-4420, 70) for 15 s, Move orders and
+			-- all, losing 40-70 HP/s. Log what holds him; past the first freeze, Stop first and try other directions.
+			local froze = S.kite_pos and dist2(hp, S.kite_pos) < 30
+			S.kite_pos = hp
+			if froze then
+				S.frozen = (S.frozen or 0) + 1
+				if S.frozen <= 3 or S.frozen % 6 == 0 then
+					local mods, act, tgt = {}, nil, nil
+					for _, m in ipairs(h:FindAllModifiers()) do table.insert(mods, m:GetName()) end
+					pcall(function() act = h:GetCurrentActiveAbility() and h:GetCurrentActiveAbility():GetAbilityName() end)
+					pcall(function() tgt = h:GetAttackTarget() and h:GetAttackTarget():GetUnitName() end)
+					local near = {}
+					for _, u in ipairs(FindUnitsInRadius(h:GetTeamNumber(), hp, nil, 400, DOTA_UNIT_TARGET_TEAM_BOTH,
+							DOTA_UNIT_TARGET_ALL, DOTA_UNIT_TARGET_FLAG_INVULNERABLE + DOTA_UNIT_TARGET_FLAG_OUT_OF_WORLD, FIND_CLOSEST, false)) do
+						if u ~= h then table.insert(near, {u:GetUnitName(), math.floor(dist2(u:GetAbsOrigin(), hp))}) end
+						if #near >= 8 then break end
+					end
+					local wt = S.walked_to and Vector(S.walked_to[1], S.walked_to[2], hp.z)
+					self:Log("stack_frozen", {n = S.frozen, x = math.floor(hp.x), y = math.floor(hp.y), hp = h:GetHealth(), mods = mods,
+						rooted = h:IsRooted(), stunned = h:IsStunned(), attacking = h:IsAttacking(), attack_target = tgt, active = act,
+						path = wt and GridNav:CanFindPath(hp, wt) or nil, path_len = wt and math.floor(GridNav:FindPathLength(hp, wt)) or nil,
+						near = near})
+				end
+			end
+			S.kite_at, S.kites = now, (S.kites or 0) + 1
+			local cx, cy = 0, 0
+			for _, u in ipairs(chasers) do local q = u:GetAbsOrigin(); cx = cx + q.x; cy = cy + q.y end
+			local away = hp - Vector(cx / #chasers, cy / #chasers, 0)
+			away.z = 0
+			local deg = away:Length2D() < 1 and AS.dir or math.deg(math.atan2(away.y, away.x))
+			-- the first angle that gives a real step (200+); never a move onto his own spot
+			local p
+			for _, off in ipairs({0, 30, -30, 60, -60, 90, -90, 135, -135, 180}) do
+				local q = self:RetreatPoint(hp, deg + off, 500, 40)
+				if dist2(q, hp) >= 200 then p = q break end
+			end
+			if p then self:Move(p) end
+		end
+		-- Keen out before the chasers kill him (the Keen channel takes ~3 s of hits); the stack is likely spoiled anyway
+		if h:GetHealth() < 0.45 * h:GetMaxHealth() then
+			tr.stack_ok = false
+			return leave("low hp")
+		end
+	end
+	if minute > S.minute then                                             -- :00 passed: the game's marker on the new creeps
+		if now - (S.scanned or 0) >= 0.5 then
+			S.scanned = now
+			local n = 0
+			for _, u in ipairs(self:Units(vec(CFG.stations.C.stand), 1800, true)) do
+				if u:HasModifier("modifier_stacked_neutral") then n = n + 1 end
+			end
+			S.marked = math.max(S.marked or 0, n)
+		end
+		if sec >= 1.5 and (#chasers == 0 or sec >= 8) then              -- Keen once they've let go
+			tr.stack_ok = (S.marked or 0) > 0
+			return leave("after :00")
+		end
+	end
+	return true
+end
+
 function TinkerBot:StackStep(t, now)
 	local tr = self.trip
-	if not CFG.stack or tr.station == "B" or tr.station == "E" then return false end
+	if (tr.stack_only or tr.stack_after) and tr.station == "C" then return self:AncientStack(t, now) end
+	if not (CFG.stack or tr.stack_only) or tr.station == "B" or tr.station == "E" then return false end
 	local sec = t % 60
 	local h = self.hero
 	local march, laser = self:Ab("tinker_march_of_the_machines"), self:Ab("tinker_laser")
@@ -1714,6 +2614,18 @@ function TinkerBot:Trip(t, now)
 	-- fixed March counts at camps (your rules): no Immortal-threshold / dead-March / survivor skips there
 	local fixed = CFG.fixed_marches and tr.station ~= "B"
 	local h = self.hero
+	-- trip trace (logging only, like the lab): every neutral near Tinker every 0.5 s, to see why creeps survive
+	if tr.station ~= "B" and now - (tr.traced or 0) >= 0.5 then
+		tr.traced = now
+		local hp, cs = h:GetAbsOrigin(), {}
+		for _, u in ipairs(self:Units(hp, 1800, true)) do
+			local q = u:GetAbsOrigin()
+			table.insert(cs, {u:entindex(), (u:GetUnitName():gsub("npc_dota_neutral_", "")), u:GetHealth(), u:GetMaxHealth(),
+				math.floor(q.x), math.floor(q.y)})
+		end
+		self:Log("trip_creeps", {station = tr.station, start = tr.start, dt = math.floor((now - tr.landed_at) * 10) / 10,
+			hx = math.floor(hp.x), hy = math.floor(hp.y), marches = tr.marches, creeps = cs})
+	end
 	if self:StackStep(t, now) then return end
 	if self:OutOfSpawnBox(t) then return end
 	local S = CFG.stations[tr.station]
@@ -1729,9 +2641,40 @@ function TinkerBot:Trip(t, now)
 		centre = Vector(cx / #targets, cy / #targets, 0)
 	end
 	local function nxt() tr.i = tr.i + 1; tr.issued = nil end
+	if tok == nil and tr.stack_after and not tr.stack_tried then
+		-- the farming's done: stay for the :53 pull if it's close enough and there's mana to Rearm + Keen home
+		tr.stack_tried = true
+		local sec = t % 60
+		-- at night the pull is a March (Rearm for it if needed), then Rearm + Keen home
+		local need = mc + rc + kc + (march:IsCooldownReady() and 0 or rc)
+		local have = h:GetMana() + self:BottleCharges() * 60
+		if sec >= 38 and sec < 51 and have >= need then
+			table.insert(tr.plan, "wait")
+			tr.i, tok = #tr.plan, "wait"
+			if h:GetMana() < need and self:BottleCharges() > 0 then self:UseBottle("stack: mana for the pull") end
+			self:Log("stack", {station = "C", step = "stay for the stack", sec = math.floor(sec * 10) / 10, mana = math.floor(h:GetMana())})
+		else
+			self.ancient_stacked = (self.stack_tries or 0) >= 2                -- a later C trip can try again (twice)
+			self:Log("stack", {station = "C", step = "skip", sec = math.floor(sec * 10) / 10, mana = math.floor(h:GetMana()),
+				why = have < need and "mana" or "timing", need = need})
+		end
+	end
 	if tok == nil then return self:FinishDecision(t, now, targets) end
 	if tok == "walk" then
 		local spot = S.stand and vec(S.stand) or centre
+		-- closer to the camps (batch 10-02 at A: 80% of the creeps left near Tinker were never hit, 760-1,000 away;
+		-- the footprint lab: a camp at 600 loses 45-68% HP to one March). Stays within 400 so the facing holds.
+		local pull = CFG.stand_pull and CFG.stand_pull[tr.station]
+		if pull and spot then
+			local cx, cy, k = 0, 0, 0
+			for _, c in ipairs(self.camps or {}) do if c.st == tr.station then cx, cy, k = cx + c.pos.x, cy + c.pos.y, k + 1 end end
+			if k > 0 then
+				local to = Vector(cx / k, cy / k, spot.z) - spot
+				to.z = 0
+				local d = math.min(pull, math.max(0, to:Length2D() - 500))
+				if d > 0 then spot = spot + to:Normalized() * d end
+			end
+		end
 		if tr.station == "B" then
 			if centre then spot = centre + (self.fountain - centre):Normalized() * 350 else spot = nil end
 		end
@@ -1830,6 +2773,14 @@ function TinkerBot:Trip(t, now)
 		self:UseBottle("while the robots work")
 		return nxt()
 	end
+	if tok == "wait" then                                                  -- ancient stack trip: StackStep acts at :50-:55
+		if t % 60 >= 55.5 and not tr.stack then
+			self:Log("stack", {station = tr.station, step = "no stack (no ancients / no mana)", creeps = #targets})
+			if tr.stack_only then tr.stack_ok = false end
+			tr.i = #tr.plan + 1
+		end
+		return
+	end
 	if tok == "R" then
 		-- only if another March is planned and affordable with the mana to get home
 		local more = false
@@ -1920,6 +2871,21 @@ function TinkerBot:Trip(t, now)
 		end
 		local ldmg = CFG.laser_dmg[laser:GetLevel()] or 0
 		local best, why = nil, "kills it"
+		if CFG.laser_awake then
+			-- night (5:00-10:00): sleeping camp creeps read unselectable and Dota refuses the cast, then the trip waits
+			-- 1.5 s for nothing (batch 10-02: the lab's closing Laser spent no mana 18 of 36 times). Awake ones only.
+			local awake = {}
+			for _, u in ipairs(targets) do
+				local unsel = false
+				pcall(function() unsel = u:IsUnselectable() end)
+				if not unsel then table.insert(awake, u) end
+			end
+			if #awake == 0 then
+				self:Log("skip", {why = "Laser: every creep left is asleep (unselectable)", creeps = #targets})
+				return nxt()
+			end
+			targets = awake
+		end
 		if tr.lab_laser == "most_hp" then
 			why = "lab: the most HP left"
 			for _, u in ipairs(targets) do if not best or u:GetHealth() > best:GetHealth() then best = u end end
