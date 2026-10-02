@@ -6,6 +6,7 @@ makes the decisions (where to Keen next, how to finish a camp).
     python bot.py --speed 2          run the game at 2x (host_timescale)
     python bot.py --end 1200         play until 20:00 instead of 10:00
     python bot.py --no-launch        only install + run the bridge (Dota already in the bot game)
+    python bot.py --video            also film the screen to bot_runs/<run>.mp4 (off by default)
 
 Close Dota first: the bot game needs Dota started with Workshop Tools (-tools).
 Everything the bot sees, decides and does is recorded to bot_runs/<date_time>.jsonl, and a one-line
@@ -18,6 +19,7 @@ import argparse
 import csv
 import http.server
 import json
+import math
 import pathlib
 import subprocess
 import sys
@@ -34,6 +36,7 @@ GAME_DIR = DOTA / "game" / "dota_addons" / ADDON
 CONTENT_DIR = DOTA / "content" / "dota_addons" / ADDON
 RUNS = HERE / "bot_runs"
 PORT = 3040
+NETCON = 2121                       # --keep-dota: Dota's console on this port (-netconport) for reloads and quit
 
 # Stations from 44 Immortal Tinker replays (patch 7.41), Radiant coordinates:
 #   land  = median Keen landing spot of their trips there
@@ -100,12 +103,17 @@ def drill_state(session: str) -> dict:
         sys.exit(f"no 5:00 state in session {session}")
     st["items"] = [i for i in st["items"] if i not in ("item_ward_observer", "item_ward_sentry")]
     st["abilities"] = {k: v for k, v in st["abilities"].items() if k != "tinker_eureka"}
-    st.update(start_at=300, ffwd_speed=10, session=session)
+    st.update(start_at=300, ffwd_speed=10, session=session)    # 50x tried 10-02: the PC tops out at ~10x anyway
     return st
 
 
 def install(advisor: str, speed: float, end_at: int, lane_speed: float = 1.0, drill: dict | None = None,
-            route: str = "rules", manual: bool = False) -> pathlib.Path:
+            route: str = "rules", manual: bool = False, aim: str = "off", use_mana: bool = False,
+            ready: str = "fresh", router: str = "rules", tricks: bool = True, plan: str = "user",
+            lab: dict | None = None, min_marches: int = 0, ancient_stack: bool = False,
+            stack_drill: str | None = None, stack_bot: int = 0, stack_set: str = "all",
+            laser_awake: bool = False, a_marches: int = 0, stand_pull: int = 0,
+            real_camps: bool = False, a_face: int | None = None) -> pathlib.Path:
     vs = GAME_DIR / "scripts" / "vscripts"
     vs.mkdir(parents=True, exist_ok=True)
     CONTENT_DIR.mkdir(parents=True, exist_ok=True)      # the tools only list addons that have a content folder
@@ -122,9 +130,42 @@ def install(advisor: str, speed: float, end_at: int, lane_speed: float = 1.0, dr
         # fitted on 1,098 Immortal camp trips (148 games): camp HP still standing ~6 s after the 1st March
         "more_march_hp": {"A": {2: 5500, 3: 6500}, "D": {2: 6300, 3: 8900}, "C": {2: 1100, 3: 7500}, "E": {2: 5500, 3: 8900}},
         "leave_at_once": True, "stack": False,        # stacking: off until it has a stricter rule (tested: -400)
+        # stations whose Marches aim at the creeps instead of the replay facing (off: the facing everywhere)
+        "aim_stations": {"C": True, "D": True, "E": True} if aim == "on" else {"D": True} if aim == "d" else {},
+        # March on while the mana covers it instead of stopping at the Immortal HP thresholds (more_march_hp)
+        "use_mana": use_mana,
+        # fresh: a camp is ready by the creeps beyond what the last trip left; old: by all creeps there
+        "ready": ready,
+        # rate: go where the measured gold per second is highest (bot_lua RateRoute); rules: the Immortal routing
+        "router": router,
+        # skip a 3rd+ March with nothing it can kill; Laser the ranged / flag bearer at mid; March the next wave early
+        "skip_dead_marches": tricks, "wave_laser": tricks, "future_wave": tricks,
+        # user: fixed March counts (3 at small camps; at March 4: 2, C 3 + Laser the biggest ancient) and never
+        # the same place twice in a row; auto: thresholds and skips decide the March count
+        # lab: like user, but the March count and the closing Laser per station come from the March lab (10-01 1820)
+        "fixed_marches": plan in ("user", "lab"), "no_repeat": plan in ("user", "lab"), "lab_counts": plan == "lab",
         "skill_order": {i + 1: s for i, s in enumerate(SKILLS) if s},
         "buy": buy_list(),
     }
+    if min_marches:
+        cfg["min_marches"] = min_marches                       # brute force: at least this many Marches at camps
+    cfg["ancient_stack"] = ancient_stack                       # once ~7:45: pull the ancients at :53, farm them next
+    cfg["laser_awake"] = laser_awake                           # camp Lasers only at awake creeps (night: asleep = refused)
+    if a_marches:
+        cfg["a_marches"] = a_marches                           # Marches at A once March is level 4 (lab: 2)
+    cfg["real_camps"] = real_camps                             # camps = the map's spawn boxes near each stand spot
+    if a_face is not None:
+        cfg["stations"]["A"]["face"] = a_face                  # A's March facing (A lab 10-02: 325 was 10 points off the best)
+    if stand_pull:
+        cfg["stand_pull"] = {"A": stand_pull}                  # stand this much closer to A's camps
+    if stack_drill:
+        cfg["stack_drill"] = {"station": stack_drill}          # you stack, the script records
+        if stack_bot:
+            cfg["stack_drill"]["bot"] = stack_sweep(stack_bot, stack_set)
+        cfg["end_at"] = 999999
+    if lab:
+        cfg["lab"] = lab
+        cfg["end_at"] = 999999                                 # the lab ends itself when its tests are done
     if drill:
         cfg["drill"] = drill
         owned = list(drill["items"])
@@ -142,6 +183,15 @@ def install(advisor: str, speed: float, end_at: int, lane_speed: float = 1.0, dr
 
 
 # ---------------------------------------------------------------------- Jev questions
+# Jev's station guidance for the bot: the coach's Immortal lines, but the bot's own numbers on waves. Batch
+# 2026-09-30 (20 runs): Jev took 0-2 wave trips a game vs the rules' 3-6, and more wave trips went with more
+# net worth (r = 0.49); a wave of 4-7 creeps paid 3 kills in ~9 s, about what a camp trip pays per second.
+BOT_GUIDANCE = [g for g in jev_advisor.GUIDANCE if not g.startswith("The mid wave is worth it")] + [
+    "For this bot (20 test games): a mid-wave trip with 4+ creeps pays about 3 kills in ~9 s and a camp trip "
+    "about 4 kills in 11-15 s, so per second a wave is as good as a camp. After a camp trip, take a visible mid "
+    "wave of 4+ creeps; never two waves in a row.",
+]
+
 FINISH_TEXT = {
     "keen_now": "Leave now: the robots keep hitting during the 3 s Keen channel and their kills still count",
     "laser": "Laser a creep: one it kills (`laser.creeps_it_kills`), else the tankiest one (`tanky_creeps`), which "
@@ -280,7 +330,7 @@ class Bridge:
             return rules, "rules", None
         from typesafe_sdk import Choice, Noul
         if kind == "station":
-            state = dict(state, guidance=jev_advisor.GUIDANCE)
+            state = dict(state, guidance=BOT_GUIDANCE)
             q = {"pick": Choice(
                     instructions="Tinker is farming the jungle in Dota 2, Keen Teleporting to a spot, clearing it with "
                                  "March of the Machines and Rearm, and going back to fountain for mana. Using `tinker`, "
@@ -394,9 +444,119 @@ def serve(bridge: Bridge):
     return srv
 
 
+def netcon(cmd: str) -> bool:
+    """Type a command into the running Dota's console (Dota started with -netconport NETCON)."""
+    import socket
+    try:
+        with socket.create_connection(("127.0.0.1", NETCON), timeout=3) as c:
+            c.sendall((cmd + "\n").encode())
+            time.sleep(0.3)
+        return True
+    except OSError:
+        return False
+
+
 def dota_running() -> bool:
     out = subprocess.run(["tasklist", "/FI", "IMAGENAME eq dota2.exe"], capture_output=True, text=True).stdout
     return "dota2.exe" in out.lower()
+
+
+def stack_sweep(reps: int, which: str = "all") -> list:
+    """The bot's stacking tests at C, around your 10 stacks (10-02: hit landed :53.4-:54.2, the second camp ~2 s
+    later, ~1,000 walked at ~330 deg). A: when the hit lands; B: where/how far to walk; C: the second hit.
+    which="walk": the follow-up (sweep 1: walking 0-500 never stacked, 1,000 at 330 deg 2/3): 1,000-1,600 at
+    330 deg x hits at :53.5-:54.5, second hit +1.5 s."""
+    base = {"box1": "neutralcamp_good_8", "land": 53.5, "second": 2.0, "walk": 1000, "dir": 330}
+    tests = []
+    if which == "walk":
+        for _ in range(reps):
+            for walk in (1000, 1300, 1600):
+                for land in (53.5, 54, 54.5):
+                    tests.append({**base, "kind": "walk", "walk": walk, "land": land, "second": 1.5})
+        return tests
+    for _ in range(reps):
+        for land in (49.5, 50.5, 51.5, 52, 52.5, 53, 53.5, 54, 54.5, 55, 55.5, 56.5):
+            tests.append({**base, "kind": "timing", "land": land})
+        for d in (330, 30, 150):
+            for walk in (0, 500, 1000):
+                tests.append({**base, "kind": "retreat", "dir": d, "walk": walk})
+        for sec in (0, 1.0, 2.0, 3.5):
+            tests.append({**base, "kind": "second", "second": sec})
+    for x in tests:
+        if not x["second"]:
+            x.pop("second")                                    # no second hit (Lua: nil)
+    return tests
+
+
+A_CAMPS = [(-1454, -3357), (-1983, -4815)]        # A's two real spawners (the map's neutralcamp_good_5 / _9)
+A_FAMILY_PAIRS = [(["centaur_khan", "centaur_outrunner", "centaur_outrunner"],
+                   ["ogre_magi", "ogre_mauler", "ogre_mauler"]),
+                  (["satyr_hellcaller", "satyr_soulstealer", "satyr_trickster"],
+                   ["alpha_wolf", "giant_wolf", "giant_wolf"])]
+
+
+def a_geo_tests(reps: int) -> list:
+    """The A geometry lab: both of A's real camps at once; Tinker's stand spot (on the camp-to-camp line: t from
+    the north camp, s sideways) x the March facing (every 30 deg + your 325), at your March counts (3 + Laser at
+    March 3, 2 + Laser at March 4). The bot's current spot and facing are the baseline (off 0, face 325)."""
+    (x1, y1), (x2, y2) = A_CAMPS
+    sx, sy = STATIONS["A"]["stand"]
+    d = math.hypot(x2 - x1, y2 - y1)
+    ux, uy = (x2 - x1) / d, (y2 - y1) / d
+    stands = [(0, 0, "now")]
+    for t in (350, 550, 775):
+        for s in (-300, 0, 300):
+            px = x1 + t * ux - s * uy
+            py = y1 + t * uy + s * ux
+            stands.append((round(px - sx), round(py - sy), f"t{t}s{s}"))
+    tests = []
+    for _ in range(reps):
+        for fi, fpair in enumerate(A_FAMILY_PAIRS):
+            for ox, oy, name in stands:
+                for face in [325] + list(range(0, 360, 30)):
+                    for march, n in ((3, 3), (4, 2)):
+                        tests.append({"st": "A", "tag": name, "pair": fi, "off": [ox, oy], "face": face,
+                                      "march": march, "n": n, "laser": 1,
+                                      "spawns": [{"x": cx, "y": cy, "family": fam}
+                                                 for (cx, cy), fam in zip(A_CAMPS, fpair)]})
+    return tests
+
+
+def lab_config(a) -> dict:
+    """The lab's tests: with lab_families.json (python lab_families.py) every family is spawned by name at its camp;
+    without it the real spawns are used."""
+    cfg = {"reps": a.lab, "stations": a.lab_stations.split(","), "march_levels": [3, 4], "marches": [1, 2, 3, 4],
+           "lasers": [0, 1, 2], "speed": 10, "map": a.lab_map}       # Laser 1: the bot's pick, 2: the most HP left
+    if getattr(a, "lab_a", None):
+        cfg["geo"] = a_geo_tests(a.lab_a)
+        return cfg
+    if a.lab_probe is not None:
+        cfg["probe"] = a.lab_probe
+    if getattr(a, "lab_footprint", None):
+        # one March due east from the map centre, rooted + disarmed creeps (see LabFootprint in the Lua)
+        cfg["footprint"] = {
+            "reps": a.lab_footprint, "levels": [3, 4], "dummy": "kobold",
+            "step": 300, "along": [-1500, 2100], "side": [-1200, 1200],          # grid: 13 x 9 spots
+            "shield_front": [0, 300, 600], "shield_gap": [150, 300], "shield_side": [0, 300],
+            "families": [["centaur_khan", "centaur_outrunner", "centaur_outrunner"],
+                         ["satyr_hellcaller", "satyr_soulstealer", "satyr_trickster"],
+                         ["enraged_wildkin", "wildkin", "wildkin"]],
+            "angle_dist": [600, 900], "angle_off": [0, 45, 90, 135, 180],
+        }
+    fams = HERE / "lab_families.json"
+    if fams.exists():
+        import itertools
+        camps = [c for c in json.loads(fams.read_text(encoding="utf-8")) if c["station"] in cfg["stations"]]
+        cfg["camps"] = camps
+        # a station's camps are hit by the same Marches, and robots explode on the first creep they reach, so a
+        # two-camp station gets every family pair (you: "one X and two Y, or one X and two Z ...")
+        combos = []
+        for st in cfg["stations"]:
+            cs = [c for c in camps if c["station"] == st]
+            for picks in itertools.product(*[c["families"] for c in cs]):
+                combos.append({"station": st, "spawns": [{"x": c["x"], "y": c["y"], "family": f} for c, f in zip(cs, picks)]})
+        cfg["combos"] = combos
+    return cfg
 
 
 def main():
@@ -406,13 +566,63 @@ def main():
     ap.add_argument("--lane-speed", type=float, default=None, help="game speed while laning (default: --speed)")
     ap.add_argument("--end", type=int, default=600, help="game clock (s) when the run ends")
     ap.add_argument("--no-launch", action="store_true")
+    ap.add_argument("--keep-dota", action="store_true",
+                    help="start Dota with a console port; if it's already open, load the game in it instead of relaunching")
     ap.add_argument("--route", choices=["rules", "jev"], default="rules", help="who decides where to Keen next")
     ap.add_argument("--manual", action="store_true", help="you play: the drill sets up 5:00, no bot, no video; the coach guides")
     ap.add_argument("--drill", nargs="?", const=DRILL_DEFAULT, default=None, metavar="SESSION",
                     help="skip the lane: start at 5:00 in fountain from your saved F11 drill state "
                          f"(default: your best F11 run, session {DRILL_DEFAULT})")
-    ap.add_argument("--no-video", action="store_true", help="don't film the screen (the .jsonl log is always written)")
+    ap.add_argument("--video", action="store_true", help="film the screen to bot_runs/<run>.mp4 (~300 MB a run)")
+    ap.add_argument("--no-video", action="store_true", help="(the default now; kept so old commands still work)")
+    ap.add_argument("--hud", action="store_true", help="show the Tinker x Jev panel (off by default; X toggles it)")
+    ap.add_argument("--no-hud", action="store_true", help="(the default now; kept so old commands still work)")
+    ap.add_argument("--aim", choices=["on", "off", "d"], default="off",
+                    help="on: Marches at C/D/E aim at the creeps; d: at D only; off: the Immortal replay facing")
+    ap.add_argument("--marches", choices=["immortal", "mana"], default="mana",
+                    help="immortal: stop at the Immortal HP thresholds; mana: March on while the mana covers it")
+    ap.add_argument("--router", choices=["rules", "rate"], default="rate",
+                    help="rules: the Immortal routing rules; rate: the best measured gold per second")
+    ap.add_argument("--lab", nargs="?", const=2, type=int, default=None, metavar="REPS",
+                    help="lab: test 1-4 Marches +/- Laser at March 3 and 4 on every camp, REPS times each (default 2)")
+    ap.add_argument("--lab-stations", default="A,C,D,E", help="lab: which stations (default A,C,D,E)")
+    ap.add_argument("--lab-map", default="creeptests", help="lab: the map (default creeptests, empty; dota = the real map)")
+    ap.add_argument("--lab-probe", type=int, default=None, metavar="MINUTES",
+                    help="lab: instead of tests, log a fresh creep family's HP and buffs every game minute up to MINUTES")
+    ap.add_argument("--lab-footprint", type=int, default=None, metavar="REPS",
+                    help="lab: where one March does damage (dummy grid, shielding, camp angles); needs --lab")
+    ap.add_argument("--lab-a", type=int, default=None, metavar="REPS",
+                    help="lab: A's two real camps at once, the stand spot x the March facing, REPS times; needs --lab")
+    ap.add_argument("--min-marches", type=int, default=0, help="at least this many Marches a camp trip (mana allowing)")
+    ap.add_argument("--stack-drill", nargs="?", const="C", default=None, metavar="STATION",
+                    help="you practise stacking at a station (default C): fast to :40 each minute, every attempt "
+                         "recorded and scored by the real spawn boxes; opens stack_hud.py")
+    ap.add_argument("--stack-bot", type=int, default=0, metavar="REPS",
+                    help="with --stack-drill: the bot runs the stacking sweep (timing, retreat, second hit) REPS times")
+    ap.add_argument("--stack-set", choices=["all", "walk"], default="all",
+                    help="which stacking sweep: all (timing, retreat, second hit) or walk (1,000-1,600 at 330 deg)")
+    ap.add_argument("--ancient-stack", action="store_true",
+                    help="once ~7:45 (level 7+, March 4, 600+ mana): stack the ancients at :53, farm them on the next C visit")
+    ap.add_argument("--laser-awake", action="store_true",
+                    help="camp Lasers only at awake creeps: at night sleeping ones refuse the cast (10-02)")
+    ap.add_argument("--real-camps", action="store_true",
+                    help="track the map's spawn boxes near each stand (A and E have two camps; the replay spots gave one)")
+    ap.add_argument("--stand-pull", type=int, default=0,
+                    help="at A, stand up to this much closer to the camps' middle (keeps 500 from it)")
+    ap.add_argument("--a-face", type=int, default=None,
+                    help="at A, March facing in degrees (default: the replay's 325)")
+    ap.add_argument("--a-marches", type=int, default=0,
+                    help="Marches at A once March is level 4 (default: the plan's, lab = 2)")
+    ap.add_argument("--plan", choices=["user", "lab", "auto"], default="user",
+                    help="user: fixed March counts by March level + never the same place twice in a row; "
+                         "lab: same with the lab's per-station counts + a Laser after the last March; auto: skips decide")
+    ap.add_argument("--tricks", choices=["on", "off"], default="on",
+                    help="on: skip 3rd+ Marches with nothing to kill, Laser ranged/flag bearer at mid, March the next wave early")
+    ap.add_argument("--ready", choices=["fresh", "old"], default="fresh",
+                    help="fresh: leftovers from the last trip don't make a camp ready; old: every creep counts")
     a = ap.parse_args()
+    if a.stack_drill:
+        a.keep_dota = True                                   # the HUD's buttons talk to Dota's console port
     if subprocess.run([sys.executable, str(HERE / "lua_check.py")]).returncode != 0:
         sys.exit("bot script check failed: not launching")
     drill = drill_state(a.drill) if a.drill else None
@@ -424,7 +634,14 @@ def main():
         (HERE / "manual_drill.flag").write_text("1")          # the coach logs this run as yours
     else:
         (HERE / "manual_drill.flag").unlink(missing_ok=True)
-    print("Addon written to", install(a.advisor, a.speed, a.end, a.lane_speed or a.speed, drill, a.route, manual=a.manual))
+    print("Addon written to", install(a.advisor, a.speed, a.end, a.lane_speed or a.speed, drill, a.route, manual=a.manual,
+                                      aim=a.aim, use_mana=a.marches == "mana", ready=a.ready, router=a.router,
+                                      tricks=a.tricks == "on", plan=a.plan,
+                                      lab=a.lab and lab_config(a), min_marches=a.min_marches,
+                                      ancient_stack=a.ancient_stack, stack_drill=a.stack_drill,
+                                      stack_bot=a.stack_bot, stack_set=a.stack_set, laser_awake=a.laser_awake,
+                                      a_marches=a.a_marches, stand_pull=a.stand_pull, real_camps=a.real_camps,
+                                      a_face=a.a_face))
     print("Route decided by:", a.route)
     bot_hud.COMPARE_SESSION = a.drill
     bridge = Bridge(a.advisor)
@@ -434,12 +651,45 @@ def main():
         sys.exit(f"Bridge port {PORT} is busy (another bot.py running?): {ex}")
     print(f"Bridge on 127.0.0.1:{PORT}, advisor = {a.advisor}, recording to {bridge.path}")
     if not a.no_launch:
+        game_map = a.lab_map if a.lab else "dota"
         if dota_running():
-            sys.exit("Dota is running: close it first (the bot game needs Dota started with Workshop Tools).")
-        subprocess.Popen([str(STEAM / "steam.exe"), "-applaunch", "570", "-tools", "-addon", ADDON, "-novid",
-                          "-gamestateintegration", "-condebug", "-language", "english", "+dota_launch_custom_game", ADDON, "dota"])
-        print("Launching Dota (Workshop Tools) into the bot game… the first load takes a minute.")
+            # --keep-dota: Dota stays open between games; load the next game in it (~30 s instead of ~90 s)
+            if a.keep_dota and netcon(f"dota_launch_custom_game {ADDON} {game_map}"):
+                print("Dota is open: loading the bot game in it (--keep-dota).")
+            else:
+                sys.exit("Dota is running: close it first (the bot game needs Dota started with Workshop Tools).")
+        else:
+            # a lab run doesn't need sound or a high frame rate (fps_max is saved to your Dota config: reset it with
+            # your usual value, fps_max 0 = no cap); 60, not 30, so the 10x simulation isn't capped by the frames
+            lab_args = ["-nosound", "+fps_max", "60"] if a.lab else []
+            if a.keep_dota:
+                lab_args += ["-netconport", str(NETCON)]          # the console port the next games load through
+            subprocess.Popen([str(STEAM / "steam.exe"), "-applaunch", "570", "-tools", "-addon", ADDON, "-novid",
+                              "-gamestateintegration", "-condebug", "-language", "english", *lab_args,
+                              "+dota_launch_custom_game", ADDON, game_map])
+            print("Launching Dota (Workshop Tools) into the bot game… the first load takes a minute.")
+    if a.stack_drill:
+        # no outside window (it took focus from Dota): everything is chat -time 7:50 -reset -auto -skip
+        print(f"Stacking drill at {a.stack_drill}: chat -time 7:50, -reset, -auto, -skip. Close Dota (or Ctrl+C) to stop.")
+        try:
+            for _ in range(180):                             # Dota starting
+                if dota_running():
+                    break
+                time.sleep(1)
+            while dota_running() and not bridge.done.is_set():   # the bot's sweep ends itself
+                time.sleep(2)
+        except KeyboardInterrupt:
+            pass
+        return
     print("Type -bot in the game chat to take over. Ctrl+C here to stop.\n")
+    if a.lab:                                                # no HUD for a lab: just wait for its end
+        print("Lab: testing Marches on the camps. Ctrl+C here to stop.")
+        try:
+            while not bridge.done.wait(1):
+                pass
+        except KeyboardInterrupt:
+            pass
+        return
     if a.manual:
         print("Manual drill: you play from 5:00. The coach's HUD guides you. Ctrl+C here after 10:00.")
         try:
@@ -449,11 +699,22 @@ def main():
             pass
         (HERE / "manual_drill.flag").unlink(missing_ok=True)
         return
-    run_ui(bridge, record=not a.no_video)
+    if not a.hud and not (a.video and not a.no_video):
+        try:
+            while not bridge.done.wait(0.5):                  # no panel: just wait for the game to end
+                pass
+        except KeyboardInterrupt:
+            pass
+        return
+    run_ui(bridge, record=a.video and not a.no_video)
+
+
+VK_X = 0x58
 
 
 def run_ui(bridge: Bridge, record: bool):
-    """Thinking panel on screen + whole-screen recording from the start of the game to the end card."""
+    """Thinking panel on screen + whole-screen recording from the start of the game to the end card. X hides/shows
+    the panel (a global key poll: the panel is click-through and never has focus, Dota keeps the keyboard)."""
     import ctypes
     import tkinter as tk
     import bot_hud
@@ -463,12 +724,18 @@ def run_ui(bridge: Bridge, record: bool):
     root.withdraw()
     hud = bot_hud.BotHud(root, sw, sh)
     rec = bot_hud.Recorder(bridge.path.with_suffix(".mp4")) if record else None
-    st = {"recording": False, "end_at": None}
+    st = {"recording": False, "end_at": None, "shown": True, "x_down": False}
 
     def tick():
+        down = bool(ctypes.windll.user32.GetAsyncKeyState(VK_X) & 0x8000)
+        if down and not st["x_down"]:                         # X pressed: toggle the panel
+            st["shown"] = not st["shown"]
+            hud.show(st["shown"])
+        st["x_down"] = down
         h = dict(bridge.hud)
         try:
-            hud.render(h)
+            if st["shown"]:
+                hud.render(h)
         except Exception as ex:
             print("HUD:", ex)
         if rec and not st["recording"] and h.get("clock") is not None and h["clock"] >= -5:

@@ -103,10 +103,10 @@ Type `-bot` in chat to take control yourself, `-bot` again to hand it back.
 
 **Video + thinking panel.** While the bot plays, a transparent panel (top right) shows what it is doing now,
 the last decision (every option with Jev's probability, the pick, what the rules would have picked, and the
-facts Jev was given), net worth against your best laned run, and the trip log. The whole screen, panel
-included, is filmed from 0:00 to the result card into `bot_runs/<date_time>.mp4` (needs ffmpeg; GPU encoder
-when available, `--no-video` to skip). With OBS instead: use a *Display Capture* source, since Game Capture
-doesn't include overlays.
+facts Jev was given), net worth against your best laned run, and the trip log. With `--video` the whole
+screen, panel included, is filmed from 0:00 to the result card into `bot_runs/<date_time>.mp4` (off by
+default, ~300 MB a run; needs ffmpeg, GPU encoder when available). With OBS instead: use a *Display Capture*
+source, since Game Capture doesn't include overlays.
 Everything is recorded to `bot_runs/<date_time>.jsonl` (a snapshot every second plus every Keen, cast, buy,
 decision and Jev's probabilities); each run adds a line to `bot_runs/summary.csv`. Bot runs never touch your
 `runs.csv` or score sheet. Cost: one Jev decision is ~1,000 input tokens ($0.042 per 1M), well under a cent a run.
