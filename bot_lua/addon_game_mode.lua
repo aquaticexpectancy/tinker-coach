@@ -747,12 +747,43 @@ function TinkerBot:Think()
 	return 0.1
 end
 
+-- --probe: what the game itself says about mana (regen, buffs, ability costs / cooldowns / channel times), logged
+-- on every snapshot so the offline simulator's parameters can be read instead of fitted. Logging only.
+function TinkerBot:ProbeFields(h)
+	local f = {}
+	pcall(function() f.regen = h:GetManaRegen() end)
+	pcall(function()
+		local mods = {}
+		for i = 0, h:GetModifierCount() - 1 do table.insert(mods, h:GetModifierNameByIndex(i)) end
+		f.mods = table.concat(mods, ",")
+	end)
+	f.ab = {}
+	for key, name in pairs({march = "tinker_march_of_the_machines", rearm = "tinker_rearm", laser = "tinker_laser", keen = "tinker_keen_teleport"}) do
+		local ab = self:Ab(name)
+		if ab then
+			local a = {lv = ab:GetLevel()}
+			pcall(function() a.cost = ab:GetManaCost(-1) end)
+			pcall(function() a.cd = ab:GetCooldown(-1) end)
+			pcall(function() a.cdl = ab:GetCooldownTimeRemaining() end)
+			pcall(function() a.ch = ab:GetChannelTime() end)
+			pcall(function() a.cp = ab:GetCastPoint() end)
+			f.ab[key] = a
+		end
+	end
+	return f
+end
+
 function TinkerBot:Snapshot(t)
 	local h = self.hero
 	local p = h:GetAbsOrigin()
-	self:Log("snap", {x = math.floor(p.x), y = math.floor(p.y), hp = h:GetHealth(), mana = math.floor(h:GetMana()),
+	local data = {x = math.floor(p.x), y = math.floor(p.y), hp = h:GetHealth(), mana = math.floor(h:GetMana()),
 		max_mana = math.floor(h:GetMaxMana()), level = h:GetLevel(), lh = PlayerResource:GetLastHits(self.pid),
-		gold = PlayerResource:GetGold(self.pid), nw = self:NetWorth(), phase = self.phase, station = self.station})
+		gold = PlayerResource:GetGold(self.pid), nw = self:NetWorth(), phase = self.phase, station = self.station}
+	if CFG.probe then
+		for k, v in pairs(self:ProbeFields(h)) do data[k] = v end
+		data.mana_f = h:GetMana()
+	end
+	self:Log("snap", data)
 end
 
 function TinkerBot:Step(t, now)

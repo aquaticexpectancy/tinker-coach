@@ -47,6 +47,7 @@ SETUPS["pull_10x"] = SETUPS["lab_10x"] + ["--stand-pull", "350"]   # stand 350 c
 SETUPS["boxes_10x"] = SETUPS["lab_10x"] + ["--real-camps"]   # camps from the map's spawn boxes (A, E: 2 each)
 SETUPS["af300_10x"] = SETUPS["lab_10x"] + ["--a-face", "300"]   # A lab 10-02: facing 300 beat 325 by ~10 points
 SETUPS["af0_10x"] = SETUPS["lab_10x"] + ["--a-face", "0"]       # ... and so did 0
+SETUPS["probe_10x"] = SETUPS["lab_10x"] + ["--probe"]           # lab_10x + the game's own mana regen / costs in every snapshot (sim/)
 COMMON = ["--drill", "--speed", "2", "--no-video", "--no-hud"]   # follow a batch with lab_hud.py
 TIMEOUT = 15 * 60                           # a run is ~4-5 min; anything past this is stuck
 FIELDS = ["setup", "run", "status", "nw", "lh", "camp_trips", "camp_lh", "wave_trips", "wave_lh", "jev_lowconf", "jev_calls"]

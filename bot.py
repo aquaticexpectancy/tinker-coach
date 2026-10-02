@@ -113,7 +113,7 @@ def install(advisor: str, speed: float, end_at: int, lane_speed: float = 1.0, dr
             lab: dict | None = None, min_marches: int = 0, ancient_stack: bool = False,
             stack_drill: str | None = None, stack_bot: int = 0, stack_set: str = "all",
             laser_awake: bool = False, a_marches: int = 0, stand_pull: int = 0,
-            real_camps: bool = False, a_face: int | None = None) -> pathlib.Path:
+            real_camps: bool = False, a_face: int | None = None, probe: bool = False) -> pathlib.Path:
     vs = GAME_DIR / "scripts" / "vscripts"
     vs.mkdir(parents=True, exist_ok=True)
     CONTENT_DIR.mkdir(parents=True, exist_ok=True)      # the tools only list addons that have a content folder
@@ -154,6 +154,7 @@ def install(advisor: str, speed: float, end_at: int, lane_speed: float = 1.0, dr
     if a_marches:
         cfg["a_marches"] = a_marches                           # Marches at A once March is level 4 (lab: 2)
     cfg["real_camps"] = real_camps                             # camps = the map's spawn boxes near each stand spot
+    cfg["probe"] = probe                                       # --probe: the game's own mana regen / costs on every snapshot
     if a_face is not None:
         cfg["stations"]["A"]["face"] = a_face                  # A's March facing (A lab 10-02: 325 was 10 points off the best)
     if stand_pull:
@@ -613,6 +614,9 @@ def main():
                     help="at A, March facing in degrees (default: the replay's 325)")
     ap.add_argument("--a-marches", type=int, default=0,
                     help="Marches at A once March is level 4 (default: the plan's, lab = 2)")
+    ap.add_argument("--probe", action="store_true",
+                    help="log the game's own mana regen, buffs and ability costs / cooldowns / channel times on every snapshot "
+                         "(for the offline simulator; logging only)")
     ap.add_argument("--plan", choices=["user", "lab", "auto"], default="user",
                     help="user: fixed March counts by March level + never the same place twice in a row; "
                          "lab: same with the lab's per-station counts + a Laser after the last March; auto: skips decide")
@@ -641,7 +645,7 @@ def main():
                                       ancient_stack=a.ancient_stack, stack_drill=a.stack_drill,
                                       stack_bot=a.stack_bot, stack_set=a.stack_set, laser_awake=a.laser_awake,
                                       a_marches=a.a_marches, stand_pull=a.stand_pull, real_camps=a.real_camps,
-                                      a_face=a.a_face))
+                                      a_face=a.a_face, probe=a.probe))
     print("Route decided by:", a.route)
     bot_hud.COMPARE_SESSION = a.drill
     bridge = Bridge(a.advisor)
