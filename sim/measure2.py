@@ -5,7 +5,8 @@ from trips import trips_of
 
 PASSIVE = 1000.0 / 700.0       # checked below against the logs
 PAYOFF_SETUPS = {"lab_10x", "lab", "user", "a3_10x", "brute4_10x", "af300_10x", "af0_10x", "pull_10x", "awake_10x",
-                 "rules_facing", "rate_mana", "rules_mana", "rate", "tricks", "rules_fresh"}
+                 "rules_facing", "rate_mana", "rules_mana", "rate", "tricks", "rules_fresh",
+                 "force1_10x", "force2_10x", "force3_10x", "force4_10x"}
 CAMPS = {"A": [(-1454, -3357), (-1983, -4815)], "C": [(-4013, 991), (-5015, -96)],
          "D": [(-8023, -1838), (-8314, -553)], "E": [(-721, -7696)]}
 TRACKED = {"A": [0], "C": [0, 1], "D": [0, 1], "E": [0]}      # the bot's own camp list (camp_spot events: the others had no spawner)

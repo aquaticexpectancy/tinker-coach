@@ -113,7 +113,10 @@ def install(advisor: str, speed: float, end_at: int, lane_speed: float = 1.0, dr
             lab: dict | None = None, min_marches: int = 0, ancient_stack: bool = False,
             stack_drill: str | None = None, stack_bot: int = 0, stack_set: str = "all",
             laser_awake: bool = False, a_marches: int = 0, stand_pull: int = 0,
-            real_camps: bool = False, a_face: int | None = None, probe: bool = False) -> pathlib.Path:
+            real_camps: bool = False, a_face: int | None = None, probe: bool = False,
+            force_n: dict | None = None, n_plan: dict | None = None, laser_plan: dict | None = None,
+            leave_mana: int | None = None, chain: int | None = None, cycle: str | None = None,
+            sweep: int = 0) -> pathlib.Path:
     vs = GAME_DIR / "scripts" / "vscripts"
     vs.mkdir(parents=True, exist_ok=True)
     CONTENT_DIR.mkdir(parents=True, exist_ok=True)      # the tools only list addons that have a content folder
@@ -147,6 +150,26 @@ def install(advisor: str, speed: float, end_at: int, lane_speed: float = 1.0, dr
         "skill_order": {i + 1: s for i, s in enumerate(SKILLS) if s},
         "buy": buy_list(),
     }
+    if n_plan:
+        cfg["n_plan"] = n_plan                                 # --n-plan: Marches per station and March level (sim/ search)
+    if laser_plan:
+        cfg["laser_plan"] = laser_plan                         # --laser-plan: closing Laser on (1) / off (0) per station and level
+    if leave_mana is not None:
+        cfg["leave_mana"] = leave_mana                         # --leave-mana: leave the fountain at this mana (after the Rearm)
+    if chain is not None:
+        cfg["chain"] = chain                                   # --chain: straight to the next station when the mana covers it + this margin
+    if cycle:
+        cfg["cycle"] = cycle                                   # --cycle: a fixed station order, e.g. ABCBDB (B only when a wave is up)
+    if sweep:
+        # --sweep N: Keen to mid when the waves are about to meet (~:19 / ~:49), N Marches there, leave at once.
+        # lo..hi = landing phase (s into the 30 s wave cycle) that counts as "about to meet"; wait = how many seconds
+        # early the fountain waits for it; stand = just short of the usual meeting point (80 games 10-02);
+        # range = cast once 2+ enemy creeps are this close; blind = cast anyway from this phase; hold = max wait there
+        # (smoke test 10-02: landing at phase 12 stood 4-7 s at mid before the creeps came, so land at 14.5+)
+        cfg["sweep"] = {"n": sweep, "lo": 14.5, "hi": 19, "wait": 7, "arrive_f": 3.4, "arrive": 6,
+                        "stand": [-600, -500], "range": 1000, "blind": 19, "hold": 9}
+    if force_n:
+        cfg["force_n"] = force_n                               # --force-n: exactly N Marches per station (A,C,D,E camps; B the wave)
     if min_marches:
         cfg["min_marches"] = min_marches                       # brute force: at least this many Marches at camps
     cfg["ancient_stack"] = ancient_stack                       # once ~7:45: pull the ancients at :53, farm them next
@@ -560,6 +583,17 @@ def lab_config(a) -> dict:
     return cfg
 
 
+def parse_plan(txt):
+    """'4:A=2,C=3;3:A=3' -> {4: {'A': 2, 'C': 3}, 3: {'A': 3}}"""
+    if not txt:
+        return None
+    out = {}
+    for part in txt.split(";"):
+        lvl, rest = part.split(":")
+        out[int(lvl)] = {k.strip(): int(v) for k, v in (p.split("=") for p in rest.split(","))}
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--advisor", choices=["jev", "rules"], default="rules", help="rules (default, no Jev calls) or jev")
@@ -614,12 +648,29 @@ def main():
                     help="at A, March facing in degrees (default: the replay's 325)")
     ap.add_argument("--a-marches", type=int, default=0,
                     help="Marches at A once March is level 4 (default: the plan's, lab = 2)")
+    ap.add_argument("--force-n", default=None, metavar="A=2,C=2,D=2,E=2,B=3",
+                    help="exactly this many Marches per station (mana allowing); for measuring the payoff by March count (sim/)")
+    ap.add_argument("--n-plan", default=None, metavar="4:A=2,C=2,D=2,E=2;3:A=3,D=3,E=3",
+                    help="Marches per station for March level 4 / 3 (default: the lab plan)")
+    ap.add_argument("--laser-plan", default=None, metavar="4:A=1,C=1,D=1,E=0",
+                    help="closing Laser on (1) / off (0) per station for March level 4 / 3 (default: the lab plan)")
+    ap.add_argument("--leave-mana", type=int, default=None,
+                    help="leave the fountain once the Rearm is done and the mana is this high (default: the bot's rule)")
+    ap.add_argument("--chain", type=int, default=None, metavar="MARGIN",
+                    help="go straight to the next station when mana covers its Rearm + Keen + Marches + Keen home + MARGIN")
+    ap.add_argument("--cycle", default=None, metavar="ABCBDB",
+                    help="a fixed station order instead of the gold-per-second router (B only when a wave is up)")
+    ap.add_argument("--sweep", type=int, default=0, metavar="MARCHES",
+                    help="lane creeps first: Keen to mid when the waves are about to meet, cast this many Marches "
+                         "where they meet and leave at once (waits a few seconds in fountain for the timing)")
     ap.add_argument("--probe", action="store_true",
                     help="log the game's own mana regen, buffs and ability costs / cooldowns / channel times on every snapshot "
                          "(for the offline simulator; logging only)")
-    ap.add_argument("--plan", choices=["user", "lab", "auto"], default="user",
+    ap.add_argument("--plan", choices=["combo", "user", "lab", "auto"], default="combo",
                     help="user: fixed March counts by March level + never the same place twice in a row; "
-                         "lab: same with the lab's per-station counts + a Laser after the last March; auto: skips decide")
+                         "lab: same with the lab's per-station counts + a Laser after the last March; auto: skips decide; "
+                         "combo (default): lab + 3 Marches at the wave, 2 at D on the 4th trip, leave the fountain at 360 mana, "
+                         "cycle ABDBCB (sim/ best, +170..240 nw vs lab in real batches; explicit flags override)")
     ap.add_argument("--tricks", choices=["on", "off"], default="on",
                     help="on: skip 3rd+ Marches with nothing to kill, Laser ranged/flag bearer at mid, March the next wave early")
     ap.add_argument("--ready", choices=["fresh", "old"], default="fresh",
@@ -629,6 +680,12 @@ def main():
         a.keep_dota = True                                   # the HUD's buttons talk to Dota's console port
     if subprocess.run([sys.executable, str(HERE / "lua_check.py")]).returncode != 0:
         sys.exit("bot script check failed: not launching")
+    if a.plan == "combo":
+        a.plan = "lab"
+        a.force_n = a.force_n or "B=3"
+        a.n_plan = a.n_plan or "4:D=2"
+        a.leave_mana = 360 if a.leave_mana is None else a.leave_mana
+        a.cycle = a.cycle or "ABDBCB"
     drill = drill_state(a.drill) if a.drill else None
     if drill:
         print(f"Drill start: your {a.drill} state at 5:00: level {drill['level']}, {drill['abilities']}, "
@@ -645,7 +702,10 @@ def main():
                                       ancient_stack=a.ancient_stack, stack_drill=a.stack_drill,
                                       stack_bot=a.stack_bot, stack_set=a.stack_set, laser_awake=a.laser_awake,
                                       a_marches=a.a_marches, stand_pull=a.stand_pull, real_camps=a.real_camps,
-                                      a_face=a.a_face, probe=a.probe))
+                                      a_face=a.a_face, probe=a.probe,
+                                      n_plan=parse_plan(a.n_plan), laser_plan=parse_plan(a.laser_plan),
+                                      leave_mana=a.leave_mana, chain=a.chain, cycle=a.cycle, sweep=a.sweep,
+                                      force_n={k.strip(): int(v) for k, v in (p.split("=") for p in a.force_n.split(","))} if a.force_n else None))
     print("Route decided by:", a.route)
     bot_hud.COMPARE_SESSION = a.drill
     bridge = Bridge(a.advisor)

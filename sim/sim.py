@@ -24,7 +24,7 @@ class Payoffs:
         self.by_sN = {}
         # records from older / different bot versions pay less per trip than the current lab plan at the same cell:
         # scale them by the per-station ratio measured on the cells both families cover
-        fam = lambda r: r["setup"] in ("lab_10x", "lab", "a3_10x", "brute4_10x", "awake_10x")
+        fam = lambda r: r["setup"] in ("lab_10x", "lab", "a3_10x", "brute4_10x", "awake_10x", "force1_10x", "force2_10x", "force3_10x", "force4_10x")
         cells = {}
         for r in P["payoff_records"]:
             cells.setdefault((r["S"], r["N"], r["ml"], fam(r)), []).append(r["lh"])
@@ -71,14 +71,14 @@ class Payoffs:
     def bucket(self, M, first):
         return "first" if first else M
 
-    def sample(self, rng, S, N, ml, M, first):
+    def sample(self, rng, S, N, ml, M, first, laser=None, off=False):
         key = self.bucket(M, first)
         ratio_note = None
         pool = self.recs.get((S, N, ml), [])
         scale = 1.0
-        if len(pool) < 6:
+        if len(pool) < 20:
             pool = [r for r in self.by_sN.get((S, N), [])]
-        if len(pool) < 6:                                   # no data for this Marches count: reference N, lab shape
+        if len(pool) < 20:                                   # no data for this Marches count: reference N, lab shape
             ref = 3 if (S, 3) in self.by_sN and len(self.by_sN[(S, 3)]) >= 6 else 2
             if S == "B":
                 ref = 2 if N <= 2 else 3
@@ -90,6 +90,12 @@ class Payoffs:
             elif S == "B":
                 scale = {1: 0.5, 2: 1.0, 3: 1.55}.get(min(N, 3), 1.0) / {1: 0.5, 2: 1.0, 3: 1.55}[ref]
             self.note.add((S, N, ml))
+        if laser is not None and S != "B":
+            lp = [r for r in pool if (r["L"] > 0) == laser]
+            if len(lp) >= 25:
+                pool = lp
+            elif not laser:                                  # no L==0 records for this cell: drop the Laser's share
+                scale *= 0.88
         same = [r for r in pool if (r["first"] if key == "first" else (not r["first"] and r["M"] == key))]
         if S != "B" and len(same) >= 12:
             r = rng.choice(same)
@@ -101,8 +107,11 @@ class Payoffs:
                 fm = self.fM[S]
                 pool_f = sum(fm["first"] if p["first"] else fm[p["M"]] for p in pool[:200]) / min(len(pool), 200)
                 scale *= fm[key] / pool_f
+        if off:                                              # a Marches count the bot does not use: payoff uncertainty knob
+            scale *= 1.0 + self.P.get("_off_delta", 0.0)
+        gscale = self.P.get("_gold_scale", 1.0)
         lh = lh * scale
-        g = g * scale
+        g = g * scale * gscale
         k = int(lh)
         lh = k + (1 if rng.random() < lh - k else 0)
         return {"lh": lh, "gold": g, "L": r["L"], "tail": r["tail"] if r["tail"] is not None else 2.0, "walk": r["walk"],
@@ -301,16 +310,17 @@ class Sim:
     def wave_at(self, t):
         j = int((t - 14) // 30)
         tau = t - (30 * j + 14)
-        if tau >= 26 or j < 0:
+        if tau >= 24.5 or j < 0:
             return None
         w = self.waves.get(j)
         if w is None:
-            q = self.P.get("wave_visible_p", 0.75)
+            q = self.P.get("wave_visible_p", 0.7)
             w = self.waves[j] = {"vis": self.rng.random() < q, "n0": self.rng.choice([6, 7, 7, 8]), "used": False,
-                                 "noise": self.rng.gauss(0, 0.6)}
-        if not w["vis"] or w["used"]:
+                                 "noise": self.rng.gauss(0, 0.6), "arr": self.rng.uniform(14.5, 19.5) - 14,
+                                 "floor": self.rng.choice([3, 3, 4, 4, 5])}
+        if not w["vis"] or w["used"] or tau < w["arr"]:
             return None
-        n = max(3, round(w["n0"] - 0.27 * tau + w["noise"]))
+        n = max(w["floor"], round(w["n0"] - 0.27 * tau + w["noise"]))
         return {"n": n, "j": j}
 
     # ------------------------------------------------------------------ movement and trips
@@ -390,7 +400,9 @@ class Sim:
         if S == "B" and wave is None:
             pay = {"lh": 0, "gold": 0.0, "L": 0, "tail": 1.0, "walk": walk}
         else:
-            pay = self.pay.sample(rng, S, max(marches, 1), self.march_lvl(), M if M is not None else 2, first)
+            base_n = 2 if S == "B" else LAB_PLAN[self.march_lvl()].get(S, (3,))[0]
+            pay = self.pay.sample(rng, S, max(marches, 1), self.march_lvl(), M if M is not None else 2, first, plan.get("laser"),
+                                  off=(plan["N"] != base_n))
             if marches == 0:
                 pay = {"lh": 0, "gold": 0.0, "L": 0, "tail": 1.0, "walk": walk}
         # laser attempts: the sampled record's attempts, each spends mana only if the creep takes it

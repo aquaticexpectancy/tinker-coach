@@ -47,6 +47,12 @@ SETUPS["pull_10x"] = SETUPS["lab_10x"] + ["--stand-pull", "350"]   # stand 350 c
 SETUPS["boxes_10x"] = SETUPS["lab_10x"] + ["--real-camps"]   # camps from the map's spawn boxes (A, E: 2 each)
 SETUPS["af300_10x"] = SETUPS["lab_10x"] + ["--a-face", "300"]   # A lab 10-02: facing 300 beat 325 by ~10 points
 SETUPS["af0_10x"] = SETUPS["lab_10x"] + ["--a-face", "0"]       # ... and so did 0
+for _n, _v in (("1", "A=1,C=1,D=1,E=1,B=1"), ("2", "A=2,C=2,D=2,E=2,B=2"), ("3", "A=3,C=3,D=3,E=3,B=3"), ("4", "A=4,C=4,D=4,E=4,B=3")):
+    SETUPS["force%s_10x" % _n] = SETUPS["lab_10x"] + ["--force-n", _v]    # exactly N Marches everywhere: payoff by March count (sim/)
+SETUPS["wave3_10x"] = SETUPS["lab_10x"] + ["--force-n", "B=3"]      # sim/ Step 5: 3 Marches at the mid wave (everything else = lab_10x)
+SETUPS["combo_10x"] = SETUPS["lab_10x"] + ["--force-n", "B=3", "--n-plan", "4:D=2", "--leave-mana", "360", "--cycle", "ABDBCB"]   # sim/ best combination
+SETUPS["sweep1_10x"] = SETUPS["combo_10x"] + ["--sweep", "1"]    # combo + pre-cast 1 March where the mid waves meet, leave at once
+SETUPS["sweep2_10x"] = SETUPS["combo_10x"] + ["--sweep", "2"]    # ... 2 Marches (Rearm between)
 SETUPS["probe_10x"] = SETUPS["lab_10x"] + ["--probe"]           # lab_10x + the game's own mana regen / costs in every snapshot (sim/)
 COMMON = ["--drill", "--speed", "2", "--no-video", "--no-hud"]   # follow a batch with lab_hud.py
 TIMEOUT = 15 * 60                           # a run is ~4-5 min; anything past this is stuck

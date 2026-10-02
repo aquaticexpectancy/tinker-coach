@@ -1976,6 +1976,12 @@ function TinkerBot:Landed(t, now)
 		self.asked_station = false
 		self:SetPhase("fountain")
 	else
+		if CFG.cycle then                                                  -- the cycle moves on to the station just visited
+			for k = 1, #CFG.cycle do
+				local idx = ((self.cycle_i or 0) + k - 1) % #CFG.cycle + 1
+				if CFG.cycle:sub(idx, idx) == st then self.cycle_i = idx; break end
+			end
+		end
 		self.trip = {station = st, start = t, lh0 = PlayerResource:GetLastHits(self.pid), marches = 0, lasers = 0,
 			plan = {}, i = 1, landed_at = now}
 		for tok in CFG.stations[st].plan:gmatch("%S+") do table.insert(self.trip.plan, tok) end
@@ -1989,12 +1995,39 @@ function TinkerBot:Landed(t, now)
 			-- and A visits/LH split the best games from the worst. Test: a set March count at A.
 			if CFG.a_marches and st == "A" and lvl >= 4 then n = CFG.a_marches end
 			if CFG.min_marches then n = math.max(n, CFG.min_marches) end   -- brute force: at least this many (mana allowing)
+			if CFG.force_n and CFG.force_n[st] then n = CFG.force_n[st] end -- --force-n: exactly this many (sim/ payoff measurement)
+			-- --n-plan / --laser-plan: March count and closing Laser per station and March level (sim/ search)
+			local pk = lvl >= 4 and 4 or 3
+			if CFG.n_plan and CFG.n_plan[pk] and CFG.n_plan[pk][st] then n = CFG.n_plan[pk][st] end
+			local lz = lab and lab.laser or nil
+			if CFG.laser_plan and CFG.laser_plan[pk] and CFG.laser_plan[pk][st] ~= nil then
+				lz = CFG.laser_plan[pk][st] == 1 and ((lab and lab.laser) or (st == "C" and "ancient" or "most_hp")) or nil
+			end
 			self.trip.plan = {"walk", "M"}
 			for _ = 2, n do table.insert(self.trip.plan, "b"); table.insert(self.trip.plan, "R"); table.insert(self.trip.plan, "M") end
-			if lab and lab.laser then table.insert(self.trip.plan, "L"); self.trip.lab_laser = lab.laser end
+			if lz then table.insert(self.trip.plan, "L"); self.trip.lab_laser = lz end
+		end
+		if st == "B" and CFG.force_n and CFG.force_n.B then              -- --force-n B=N: exactly N Marches at the wave
+			self.trip.forced = true
+			self.trip.plan = {"walk", "M"}
+			for _ = 2, CFG.force_n.B do table.insert(self.trip.plan, "b"); table.insert(self.trip.plan, "R"); table.insert(self.trip.plan, "M") end
 		end
 		if st == "B" and CFG.wave_laser ~= false then                          -- Laser while the robots work
 			for j, tok in ipairs(self.trip.plan) do if tok == "M" then table.insert(self.trip.plan, j + 1, "L") break end end
+		end
+		if st == "B" and CFG.sweep and not self:MidWave() then
+			-- --sweep N: nothing in reach yet and the wave is about to meet: N Marches where it meets, then leave
+			-- (no Laser, no waiting for the robots: their kills count from anywhere)
+			local ph = t % 30
+			if ph >= CFG.sweep.lo - CFG.sweep.wait - 1 and ph <= CFG.sweep.hi + 3 then
+				self.trip.sweep, self.trip.forced = true, nil
+				self.trip.plan = {"walk", "S", "b"}
+				for _ = 2, CFG.sweep.n do
+					table.insert(self.trip.plan, "RS"); table.insert(self.trip.plan, "S"); table.insert(self.trip.plan, "b")
+				end
+				table.insert(self.trip.plan, "K")
+				self:Log("sweep", {step = "trip", phase = math.floor(ph * 10) / 10, marches = CFG.sweep.n})
+			end
 		end
 		-- farm + stack: any C visit 7:15-9:00 can stay for the pull, not only the forced one (validation 10-02: the
 		-- forced pick needs a decision at :18-:34 and two games never had one)
@@ -2082,7 +2115,7 @@ function TinkerBot:Book(prev)
 		self.leftover[prev.station] = {n = left, minute = self:Minute()}
 	end
 	self:Log("trip", {station = prev.station, seconds = math.floor(prev.stop - prev.start), last_hits = prev.lh,
-		marches = prev.marches, lasers = prev.lasers, creeps_left = left})
+		marches = prev.marches, lasers = prev.lasers, creeps_left = left, sweep = prev.sweep})
 end
 
 -- ------------------------------------------------------------------ fountain: Bottle, Rearm, Bottle, Keen
@@ -2110,6 +2143,20 @@ function TinkerBot:Fountain(t, now)
 	-- leave when the whole trip's mana is there: the Keen out (the channel in fountain refills only ~15) + the plan
 	-- your 7 s / Immortal 7.5 s rule: leave at once with the whole trip's mana, else at 7.5 s if two Marches'
 	-- worth is there (Keen out + M + R + M + Keen home), else wait up to 11 s
+	if CFG.leave_mana then                                         -- --leave-mana X: leave once the Rearm is done and the mana is X
+		local leave_at = CFG.leave_mana
+		if st == "B" and CFG.sweep then
+			-- --sweep N: the whole sweep's mana (Keen out, N Marches, the Rearms between and to leave, Keen home)
+			local smc, src, skc = self:Costs()
+			local n = CFG.sweep.n
+			leave_at = math.max(leave_at, skc + n * smc + n * src + skc + self:Reserve() - self:BottleCharges() * 60)
+		end
+		if (dwell >= 3.5 and h:GetMana() >= leave_at) or h:GetMana() >= h:GetMaxMana() * 0.97 or dwell >= (CFG.leave_cap or 15) then
+			self.go_to = st
+			self:SetPhase("go_station")
+		end
+		return
+	end
 	local mc, rc, kc = self:Costs()
 	local have = h:GetMana() - kc + self:BottleCharges() * 60      -- (the refill during the Keen channel is too unreliable to count on)
 	local two = 2 * mc + rc + kc + self:Reserve()        -- same rule the camp uses for the 2nd March
@@ -2222,6 +2269,22 @@ function TinkerBot:StationRate(st, t, arrive, wave)
 	return math.min(g[1] + g[2] * n, 35 * n) / g[3]                      -- no more than ~35 gold a creep
 end
 
+-- --sweep N: the mid waves meet at ~:19 and ~:49 (80 games 10-02: the enemy front is at lane coordinate +180 at
+-- phase 17 and stalls at -200..-500 from phase 19). When the Keen would land shortly before that (phase lo..hi),
+-- the wave counts as up although nothing is in reach yet: land, March where it is about to meet, leave at once.
+-- Second value: a few seconds too early from the fountain -> wait there for it.
+function TinkerBot:SweepDue(t, in_f)
+	local S = CFG.sweep
+	if not S then return nil, false end
+	if not in_f then
+		local mc, rc, kc = self:Costs()
+		if self.hero:GetMana() + self:BottleCharges() * 60 < kc + mc + rc + kc + self:Reserve() then return nil, false end
+	end
+	local land = (t + (in_f and S.arrive_f or S.arrive)) % 30
+	if land >= S.lo and land <= S.hi then return {n = 4, sweep = true}, false end
+	return nil, land >= S.lo - S.wait and land < S.lo
+end
+
 -- options = every station that pays something; pick = the best gold per second, or wait in fountain when nothing
 -- beats ~2.5/s (4.5/s when the :00 spawn is under 15 s away: waiting for it pays more)
 function TinkerBot:RateRoute(t, wave, here, in_f)
@@ -2235,20 +2298,42 @@ function TinkerBot:RateRoute(t, wave, here, in_f)
 	for _, c in ipairs(self.camps or {}) do if c.n == 0 and not c.stuck then spawning = true end end
 	local bar = not spawning and 0.5 or (60 - t % 60 <= 15) and 4.5 or 2.5
 	local options, pick, best, rates = {}, "F", bar, {}
+	local sweep, sweep_soon = nil, false
+	if CFG.sweep and not wave and here ~= "B" and last ~= "B" then sweep, sweep_soon = self:SweepDue(t, in_f) end
+	local bw = wave or sweep                                               -- a wave in reach, or one about to meet (--sweep)
 	for _, s in ipairs({"A", "C", "D", "E", "B"}) do
 		local ok = s ~= here and (in_f or h:GetMana() + self:BottleCharges() * 60 >= self:PlanNeed(s))
 		if s == "C" and march < 4 then ok = false end
 		-- two waves in a row only for a fresh wave of 4+: the mid wave pays the most (7.1 gold/s, 42.8 a kill vs
 		-- 20.7-31.2 at camps, 1,169 bot trips); the Immortal "never two in a row" kept the bot on cheap A/D kills
-		if s == "B" and (not wave or last == "B" and wave.n < 4) then ok = false end
+		if s == "B" and (not bw or last == "B" and bw.n < 4) then ok = false end
 		-- your rule: never the same place twice in a row; more Marches on the visit instead (6:30 test: D then D)
 		if CFG.no_repeat and s == last then ok = false end
 		if ok then
-			local r = self:StationRate(s, t, arrive, wave)
+			local r = self:StationRate(s, t, arrive, s == "B" and bw or wave)
 			rates[s] = math.floor(r * 10 + 0.5) / 10
 			if r > 0 then table.insert(options, s) end
 			if r > best then best, pick = r, s end
 		end
+	end
+	if CFG.cycle then                                                      -- --cycle ABCBDB: a fixed order, B only when a wave is up
+		local cyc, n = CFG.cycle, #CFG.cycle
+		pick, options = "F", {}
+		for k = 1, n do
+			local idx = ((self.cycle_i or 0) + k - 1) % n + 1
+			local s = cyc:sub(idx, idx)
+			local ok = s ~= last and s ~= here
+			if s == "B" and not bw then ok = false end
+			if s == "C" and march < 4 then ok = false end
+			if ok then pick = s; table.insert(options, s); break end
+		end
+	end
+	if sweep then                                                          -- --sweep: the wave comes first, whatever the order says
+		pick, options = "B", {"B"}
+		rates.sweep = 1
+	elseif sweep_soon and in_f then                                        -- a few seconds early: wait in fountain for it
+		pick, options = "F", {}
+		rates.sweep_wait = 1
 	end
 	table.insert(options, "F")
 	return options, pick, rates
@@ -2643,7 +2728,7 @@ end
 function TinkerBot:Trip(t, now)
 	local tr = self.trip
 	-- fixed March counts at camps (your rules): no Immortal-threshold / dead-March / survivor skips there
-	local fixed = CFG.fixed_marches and tr.station ~= "B"
+	local fixed = CFG.fixed_marches and (tr.station ~= "B" or tr.forced)
 	local h = self.hero
 	-- trip trace (logging only, like the lab): every neutral near Tinker every 0.5 s, to see why creeps survive
 	if tr.station ~= "B" and now - (tr.traced or 0) >= 0.5 then
@@ -2707,7 +2792,8 @@ function TinkerBot:Trip(t, now)
 			end
 		end
 		if tr.station == "B" then
-			if centre then spot = centre + (self.fountain - centre):Normalized() * 350 else spot = nil end
+			if tr.sweep then spot = vec(CFG.sweep.stand)                     -- just short of where the waves meet
+			elseif centre then spot = centre + (self.fountain - centre):Normalized() * 350 else spot = nil end
 		end
 		local close = centre and dist2(p, centre) < 450
 		if spot == nil then
@@ -3024,10 +3110,79 @@ function TinkerBot:Trip(t, now)
 		tr.issued = now
 		return self:MarchDir(tr.future_dir, "next wave, before it arrives")
 	end
+	if tok == "S" then                                                     -- --sweep: March where the wave is about to meet
+		if tr.issued then
+			if not march:IsCooldownReady() or now - tr.issued > 1.5 then tr.marches = tr.marches + 1; return nxt() end
+			return
+		end
+		if not self:Ready(march) then return nxt() end
+		local near, ph = 0, t % 30
+		for _, u in ipairs(targets) do if dist2(p, u:GetAbsOrigin()) <= CFG.sweep.range then near = near + 1 end end
+		local held = now - tr.landed_at
+		-- the first March waits for the wave to come into the robots' reach, or casts blind once it should be there
+		if tr.marches == 0 and near < 2 and held < CFG.sweep.hold and not (ph >= CFG.sweep.blind and ph < CFG.sweep.blind + 8) then
+			if not tr.hold_logged then
+				tr.hold_logged = true
+				self:Log("sweep", {step = "hold", phase = math.floor(ph * 10) / 10, creeps = #targets})
+			end
+			return
+		end
+		local dir = centre and (centre - p) or Vector(1, 1, 0)
+		dir.z = 0
+		if dir:Length2D() < 1 then dir = Vector(1, 1, 0) end
+		tr.issued = now
+		self:Log("sweep", {step = "march", phase = math.floor(ph * 10) / 10, creeps = #targets, near = near,
+			held = math.floor(held * 10) / 10})
+		return self:MarchDir(dir:Normalized(), "sweep: the wave is about to meet")
+	end
+	if tok == "RS" then                                                    -- --sweep 2+: Rearm for the next sweep March
+		if tr.issued then
+			if now - tr.issued >= 0.25 and not h:IsChanneling() then return nxt() end
+			return
+		end
+		if self:Ready(march) then return nxt() end
+		-- this Rearm + the March + the Rearm and Keen to leave
+		if h:GetMana() < rc or h:GetMana() + self:BottleCharges() * 60 < rc + mc + rc + kc + self:Reserve() then
+			self:Log("plan_end", {why = "mana", mana = math.floor(h:GetMana()), sweep = true})
+			tr.i = #tr.plan                                                   -- straight to the K
+			tr.issued = nil
+			return
+		end
+		if not rearm:IsCooldownReady() then return end                        -- Rearm has a 5.5 s cooldown in 7.41
+		tr.issued = now
+		self:CastNo(rearm)
+		self:Log("cast", {ability = "rearm", why = "sweep: refresh March"})
+		return
+	end
 	if tok == "K" then
 		return self:LeaveDecision(t, now)
 	end
 	nxt()
+end
+
+-- --chain MARGIN: go straight to the next station when the mana covers (Rearm for March) + Keen out + its Marches and
+-- Rearms + Keen home + the reserve + MARGIN; Bottle charges count 60 each (what sim/search.py scored)
+function TinkerBot:PlannedMarches(st)
+	if st == "B" then return (CFG.force_n and CFG.force_n.B) or 2 end
+	local lvl = self:Ab("tinker_march_of_the_machines"):GetLevel()
+	local n = lvl >= 4 and (st == "C" and 3 or 2) or 3
+	local lab = CFG.lab_counts and LAB_PLAN[lvl >= 4 and 4 or 3][st]
+	if lab then n = lab.n end
+	if CFG.force_n and CFG.force_n[st] then n = CFG.force_n[st] end
+	local pk = lvl >= 4 and 4 or 3
+	if CFG.n_plan and CFG.n_plan[pk] and CFG.n_plan[pk][st] then n = CFG.n_plan[pk][st] end
+	return n
+end
+
+function TinkerBot:ChainOk(st)
+	local h = self.hero
+	local mc, rc, kc = self:Costs()
+	local n = self:PlannedMarches(st)
+	local march = self:Ab("tinker_march_of_the_machines")
+	local keen = self:Ab("tinker_keen_teleport")
+	local extra = (march:IsCooldownReady() and keen:IsCooldownReady()) and 0 or rc
+	local need = extra + kc + n * mc + (n - 1) * rc + kc + self:Reserve() - self:BottleCharges() * 60 + CFG.chain
+	return h:GetMana() >= need
 end
 
 function TinkerBot:PrefetchStation(t)
@@ -3040,7 +3195,7 @@ function TinkerBot:PrefetchStation(t)
 	local facts, wave = self:StationFacts(t, arrive)
 	local rules = self:StationRules(t, wave, arrive)
 	local options = {"F"}
-	local full = arrive >= 0.9 * h:GetMaxMana()                                -- Immortals go home between trips
+	local full = CFG.chain ~= nil or arrive >= 0.9 * h:GetMaxMana()            -- Immortals go home between trips (--chain: judge by the next trip)
 	for _, st in ipairs({"A", "C", "D", "E"}) do
 		if full and st ~= tr.station and self:CampReady(st) and arrive >= self:PlanNeed(st) then table.insert(options, st) end
 	end
@@ -3048,6 +3203,7 @@ function TinkerBot:PrefetchStation(t)
 	if not contains(options, rules) then rules = "F" end
 	if CFG.router == "rate" and not (wave and wave.threat) then
 		if full then options, rules = self:RateRoute(t, wave, tr.station, false) else options, rules = {"F"}, "F" end
+		if CFG.chain ~= nil and rules ~= "F" and not self:ChainOk(rules) then options, rules = {"F"}, "F" end
 	end
 	self:Decide("station", facts, options, rules, function(pick, src)
 		if CFG.station_by_rules and pick ~= rules then src = "rules (jev shadow: " .. pick .. ")"; pick = rules end
@@ -3193,7 +3349,11 @@ function TinkerBot:LeaveDecision(t, now)
 	if pf and now - pf.at < 12 then                                              -- decided while the robots worked
 		self.trip.prefetch = nil
 		local _, _, kc = self:Costs()
-		if pf.pick ~= "F" and h:GetMana() + self:BottleCharges() * 60 - kc < self:PlanNeed(pf.pick) then
+		if CFG.chain ~= nil and pf.pick ~= "F" and not self:ChainOk(pf.pick) then
+			self:Log("decision", {what = "station", pick = "F", rules = "F", src = "mana_check", was = pf.pick})
+			return self:SetPhase("go_home")
+		end
+		if CFG.chain == nil and pf.pick ~= "F" and h:GetMana() + self:BottleCharges() * 60 - kc < self:PlanNeed(pf.pick) then
 			self:Log("decision", {what = "station", pick = "F", rules = "F", src = "mana_check", was = pf.pick})
 			return self:SetPhase("go_home")                                       -- Lasers since then spent the mana
 		end
